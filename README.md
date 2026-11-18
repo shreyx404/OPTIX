@@ -18,6 +18,7 @@
 | [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md) | WCAG 2.3.1 strobe safety gate, optical safety, HTTPS mic policy, and XSS/CORS boundaries |
 | [CHANGELOG.md](CHANGELOG.md) | Release history from v1.0 POC through v4.0.2 Quiet Minimal redesign |
 | [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) | ESP32 wiring schematics, MOSFET driver circuit, flashing, and standalone SoftAP operation |
+| [Copy of Presentation.pptx](Copy%20of%20Presentation.pptx) | 8-slide project presentation deck (abstract, program flow, syllabus/beyond-syllabus topics, live UI outputs, and Phase 2 roadmap; student info blank) |
 
 ---
 
@@ -86,7 +87,8 @@ OPTIX/
 ├── ARCHITECTURE.md                   # System & software architecture reference
 ├── PROTOCOL.md                       # Optical timing, compression & hardware wire protocol spec
 ├── SECURITY_AND_SAFETY.md            # Photosensitive strobe safety, optical & transport security
-└── CHANGELOG.md                      # Version history
+├── CHANGELOG.md                      # Version history
+└── Copy of Presentation.pptx         # 8-slide OPTIX project presentation deck (student details blank)
 ```
 
 ---

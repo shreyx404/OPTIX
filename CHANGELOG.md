@@ -32,8 +32,9 @@ All notable changes to the **OPTIX Adaptive Semantic Optical Morse Communication
 - **Accessibility & Ergonomics**: Added `.skip-link`, consolidated into a single `<main>` landmark with WAI-ARIA `tablist`/`tab`/`tabpanel` + arrow-key navigation, restored `:focus-visible` rings on range sliders/inputs/selects, added `Space`/`Enter` keying on `#tapperKey`, `Ctrl/Cmd+Enter` IME-safe transmit, global `Esc` abort, keyboard oscilloscope pulse scrubbing, stacked accessible `#toastRegion` (`role="alert"`/`role="status"`), Manual Key `Backspace` + clickable `A–Z · 0–9` Morse reference chart, `localStorage` persistence of calibrated operator settings (`optix_wpm`, `optix_pitch`, `optix_repeat`, `optix_sound`), and `navigator.onLine` voice status.
 - **Performance**: Replaced static `torchDigitalTwin.js` import with lazy dynamic `import()` (`-711 KB` initial startup savings), cached oscilloscope dimensions via `ResizeObserver` + hoisted pulse gradients (eliminating 60fps `getBoundingClientRect()` layout thrashing), and switched pulse scheduling to `performance.now()` drift-compensated monotonic timing.
 
-### Added — System Documentation
+### Added — System Documentation & Project Presentation
 - Created [ARCHITECTURE.md](ARCHITECTURE.md), [PROTOCOL.md](PROTOCOL.md), [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md), and [CHANGELOG.md](CHANGELOG.md); updated [README.md](README.md), [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md).
+- Completed the 8-slide institutional project presentation deck ([Copy of Presentation.pptx](Copy%20of%20Presentation.pptx)) with OPTIX Abstract & KPIs, an editable native-vector Flow of Program pipeline diagram, Syllabus vs. Out-of-Syllabus technical breakdowns, live captured console outputs (`01. Transmit`, `03. Beacon`, `06. 3D Torch` X-Ray Digital Twin), and Phase 1 → Phase 2 (`OPTIX-MK2`) Conclusion roadmap, leaving student roster and guide fields blank for manual entry.
 
 ---
 
