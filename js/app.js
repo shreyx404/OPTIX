@@ -19,6 +19,7 @@ import { sidetone } from './audioSidetone.js';
 import { opticalTransmitter } from './opticalTransmitter.js';
 import { speechHandler } from './speechHandler.js';
 import { esp32Service } from './esp32Service.js';
+import { torchDigitalTwin, TORCH_SUBSYSTEMS } from './torchDigitalTwin.js';
 
 // DOM Element cache
 const el = {};
@@ -27,7 +28,9 @@ const el = {};
 const state = {
   currentInputMode: 'text', // 'text' | 'voice' | 'manual'
   rawText: '',
+  encodedText: 'SOS',
   morseOutput: '',
+  compressionSavings: 0,
   wpm: 15,
   unitMs: 80,
   adaptiveSemanticEnabled: true,
@@ -89,6 +92,33 @@ function initDOMElements() {
   el.fullscreenToggle = document.getElementById('fullscreenToggle');
   el.torchToggle = document.getElementById('torchToggle');
   el.soundToggle = document.getElementById('soundToggle');
+  el.beaconTransmitBtn = document.getElementById('beaconTransmitBtn');
+  el.beaconQuickInput = document.getElementById('beaconQuickInput');
+  el.beaconPayloadTag = document.getElementById('beaconPayloadTag');
+  el.beaconSosBtn = document.getElementById('beaconSosBtn');
+  el.beaconEsp32Btn = document.getElementById('beaconEsp32Btn');
+  el.beaconMorseReadout = document.getElementById('beaconMorseReadout');
+  el.beaconStateDot = document.getElementById('beaconStateDot');
+  el.beaconStateLabel = document.getElementById('beaconStateLabel');
+  el.beaconCycleBadge = document.getElementById('beaconCycleBadge');
+  el.beaconTelemSpeed = document.getElementById('beaconTelemSpeed');
+  el.beaconTelemElapsed = document.getElementById('beaconTelemElapsed');
+  el.beaconTelemDuty = document.getElementById('beaconTelemDuty');
+  el.beaconTelemPulses = document.getElementById('beaconTelemPulses');
+  el.waveformVoltageBadge = document.getElementById('waveformVoltageBadge');
+  el.beaconProgressPct = document.getElementById('beaconProgressPct');
+  el.beaconProgressBar = document.getElementById('beaconProgressBar');
+  el.beaconWpmSlider = document.getElementById('beaconWpmSlider');
+  el.beaconWpmVal = document.getElementById('beaconWpmVal');
+  el.beaconRepeatBtns = document.querySelectorAll('.beacon-repeat-btn');
+  el.torchSubLabel = document.getElementById('torchSubLabel');
+  el.soundSubLabel = document.getElementById('soundSubLabel');
+  el.fsBeaconPayload = document.getElementById('fsBeaconPayload');
+  el.fsBeaconMorse = document.getElementById('fsBeaconMorse');
+  el.fsBeaconControls = document.getElementById('fsBeaconControls');
+  el.fsBeaconPlayBtn = document.getElementById('fsBeaconPlayBtn');
+  el.fsBeaconLoopBtn = document.getElementById('fsBeaconLoopBtn');
+  el.fsBeaconExitBtn = document.getElementById('fsBeaconExitBtn');
 
   // Settings
   el.wpmSlider = document.getElementById('wpmSlider');
@@ -114,11 +144,109 @@ function initDOMElements() {
   el.missionClockDisplay = document.getElementById('missionClockDisplay');
   el.charCounter = document.getElementById('charCounter');
 
-  // Initialize Optical Transmitter with DOM elements
+  // 3D Torch Digital Twin Elements
+  el.torchStageShell = document.getElementById('torchStageShell');
+  el.torchViewport = document.getElementById('torchViewport');
+  el.torchTransmitBtn = document.getElementById('torchTransmitBtn');
+  el.torchFullscreenBtn = document.getElementById('torchFullscreenBtn');
+  el.torchHudFullscreenBtn = document.getElementById('torchHudFullscreenBtn');
+  el.torchFsExitBtn = document.getElementById('torchFsExitBtn');
+  el.torchHudMode = document.getElementById('torchHudMode');
+  el.torchSyncDot = document.getElementById('torchSyncDot');
+  el.torchSyncStatus = document.getElementById('torchSyncStatus');
+  el.torchCamBtns = document.querySelectorAll('.torch-cam-btn[data-cam]');
+  el.torchModeBtns = document.querySelectorAll('.torch-mode-btn');
+  el.torchExplodeSlider = document.getElementById('torchExplodeSlider');
+  el.torchExplodeVal = document.getElementById('torchExplodeVal');
+  el.fsExplodeSlider = document.getElementById('fsExplodeSlider');
+  el.fsExplodeVal = document.getElementById('fsExplodeVal');
+  el.torchAutoRotateCheck = document.getElementById('torchAutoRotateCheck');
+  el.torchHwBtns = document.querySelectorAll('[data-hw-btn]');
+  el.torchModeBtnDesc = document.getElementById('torchModeBtnDesc');
+  el.fsModeBtn = document.getElementById('fsModeBtn');
+  el.torchPartChips = document.querySelectorAll('.torch-part-chip');
+  el.inspectorCategory = document.getElementById('inspectorCategory');
+  el.inspectorTitle = document.getElementById('inspectorTitle');
+  el.inspectorCost = document.getElementById('inspectorCost');
+  el.inspectorSummary = document.getElementById('inspectorSummary');
+  el.inspectorModel = document.getElementById('inspectorModel');
+  el.inspectorInterface = document.getElementById('inspectorInterface');
+  el.inspectorPower = document.getElementById('inspectorPower');
+  el.fsPartCategory = document.getElementById('fsPartCategory');
+  el.fsPartTitle = document.getElementById('fsPartTitle');
+  el.fsPartCost = document.getElementById('fsPartCost');
+  el.fsPartSpec = document.getElementById('fsPartSpec');
+
+  // Initialize Optical Transmitter with DOM elements + interactive waveform seek
   opticalTransmitter.init({
     beaconEl: el.beaconBulb,
     canvasEl: el.waveformCanvas,
-    fullscreenBeaconEl: el.fullscreenBeacon
+    fullscreenBeaconEl: el.fullscreenBeacon,
+    onSeek: (pulseIdx) => {
+      if (!state.morseOutput) return;
+      startLocalOpticalPlayback({ stayOnCurrentTab: true, startIndex: pulseIdx });
+    }
+  });
+
+  // Live Optical Sync: mirror every Morse dot/dash pulse onto the Beacon HUD & 3D Torch Twin
+  opticalTransmitter.addStateListener((isOn, meta = null) => {
+    // 1. Update Beacon Tab Live Telemetry HUD
+    if (el.beaconStateDot) {
+      el.beaconStateDot.classList.toggle('lit', isOn);
+      el.beaconStateDot.classList.toggle('tx-idle', !isOn && opticalTransmitter.isPlaying);
+    }
+
+    if (el.beaconStateLabel) {
+      el.beaconStateLabel.classList.toggle('lit', isOn);
+      if (meta && meta.manual && isOn) {
+        el.beaconStateLabel.textContent = 'MANUAL TEST · 3.3V HIGH';
+      } else if (isOn) {
+        const pulseName = meta && meta.type === 'dash' ? 'DASH (3T)' : 'DOT (1T)';
+        el.beaconStateLabel.textContent = `TX HIGH · ${pulseName}`;
+      } else if (meta && meta.type === 'cycleGap') {
+        el.beaconStateLabel.textContent = 'INTER-CYCLE PAUSE · 0.0V';
+      } else if (opticalTransmitter.isPlaying) {
+        const gapMap = { wordGap: 'WORD GAP (7T)', charGap: 'CHAR GAP (3T)', gap: 'GAP (1T)' };
+        const gapName = (meta && gapMap[meta.type]) || 'GAP';
+        el.beaconStateLabel.textContent = `TX LOW · ${gapName}`;
+      } else {
+        el.beaconStateLabel.textContent = 'STANDBY · 0.0V';
+      }
+    }
+
+    if (el.waveformVoltageBadge) {
+      el.waveformVoltageBadge.classList.toggle('high', isOn);
+      el.waveformVoltageBadge.textContent = isOn ? '3.3V HIGH' : '0.0V LOW';
+    }
+
+    if (el.beaconCycleBadge && meta && meta.cycle) {
+      if (meta.repeatCount >= 999) {
+        el.beaconCycleBadge.textContent = `LOOP #${meta.cycle}`;
+      } else if (meta.repeatCount > 1) {
+        el.beaconCycleBadge.textContent = `CYCLE ${meta.cycle} / ${meta.repeatCount}`;
+      } else {
+        el.beaconCycleBadge.textContent = 'TX ACTIVE · 1x';
+      }
+    } else if (el.beaconCycleBadge && !opticalTransmitter.isPlaying) {
+      el.beaconCycleBadge.textContent = formatRepeatLabel(state.repeatCount);
+    }
+
+    // 2. Mirror onto 3D Torch Twin
+    torchDigitalTwin.setOpticalPulse(isOn);
+    if (el.torchSyncDot) {
+      el.torchSyncDot.classList.toggle('lit', isOn || torchDigitalTwin.steadyBeamOn);
+    }
+    if (el.torchSyncStatus) {
+      if (isOn) {
+        el.torchSyncStatus.textContent = `TX HIGH · GPIO 18 · ${state.encodedText || 'MORSE'}`;
+      } else if (torchDigitalTwin.steadyBeamOn) {
+        el.torchSyncStatus.textContent = 'STEADY BEAM · 10W LED ON';
+      } else if (opticalTransmitter.isPlaying) {
+        el.torchSyncStatus.textContent = `TX LOW · GAP · ${state.wpm} WPM`;
+      } else {
+        el.torchSyncStatus.textContent = 'STANDBY · LIVE SYNC READY';
+      }
+    }
   });
 }
 
@@ -169,15 +297,10 @@ function initEventListeners() {
     });
   }
 
-  // Sliders
+  // Sliders (synced across Settings & Beacon Console)
   if (el.wpmSlider) {
     el.wpmSlider.addEventListener('input', (e) => {
-      const wpm = parseInt(e.target.value, 10);
-      state.wpm = wpm;
-      state.unitMs = wpmToUnitMs(wpm);
-      if (el.wpmValue) el.wpmValue.textContent = `${wpm} WPM`;
-      if (el.unitMsDisplay) el.unitMsDisplay.textContent = `${state.unitMs} ms / dot`;
-      updateCalculationsAndWaveform();
+      setWpm(parseInt(e.target.value, 10));
     });
   }
 
@@ -186,6 +309,7 @@ function initEventListeners() {
       const pitch = parseInt(e.target.value, 10);
       sidetone.setFrequency(pitch);
       if (el.pitchValue) el.pitchValue.textContent = `${pitch} Hz`;
+      if (el.soundSubLabel) el.soundSubLabel.textContent = `CW audio tone · ${pitch} Hz`;
     });
   }
 
@@ -193,12 +317,13 @@ function initEventListeners() {
     el.soundToggle.addEventListener('change', (e) => {
       state.audioSidetoneEnabled = e.target.checked;
       sidetone.setEnabled(e.target.checked);
+      opticalTransmitter.setLiveOptions({ enableSound: e.target.checked });
     });
   }
 
   if (el.repeatSelect) {
     el.repeatSelect.addEventListener('change', (e) => {
-      state.repeatCount = parseInt(e.target.value, 10);
+      setRepeatCount(parseInt(e.target.value, 10));
     });
   }
 
@@ -215,9 +340,9 @@ function initEventListeners() {
     });
   }
 
-  // Play Beacon locally on screen/torch
+  // Play Beacon locally on screen/torch (from Transmit tab)
   if (el.playBeaconBtn) {
-    el.playBeaconBtn.addEventListener('click', startLocalOpticalPlayback);
+    el.playBeaconBtn.addEventListener('click', () => startLocalOpticalPlayback());
   }
 
   // Transmit to ESP32 Hardware
@@ -237,12 +362,17 @@ function initEventListeners() {
         const ok = await opticalTransmitter.initTorch();
         if (!ok) {
           e.target.checked = false;
-          showToast('Camera flash torch not supported on this device/browser');
+          if (el.torchSubLabel) el.torchSubLabel.textContent = 'Unavailable on this device/browser';
+          showToast('Camera flash torch not supported on this device/browser', true);
         } else {
+          opticalTransmitter.setLiveOptions({ enableTorch: true });
+          if (el.torchSubLabel) el.torchSubLabel.textContent = 'Armed · Rear LED ready';
           showToast('Camera torch armed for optical transmission');
         }
       } else {
+        opticalTransmitter.setLiveOptions({ enableTorch: false });
         await opticalTransmitter.releaseTorch();
+        if (el.torchSubLabel) el.torchSubLabel.textContent = 'Physical LED strobe (mobile rear flash)';
       }
     });
   }
@@ -251,7 +381,11 @@ function initEventListeners() {
     el.fullscreenToggle.addEventListener('click', toggleFullscreenBeacon);
   }
   if (el.fullscreenBeacon) {
-    el.fullscreenBeacon.addEventListener('click', exitFullscreenBeacon);
+    el.fullscreenBeacon.addEventListener('click', (e) => {
+      if (e.target === el.fullscreenBeacon) {
+        exitFullscreenBeacon();
+      }
+    });
   }
 
   // Hardware configuration
@@ -326,7 +460,468 @@ function initEventListeners() {
 
   // Manual Tapper Key Handlers
   initManualTapper();
+  initBeaconConsoleControls();
+  initTorchDigitalTwinControls();
   renderPresets();
+}
+
+/**
+ * Shared Timing / Repeat Sync & Beacon Console Controls
+ */
+function formatRepeatLabel(count) {
+  if (count >= 999) return '∞ LOOP';
+  return `${count}x BURST`;
+}
+
+function setWpm(wpm) {
+  const safeWpm = Math.max(5, Math.min(40, Number(wpm) || 15));
+  state.wpm = safeWpm;
+  state.unitMs = wpmToUnitMs(safeWpm);
+
+  if (el.wpmSlider) el.wpmSlider.value = String(safeWpm);
+  if (el.wpmValue) el.wpmValue.textContent = `${safeWpm} WPM`;
+  if (el.unitMsDisplay) el.unitMsDisplay.textContent = `${state.unitMs} ms / dot`;
+
+  if (el.beaconWpmSlider) el.beaconWpmSlider.value = String(safeWpm);
+  if (el.beaconWpmVal) el.beaconWpmVal.textContent = `${safeWpm} WPM`;
+
+  updateCalculationsAndWaveform();
+}
+
+function setRepeatCount(count) {
+  const safeCount = Number(count) || 1;
+  state.repeatCount = safeCount;
+
+  if (el.repeatSelect) {
+    el.repeatSelect.value = String(safeCount);
+  }
+
+  if (el.beaconRepeatBtns) {
+    el.beaconRepeatBtns.forEach((btn) => {
+      const btnVal = parseInt(btn.getAttribute('data-repeat'), 10);
+      btn.classList.toggle('active', btnVal === safeCount);
+    });
+  }
+
+  if (el.beaconCycleBadge && !opticalTransmitter.isPlaying) {
+    el.beaconCycleBadge.textContent = formatRepeatLabel(safeCount);
+  }
+
+  if (el.fsBeaconLoopBtn) {
+    const isLoop = safeCount >= 999;
+    el.fsBeaconLoopBtn.textContent = isLoop ? 'Loop: ON' : 'Loop: OFF';
+    el.fsBeaconLoopBtn.classList.toggle('active', isLoop);
+  }
+
+  // Allow live update of repeat count even during active playback
+  if (opticalTransmitter.isPlaying) {
+    opticalTransmitter.repeatCount = safeCount;
+  }
+}
+
+function initBeaconConsoleControls() {
+  // Primary Transmit / Stop toggle button directly in Beacon tab
+  if (el.beaconTransmitBtn) {
+    el.beaconTransmitBtn.addEventListener('click', () => {
+      if (opticalTransmitter.isPlaying) {
+        stopAllTransmission();
+      } else {
+        startLocalOpticalPlayback({ stayOnCurrentTab: true });
+      }
+    });
+  }
+
+  // Inline Payload Input (1:1 synced with Transmit tab)
+  if (el.beaconQuickInput) {
+    el.beaconQuickInput.addEventListener('input', (e) => {
+      if (el.textInput) el.textInput.value = e.target.value;
+      handleTextInputChange(e.target.value, 'beacon');
+    });
+
+    el.beaconQuickInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        startLocalOpticalPlayback({ stayOnCurrentTab: true });
+      }
+    });
+  }
+
+  // Instant SOS Strobe Button
+  if (el.beaconSosBtn) {
+    el.beaconSosBtn.addEventListener('click', () => {
+      if (el.textInput) el.textInput.value = 'SOS';
+      if (el.beaconQuickInput) el.beaconQuickInput.value = 'SOS';
+      handleTextInputChange('SOS');
+      startLocalOpticalPlayback({ stayOnCurrentTab: true });
+      showToast('Emergency SOS optical beacon active');
+    });
+  }
+
+  // Dispatch directly to ESP32 from Beacon tab
+  if (el.beaconEsp32Btn) {
+    el.beaconEsp32Btn.addEventListener('click', () => {
+      startHardwareTransmission();
+    });
+  }
+
+  // Quick WPM Speed Slider on Beacon tab
+  if (el.beaconWpmSlider) {
+    el.beaconWpmSlider.addEventListener('input', (e) => {
+      setWpm(parseInt(e.target.value, 10));
+    });
+  }
+
+  // Repeat / Loop Pills on Beacon tab
+  if (el.beaconRepeatBtns) {
+    el.beaconRepeatBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = parseInt(btn.getAttribute('data-repeat'), 10);
+        setRepeatCount(val);
+      });
+    });
+  }
+
+  // Interactive Optical Emitter Bulb — press & hold for manual test flash
+  if (el.beaconBulb) {
+    let manualHolding = false;
+
+    const startManualFlash = (e) => {
+      if (e.type === 'keydown' && e.key !== ' ' && e.key !== 'Enter') return;
+      e.preventDefault();
+      if (manualHolding) return;
+      manualHolding = true;
+      opticalTransmitter.setManualPulse(true, {
+        enableTorch: Boolean(el.torchToggle && el.torchToggle.checked),
+        enableSound: state.audioSidetoneEnabled
+      });
+    };
+
+    const endManualFlash = () => {
+      if (!manualHolding) return;
+      manualHolding = false;
+      opticalTransmitter.setManualPulse(false);
+    };
+
+    el.beaconBulb.addEventListener('mousedown', startManualFlash);
+    el.beaconBulb.addEventListener('mouseup', endManualFlash);
+    el.beaconBulb.addEventListener('mouseleave', endManualFlash);
+    el.beaconBulb.addEventListener('touchstart', startManualFlash, { passive: false });
+    el.beaconBulb.addEventListener('touchend', endManualFlash);
+    el.beaconBulb.addEventListener('touchcancel', endManualFlash);
+    el.beaconBulb.addEventListener('keydown', startManualFlash);
+    el.beaconBulb.addEventListener('keyup', endManualFlash);
+    el.beaconBulb.addEventListener('blur', endManualFlash);
+  }
+
+  // Fullscreen Optical Strobe HUD Controls
+  if (el.fsBeaconControls) {
+    el.fsBeaconControls.addEventListener('click', (e) => e.stopPropagation());
+  }
+
+  if (el.fsBeaconPlayBtn) {
+    el.fsBeaconPlayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (opticalTransmitter.isPlaying) {
+        stopAllTransmission();
+      } else {
+        startLocalOpticalPlayback({ stayOnCurrentTab: true, forceFullscreenFlash: true });
+      }
+    });
+  }
+
+  if (el.fsBeaconLoopBtn) {
+    el.fsBeaconLoopBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const next = state.repeatCount >= 999 ? 1 : 999;
+      setRepeatCount(next);
+      showToast(next >= 999 ? 'Infinite optical loop enabled' : 'Single burst mode enabled');
+    });
+  }
+
+  if (el.fsBeaconExitBtn) {
+    el.fsBeaconExitBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exitFullscreenBeacon();
+    });
+  }
+
+  // ESC key closes fullscreen strobe cleanly
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && el.fullscreenBeacon && el.fullscreenBeacon.classList.contains('active')) {
+      exitFullscreenBeacon();
+    }
+  });
+
+  // Sync overlay if native fullscreen exited via browser controls
+  document.addEventListener('fullscreenchange', () => {
+    if (
+      el.fullscreenBeacon &&
+      el.fullscreenBeacon.classList.contains('active') &&
+      !document.fullscreenElement
+    ) {
+      el.fullscreenBeacon.classList.remove('active', 'active-screen', 'flash-on');
+      opticalTransmitter.setFullscreenFlash(false);
+    }
+  });
+}
+
+/**
+ * 3D Torch Digital Twin Controller & Live Sync
+ */
+function ensureTorchTwinInitialized() {
+  if (torchDigitalTwin.initialized || !el.torchViewport) return;
+
+  torchDigitalTwin.onExplodeSliderSync = (pct) => {
+    if (el.torchExplodeSlider) el.torchExplodeSlider.value = String(pct);
+    if (el.torchExplodeVal) el.torchExplodeVal.textContent = `${pct}%`;
+    if (el.fsExplodeSlider) el.fsExplodeSlider.value = String(pct);
+    if (el.fsExplodeVal) el.fsExplodeVal.textContent = `${pct}%`;
+  };
+
+  torchDigitalTwin.init(el.torchViewport, {
+    onPartSelected: (subsystem) => {
+      renderTorchInspector(subsystem);
+    },
+    onTorchButtonAction: (btnId) => {
+      handleTorchHardwareButton(btnId);
+    }
+  });
+
+  syncTorchTelemetry();
+}
+
+function isTorchFullscreen() {
+  return Boolean(
+    el.torchStageShell &&
+    (document.fullscreenElement === el.torchStageShell || el.torchStageShell.classList.contains('is-fullscreen'))
+  );
+}
+
+function toggleTorchFullscreen(forceState = null) {
+  if (!el.torchStageShell) return;
+  const shouldEnter = forceState !== null ? Boolean(forceState) : !isTorchFullscreen();
+
+  if (shouldEnter) {
+    el.torchStageShell.classList.add('is-fullscreen');
+    document.body.style.overflow = 'hidden';
+    if (el.torchStageShell.requestFullscreen) {
+      el.torchStageShell.requestFullscreen().catch(() => {
+        // Fallback CSS fullscreen already active
+      });
+    }
+  } else {
+    el.torchStageShell.classList.remove('is-fullscreen');
+    document.body.style.overflow = '';
+    if (document.fullscreenElement === el.torchStageShell && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  requestAnimationFrame(() => {
+    torchDigitalTwin.resize();
+    setTimeout(() => torchDigitalTwin.resize(), 120);
+  });
+}
+
+function initTorchDigitalTwinControls() {
+  // Transmit directly on 3D Torch (without leaving 3D Torch tab)
+  if (el.torchTransmitBtn) {
+    el.torchTransmitBtn.addEventListener('click', () => {
+      startTorchTwinTransmission();
+    });
+  }
+
+  // Fullscreen Toggle Buttons (Header, HUD Corner, Dock Exit)
+  if (el.torchFullscreenBtn) {
+    el.torchFullscreenBtn.addEventListener('click', () => toggleTorchFullscreen(true));
+  }
+  if (el.torchHudFullscreenBtn) {
+    el.torchHudFullscreenBtn.addEventListener('click', () => toggleTorchFullscreen());
+  }
+  if (el.torchFsExitBtn) {
+    el.torchFsExitBtn.addEventListener('click', () => toggleTorchFullscreen(false));
+  }
+
+  // Keep fallback state & WebGL aspect ratio synced when exiting native fullscreen (e.g., via ESC)
+  document.addEventListener('fullscreenchange', () => {
+    if (!el.torchStageShell) return;
+    const active = document.fullscreenElement === el.torchStageShell;
+    if (!active && el.torchStageShell.classList.contains('is-fullscreen')) {
+      el.torchStageShell.classList.remove('is-fullscreen');
+      document.body.style.overflow = '';
+    }
+    requestAnimationFrame(() => {
+      torchDigitalTwin.resize();
+      setTimeout(() => torchDigitalTwin.resize(), 100);
+    });
+  });
+
+  // ESC key closes CSS-fallback fullscreen as well
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isTorchFullscreen()) {
+      toggleTorchFullscreen(false);
+    }
+  });
+
+  // Camera Presets
+  el.torchCamBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const preset = btn.getAttribute('data-cam');
+      el.torchCamBtns.forEach((b) => b.classList.toggle('active', b === btn));
+      if (el.torchAutoRotateCheck) el.torchAutoRotateCheck.checked = false;
+      torchDigitalTwin.setCameraPreset(preset);
+    });
+  });
+
+  // Enclosure View Modes (Assembled / X-Ray / Exploded — synced across inline + fullscreen dock)
+  const modeLabels = {
+    assembled: 'ASSEMBLED SHELL',
+    xray: 'X-RAY CUTAWAY',
+    exploded: 'EXPLODED ASSEMBLY'
+  };
+
+  el.torchModeBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const view = btn.getAttribute('data-view');
+      el.torchModeBtns.forEach((b) => b.classList.toggle('active', b.getAttribute('data-view') === view));
+      if (el.torchHudMode) el.torchHudMode.textContent = modeLabels[view] || view.toUpperCase();
+      torchDigitalTwin.applyViewMode(view, true);
+    });
+  });
+
+  // Continuous Explode Sliders (inline + fullscreen dock kept in 1:1 sync)
+  const handleExplodeInput = (rawVal) => {
+    const pct = parseInt(rawVal, 10) || 0;
+    if (el.torchExplodeSlider) el.torchExplodeSlider.value = String(pct);
+    if (el.torchExplodeVal) el.torchExplodeVal.textContent = `${pct}%`;
+    if (el.fsExplodeSlider) el.fsExplodeSlider.value = String(pct);
+    if (el.fsExplodeVal) el.fsExplodeVal.textContent = `${pct}%`;
+    torchDigitalTwin.setExplodeAmount(pct / 100);
+    if (el.torchHudMode) {
+      el.torchHudMode.textContent = pct > 5 ? `EXPLODED ${pct}%` : (torchDigitalTwin.viewMode === 'xray' ? 'X-RAY CUTAWAY' : 'ASSEMBLED SHELL');
+    }
+  };
+
+  if (el.torchExplodeSlider) {
+    el.torchExplodeSlider.addEventListener('input', (e) => handleExplodeInput(e.target.value));
+  }
+  if (el.fsExplodeSlider) {
+    el.fsExplodeSlider.addEventListener('input', (e) => handleExplodeInput(e.target.value));
+  }
+
+  // Auto-Orbit Toggle
+  if (el.torchAutoRotateCheck) {
+    el.torchAutoRotateCheck.addEventListener('change', (e) => {
+      torchDigitalTwin.setAutoRotate(e.target.checked);
+    });
+  }
+
+  // 4 Physical Hardware Button Triggers (both inline deck and fullscreen dock)
+  el.torchHwBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const hwId = btn.getAttribute('data-hw-btn');
+      torchDigitalTwin.triggerButtonPressAnim(hwId);
+      handleTorchHardwareButton(hwId);
+    });
+  });
+
+  // Subsystem Chips
+  el.torchPartChips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const partId = chip.getAttribute('data-part');
+      torchDigitalTwin.selectSubsystem(partId);
+      renderTorchInspector(TORCH_SUBSYSTEMS[partId] || TORCH_SUBSYSTEMS.overview);
+    });
+  });
+}
+
+function handleTorchHardwareButton(btnId) {
+  if (btnId === 'ptt') {
+    toggleVoiceRecognition();
+    showToast('BTN 1 (PTT): Voice AI Dictation toggled');
+  } else if (btnId === 'tx') {
+    startTorchTwinTransmission();
+  } else if (btnId === 'sos') {
+    if (el.textInput) el.textInput.value = 'SOS';
+    handleTextInputChange('SOS');
+    torchDigitalTwin.syncTelemetry({ mode: 'SOS OVERRIDE' });
+    startTorchTwinTransmission('SOS OVERRIDE');
+    showToast('BTN 3 (SOS): Hardware Emergency Distress Beacon Active');
+  } else if (btnId === 'mode') {
+    const isSteady = torchDigitalTwin.toggleSteadyBeam();
+    if (el.torchModeBtnDesc) {
+      el.torchModeBtnDesc.textContent = isSteady ? 'Steady Beam: ON' : 'Steady Beam: OFF';
+    }
+    const modeBtn = document.getElementById('torchHwModeBtn');
+    if (modeBtn) modeBtn.classList.toggle('active', isSteady);
+    if (el.fsModeBtn) {
+      el.fsModeBtn.classList.toggle('active', isSteady);
+      el.fsModeBtn.textContent = isSteady ? 'Beam: ON' : 'Steady Beam';
+    }
+    if (el.torchSyncDot) el.torchSyncDot.classList.toggle('lit', isSteady || opticalTransmitter.isPlaying);
+    if (el.torchSyncStatus) {
+      el.torchSyncStatus.textContent = isSteady ? 'STEADY BEAM · 10W LED ON' : 'STANDBY · LIVE SYNC READY';
+    }
+  }
+}
+
+function startTorchTwinTransmission(modeOverride = null) {
+  if (!state.morseOutput) {
+    showToast('Enter or dictate a message first to transmit on the 3D Torch.', true);
+    return;
+  }
+
+  const timeline = generateOpticalTimeline(state.morseOutput, state.unitMs);
+  if (timeline.length === 0) return;
+
+  torchDigitalTwin.syncTelemetry({ mode: modeOverride || 'TX MORSE' });
+  setTransmissionUIState(true);
+
+  opticalTransmitter.playSequence(timeline, {
+    enableTorch: Boolean(el.torchToggle && el.torchToggle.checked),
+    enableSound: state.audioSidetoneEnabled,
+    enableFullscreenFlash: false,
+    onProgress: ({ currentIndex, totalItems }) => {
+      const pct = Math.round((currentIndex / totalItems) * 100);
+      if (el.progressBar) el.progressBar.style.transform = `scaleX(${pct / 100})`;
+      if (el.progressLabel) el.progressLabel.textContent = `3D Torch Emitting: ${pct}%`;
+    },
+    onComplete: () => {
+      setTransmissionUIState(false);
+      torchDigitalTwin.syncTelemetry({ mode: 'STANDBY' });
+    }
+  });
+}
+
+function renderTorchInspector(subsystem) {
+  if (!subsystem) return;
+  if (el.inspectorCategory) el.inspectorCategory.textContent = subsystem.category;
+  if (el.inspectorTitle) el.inspectorTitle.textContent = subsystem.name;
+  if (el.inspectorCost) el.inspectorCost.textContent = subsystem.cost;
+  if (el.inspectorSummary) el.inspectorSummary.textContent = subsystem.summary;
+  if (el.inspectorModel) el.inspectorModel.textContent = subsystem.partModel;
+  if (el.inspectorInterface) el.inspectorInterface.textContent = subsystem.interface;
+  if (el.inspectorPower) el.inspectorPower.textContent = subsystem.power;
+
+  // Sync floating fullscreen presentation dock callout
+  if (el.fsPartCategory) el.fsPartCategory.textContent = subsystem.category;
+  if (el.fsPartTitle) el.fsPartTitle.textContent = subsystem.name;
+  if (el.fsPartCost) el.fsPartCost.textContent = subsystem.cost;
+  if (el.fsPartSpec) el.fsPartSpec.textContent = `${subsystem.partModel} · ${subsystem.interface}`;
+
+  el.torchPartChips.forEach((chip) => {
+    chip.classList.toggle('active', chip.getAttribute('data-part') === subsystem.id);
+  });
+}
+
+function syncTorchTelemetry() {
+  torchDigitalTwin.syncTelemetry({
+    text: state.encodedText || state.rawText || 'READY',
+    morse: state.morseOutput || '',
+    wpm: state.wpm,
+    compressed: state.compressionSavings > 0,
+    savingsPercent: state.compressionSavings
+  });
 }
 
 /**
@@ -351,6 +946,16 @@ function switchTab(tabId) {
 
   if (tabId === 'beacon') {
     setTimeout(() => opticalTransmitter.resizeCanvas(), 50);
+  }
+
+  if (tabId === 'torch') {
+    requestAnimationFrame(() => {
+      ensureTorchTwinInitialized();
+      torchDigitalTwin.setVisible(true);
+      syncTorchTelemetry();
+    });
+  } else if (torchDigitalTwin.initialized) {
+    torchDigitalTwin.setVisible(false);
   }
 }
 
@@ -378,19 +983,25 @@ function renderPresets() {
 /**
  * Handle live typing or preset change
  */
-function handleTextInputChange(inputText) {
+function handleTextInputChange(inputText, source = 'main') {
   state.rawText = inputText;
   let textToEncode = inputText;
+
+  if (source !== 'beacon' && el.beaconQuickInput && el.beaconQuickInput.value !== inputText) {
+    el.beaconQuickInput.value = inputText;
+  }
 
   if (el.charCounter) {
     el.charCounter.textContent = `${inputText.length} chars`;
   }
 
   // Semantic Contraction
+  state.compressionSavings = 0;
   if (state.adaptiveSemanticEnabled && inputText.trim()) {
     const comp = applySemanticCompression(inputText);
     if (comp.savingsPercent > 0 && comp.compressed !== inputText.toUpperCase()) {
       textToEncode = comp.compressed;
+      state.compressionSavings = comp.savingsPercent;
       if (el.semanticInfo) {
         el.semanticInfo.classList.remove('hidden');
         el.semanticInfo.innerHTML = `<span class="badge">Compressed</span> "${escapeHtml(inputText)}" → <strong>${escapeHtml(comp.compressed)}</strong> (−${comp.savingsPercent}% time)`;
@@ -403,9 +1014,11 @@ function handleTextInputChange(inputText) {
   }
 
   // Convert to Morse
+  state.encodedText = textToEncode;
   state.morseOutput = textToMorse(textToEncode);
   renderMorseOutput(state.morseOutput, textToEncode);
   updateCalculationsAndWaveform();
+  syncTorchTelemetry();
 }
 
 /**
@@ -460,33 +1073,73 @@ function renderMorseOutput(morse, originalText) {
 }
 
 /**
- * Recalculate metrics and redraw timeline
+ * Recalculate metrics, sync Beacon telemetry, and redraw oscilloscope timeline
  */
 function updateCalculationsAndWaveform() {
   const metrics = calculateMorseUnits(state.morseOutput);
-  const durationSec = ((metrics.totalUnits * state.unitMs) / 1000).toFixed(2);
+  const totalSec = ((metrics.totalUnits * state.unitMs) / 1000).toFixed(2);
 
   if (el.statUnits) el.statUnits.textContent = metrics.totalUnits;
-  if (el.statDuration) el.statDuration.textContent = `${durationSec}s`;
+  if (el.statDuration) el.statDuration.textContent = `${totalSec}s`;
   if (el.statChars) el.statChars.textContent = metrics.charCount;
   if (el.statWpm) el.statWpm.textContent = state.wpm;
 
-  // Render optical timeline canvas
+  // Render optical timeline canvas & compute oscilloscope stats
   const timeline = generateOpticalTimeline(state.morseOutput, state.unitMs);
+  const stats = opticalTransmitter.getTimelineStats(timeline);
   opticalTransmitter.drawTimeline(timeline, -1);
+
+  // Sync Beacon Tab Morse Readout & Fullscreen HUD
+  if (el.beaconMorseReadout) {
+    if (state.morseOutput) {
+      el.beaconMorseReadout.textContent = state.morseOutput;
+      el.beaconMorseReadout.classList.remove('empty');
+    } else {
+      el.beaconMorseReadout.textContent = 'Enter a message above to modulate optical pulses...';
+      el.beaconMorseReadout.classList.add('empty');
+    }
+  }
+
+  if (el.fsBeaconPayload) {
+    el.fsBeaconPayload.textContent = state.encodedText || 'OPTICAL BEACON';
+  }
+  if (el.fsBeaconMorse) {
+    el.fsBeaconMorse.textContent = state.morseOutput || 'STANDBY';
+  }
+
+  // Sync Beacon Telemetry Strip
+  if (el.beaconTelemSpeed) {
+    el.beaconTelemSpeed.textContent = `${state.wpm} WPM · ${state.unitMs}ms`;
+  }
+  if (el.beaconTelemElapsed && !opticalTransmitter.isPlaying) {
+    el.beaconTelemElapsed.textContent = `0.00s / ${totalSec}s`;
+  }
+  if (el.beaconTelemDuty) {
+    el.beaconTelemDuty.textContent = `${stats.dutyCyclePct.toFixed(1)}% ON`;
+  }
+  if (el.beaconTelemPulses) {
+    el.beaconTelemPulses.textContent = `${stats.dotCount} · / ${stats.dashCount} —`;
+  }
+
+  syncTorchTelemetry();
 }
 
 /**
  * Voice Input using Web Speech API
  */
 function toggleVoiceRecognition() {
+  const pttHwBtn = document.getElementById('torchHwPttBtn');
   if (speechHandler.isListening) {
     speechHandler.stop();
     if (el.micBtn) el.micBtn.classList.remove('listening');
     if (el.micStatus) el.micStatus.textContent = '';
+    if (pttHwBtn) pttHwBtn.classList.remove('active');
+    torchDigitalTwin.setVoiceListening(false);
   } else {
     const started = speechHandler.start({
       onStatus: ({ listening }) => {
+        torchDigitalTwin.setVoiceListening(listening);
+        if (pttHwBtn) pttHwBtn.classList.toggle('active', listening);
         if (listening) {
           if (el.micBtn) el.micBtn.classList.add('listening');
           if (el.micStatus) el.micStatus.textContent = 'Listening...';
@@ -506,6 +1159,8 @@ function toggleVoiceRecognition() {
         showToast(message, true);
         if (el.micBtn) el.micBtn.classList.remove('listening');
         if (el.micStatus) el.micStatus.textContent = '';
+        if (pttHwBtn) pttHwBtn.classList.remove('active');
+        torchDigitalTwin.setVoiceListening(false);
       }
     });
 
@@ -649,9 +1304,9 @@ function completeManualWord() {
 }
 
 /**
- * Local Optical Beacon Playback (Screen + Mobile Camera Flash + Audio)
+ * Local Optical Beacon Playback (Screen + Mobile Camera Flash + Audio + Repeat/Loop)
  */
-function startLocalOpticalPlayback() {
+function startLocalOpticalPlayback(options = {}) {
   if (!state.morseOutput) {
     showToast('Please enter text or Morse code first!', true);
     return;
@@ -660,17 +1315,41 @@ function startLocalOpticalPlayback() {
   const timeline = generateOpticalTimeline(state.morseOutput, state.unitMs);
   if (timeline.length === 0) return;
 
-  switchTab('beacon');
+  if (!options.stayOnCurrentTab) {
+    switchTab('beacon');
+  }
   setTransmissionUIState(true);
 
+  const isFullscreenOpen = Boolean(
+    options.forceFullscreenFlash ||
+    (el.fullscreenBeacon && el.fullscreenBeacon.classList.contains('active-screen'))
+  );
+
   opticalTransmitter.playSequence(timeline, {
+    startIndex: Number(options.startIndex) || 0,
+    repeatCount: state.repeatCount,
+    interCycleGapMs: Math.max(420, state.unitMs * 7),
     enableTorch: Boolean(el.torchToggle && el.torchToggle.checked),
     enableSound: state.audioSidetoneEnabled,
-    enableFullscreenFlash: Boolean(el.fullscreenBeacon && el.fullscreenBeacon.classList.contains('active-screen')),
-    onProgress: ({ currentIndex, totalItems }) => {
-      const pct = Math.round((currentIndex / totalItems) * 100);
-      if (el.progressBar) el.progressBar.style.transform = `scaleX(${pct / 100})`;
-      if (el.progressLabel) el.progressLabel.textContent = `Emitting Optical Signal: ${pct}%`;
+    enableFullscreenFlash: isFullscreenOpen,
+    onFrame: ({ elapsedMs, totalDurationMs, progress, cycle, repeatCount }) => {
+      const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
+      if (el.progressBar) el.progressBar.style.transform = `scaleX(${progress})`;
+      if (el.beaconProgressBar) el.beaconProgressBar.style.transform = `scaleX(${progress})`;
+      if (el.beaconProgressPct) el.beaconProgressPct.textContent = `${pct}%`;
+
+      const elapsedSec = (elapsedMs / 1000).toFixed(2);
+      const totalSec = (totalDurationMs / 1000).toFixed(2);
+      if (el.beaconTelemElapsed) {
+        el.beaconTelemElapsed.textContent = `${elapsedSec}s / ${totalSec}s`;
+      }
+
+      if (el.progressLabel) {
+        const cycleSuffix = repeatCount >= 999
+          ? ` · Loop #${cycle}`
+          : (repeatCount > 1 ? ` · ${cycle}/${repeatCount}` : '');
+        el.progressLabel.textContent = `Emitting Optical Signal: ${pct}%${cycleSuffix}`;
+      }
     },
     onComplete: () => {
       setTransmissionUIState(false);
@@ -704,11 +1383,19 @@ async function startHardwareTransmission() {
     // Also run parallel on-screen optical visualization
     const timeline = generateOpticalTimeline(state.morseOutput, state.unitMs);
     opticalTransmitter.playSequence(timeline, {
+      repeatCount: state.repeatCount,
+      interCycleGapMs: Math.max(420, state.unitMs * 7),
       enableTorch: Boolean(el.torchToggle && el.torchToggle.checked),
       enableSound: state.audioSidetoneEnabled,
-      onProgress: ({ currentIndex, totalItems }) => {
-        const pct = Math.round((currentIndex / totalItems) * 100);
-        if (el.progressBar) el.progressBar.style.transform = `scaleX(${pct / 100})`;
+      enableFullscreenFlash: Boolean(el.fullscreenBeacon && el.fullscreenBeacon.classList.contains('active-screen')),
+      onFrame: ({ elapsedMs, totalDurationMs, progress }) => {
+        const pct = Math.min(100, Math.max(0, Math.round(progress * 100)));
+        if (el.progressBar) el.progressBar.style.transform = `scaleX(${progress})`;
+        if (el.beaconProgressBar) el.beaconProgressBar.style.transform = `scaleX(${progress})`;
+        if (el.beaconProgressPct) el.beaconProgressPct.textContent = `${pct}%`;
+        if (el.beaconTelemElapsed) {
+          el.beaconTelemElapsed.textContent = `${(elapsedMs / 1000).toFixed(2)}s / ${(totalDurationMs / 1000).toFixed(2)}s`;
+        }
         if (el.progressLabel) el.progressLabel.textContent = `ESP32 Transmitting: ${pct}%`;
       },
       onComplete: () => {
@@ -740,30 +1427,85 @@ function setTransmissionUIState(isTransmitting) {
     if (el.stopTransmissionBtn) el.stopTransmissionBtn.disabled = false;
     if (el.playBeaconBtn) el.playBeaconBtn.disabled = true;
     if (el.transmitEsp32Btn) el.transmitEsp32Btn.disabled = true;
+    if (el.beaconEsp32Btn) el.beaconEsp32Btn.disabled = true;
+
+    if (el.beaconTransmitBtn) {
+      el.beaconTransmitBtn.textContent = 'Stop Beacon';
+      el.beaconTransmitBtn.classList.remove('btn-primary');
+      el.beaconTransmitBtn.classList.add('btn-danger');
+    }
+    if (el.beaconPayloadTag) {
+      el.beaconPayloadTag.textContent = 'TX LIVE';
+      el.beaconPayloadTag.classList.add('tx-live');
+    }
+    if (el.fsBeaconPlayBtn) {
+      el.fsBeaconPlayBtn.textContent = 'Stop';
+    }
   } else {
     if (el.transmissionProgress) el.transmissionProgress.classList.add('hidden');
     if (el.stopTransmissionBtn) el.stopTransmissionBtn.disabled = true;
     if (el.playBeaconBtn) el.playBeaconBtn.disabled = false;
     if (el.transmitEsp32Btn) el.transmitEsp32Btn.disabled = false;
+    if (el.beaconEsp32Btn) el.beaconEsp32Btn.disabled = false;
+
     if (el.progressBar) el.progressBar.style.transform = 'scaleX(0)';
+    if (el.beaconProgressBar) el.beaconProgressBar.style.transform = 'scaleX(0)';
+    if (el.beaconProgressPct) el.beaconProgressPct.textContent = '0%';
+
+    if (el.beaconTransmitBtn) {
+      el.beaconTransmitBtn.textContent = 'Transmit Beacon';
+      el.beaconTransmitBtn.classList.remove('btn-danger');
+      el.beaconTransmitBtn.classList.add('btn-primary');
+    }
+    if (el.beaconPayloadTag) {
+      el.beaconPayloadTag.textContent = 'PAYLOAD';
+      el.beaconPayloadTag.classList.remove('tx-live');
+    }
+    if (el.beaconCycleBadge) {
+      el.beaconCycleBadge.textContent = formatRepeatLabel(state.repeatCount);
+    }
+    if (el.fsBeaconPlayBtn) {
+      el.fsBeaconPlayBtn.textContent = 'Transmit';
+    }
+
+    const metrics = calculateMorseUnits(state.morseOutput);
+    const totalSec = ((metrics.totalUnits * state.unitMs) / 1000).toFixed(2);
+    if (el.beaconTelemElapsed) {
+      el.beaconTelemElapsed.textContent = `0.00s / ${totalSec}s`;
+    }
   }
 }
 
 /**
- * Fullscreen strobe beacon
+ * Fullscreen Optical Strobe Beacon (auto-starts transmission & flashes dynamically)
  */
 function toggleFullscreenBeacon() {
   if (!el.fullscreenBeacon) return;
-  el.fullscreenBeacon.classList.add('active');
-  el.fullscreenBeacon.classList.add('active-screen');
-  document.documentElement.requestFullscreen?.().catch(() => {});
-  showToast('Fullscreen Optical Beacon Active. Tap anywhere to exit.');
+  if (!state.morseOutput) {
+    showToast('Enter a message first to launch Fullscreen Strobe.', true);
+    return;
+  }
+
+  el.fullscreenBeacon.classList.add('active', 'active-screen');
+  opticalTransmitter.setFullscreenFlash(true);
+
+  if (el.fsBeaconPayload) el.fsBeaconPayload.textContent = state.encodedText || 'OPTICAL BEACON';
+  if (el.fsBeaconMorse) el.fsBeaconMorse.textContent = state.morseOutput;
+
+  el.fullscreenBeacon.requestFullscreen?.().catch(() => {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  });
+
+  // Immediately begin transmitting if idle so fullscreen strobe works out of the box
+  if (!opticalTransmitter.isPlaying) {
+    startLocalOpticalPlayback({ stayOnCurrentTab: true, forceFullscreenFlash: true });
+  }
 }
 
 function exitFullscreenBeacon() {
   if (!el.fullscreenBeacon) return;
-  el.fullscreenBeacon.classList.remove('active');
-  el.fullscreenBeacon.classList.remove('active-screen');
+  el.fullscreenBeacon.classList.remove('active', 'active-screen', 'flash-on');
+  opticalTransmitter.setFullscreenFlash(false);
   if (document.fullscreenElement) {
     document.exitFullscreen?.().catch(() => {});
   }
@@ -839,10 +1581,21 @@ document.addEventListener('DOMContentLoaded', () => {
   initDOMElements();
   initEventListeners();
 
-  // Sync state with DOM checkbox state (in case browser restored it on reload)
+  // Sync state with DOM control states (in case browser restored them on reload)
   if (el.adaptiveToggle) {
     state.adaptiveSemanticEnabled = el.adaptiveToggle.checked;
   }
+  if (el.soundToggle) {
+    state.audioSidetoneEnabled = el.soundToggle.checked;
+    sidetone.setEnabled(state.audioSidetoneEnabled);
+  }
+  if (el.pitchSlider && el.soundSubLabel) {
+    const pitch = parseInt(el.pitchSlider.value, 10) || 750;
+    sidetone.setFrequency(pitch);
+    el.soundSubLabel.textContent = `CW audio tone · ${pitch} Hz`;
+  }
+  setWpm(el.wpmSlider ? parseInt(el.wpmSlider.value, 10) : state.wpm);
+  setRepeatCount(el.repeatSelect ? parseInt(el.repeatSelect.value, 10) : state.repeatCount);
 
   esp32Service.init();
   updateHardwareUI();
@@ -857,6 +1610,16 @@ document.addEventListener('DOMContentLoaded', () => {
     el.textInput.value = initialText;
   }
   handleTextInputChange(initialText);
+
+  // Keep oscilloscope canvas and 3D Torch WebGL viewport synced on mobile/tablet rotation
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      opticalTransmitter.resizeCanvas();
+      if (torchDigitalTwin.initialized) {
+        torchDigitalTwin.resize();
+      }
+    }, 180);
+  });
 
   // Sidetone unlock on first user gesture
   const unlockAudio = () => {
