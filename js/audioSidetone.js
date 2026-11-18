@@ -1,5 +1,5 @@
 /**
- * BIOTCP - Web Audio API Morse Sidetone Generator
+ * OPTIX - Web Audio API Morse Sidetone Generator
  * Synthesizes pure sine wave telegraph tones with smooth attack/decay envelope
  */
 

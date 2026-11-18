@@ -1,5 +1,5 @@
 /**
- * BIOTCP - Adaptive Semantic Optical Morse Communication System
+ * OPTIX - Adaptive Semantic Optical Morse Communication System
  * Local Development Server & ESP32 Bridge/Proxy
  */
 
@@ -333,7 +333,7 @@ function getLocalIpAddresses() {
 server.listen(PORT, '0.0.0.0', () => {
   const localIps = getLocalIpAddresses();
   console.log('\n============================================================');
-  console.log('📡 BIOTCP Optical Communication System Server Running!');
+  console.log('📡 OPTIX Optical Communication System Server Running!');
   console.log('============================================================');
   console.log(`💻 Local HTTP:         http://localhost:${PORT}`);
   if (localIps.length > 0) {

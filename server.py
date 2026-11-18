@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-BIOTCP - Adaptive Semantic Optical Morse Communication System
+OPTIX - Adaptive Semantic Optical Morse Communication System
 Python 3 Lightweight Static Server & Bridge
 """
 
@@ -39,7 +39,7 @@ def get_local_ips():
 if __name__ == "__main__":
     with socketserver.ThreadingTCPServer(("0.0.0.0", PORT), Handler) as httpd:
         print("\n" + "=" * 60)
-        print("📡 BIOTCP Python Server Running!")
+        print("📡 OPTIX Python Server Running!")
         print("=" * 60)
         print(f"💻 Local:          http://localhost:{PORT}")
         for ip in get_local_ips():

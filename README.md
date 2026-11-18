@@ -85,7 +85,7 @@ To develop a working proof-of-concept that can:
 ## 📦 Project Directory Structure
 
 ```text
-BIOTCP/
+OPTIX/
 ├── index.html                   # Mobile-responsive Transmission Studio UI
 ├── css/
 │   └── styles.css               # Cyber-tactical glassmorphism dark mode styles
@@ -123,10 +123,10 @@ python server.py
 
 Open your browser at:
 - **Desktop**: [http://localhost:3000](http://localhost:3000)
-- **Mobile Device (Full Console)**: Connect phone to `BIOTCP-Optical-Transmitter` Wi-Fi (pass: `12345678`), turn **Mobile Data OFF**, and open `http://<YOUR_COMPUTER_IP>:3000` (e.g., `http://192.168.4.2:3000`).
+- **Mobile Device (Full Console)**: Connect phone to `OPTIX-Optical-Transmitter` Wi-Fi (pass: `12345678`), turn **Mobile Data OFF**, and open `http://<YOUR_COMPUTER_IP>:3000` (e.g., `http://192.168.4.2:3000`).
 - **Mobile Device (Standalone Offline Portal)**: Open `http://192.168.4.1` (served directly from ESP32 flash memory, zero computer required!).
 
-> 💡 *See [esp32_firmware/README_FIRMWARE.md](file:///c:/Users/shrey/Downloads/BIOTCP/esp32_firmware/README_FIRMWARE.md) for full mobile prerequisites, DevKit V1 GPIO wiring without MOSFET, and troubleshooting.*
+> 💡 *See [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) for full mobile prerequisites, DevKit V1 GPIO wiring without MOSFET, and troubleshooting.*
 
 ---
 
@@ -155,7 +155,7 @@ Open your browser at:
 
 ### 4. ESP32 Hardware Bridge (`📡 ESP32 Bridge`)
 - **Mode 1: Simulated Virtual ESP32**: Allows 100% full testing and development on any computer or phone without physical hardware.
-- **Mode 2: Wi-Fi HTTP REST**: Communicates directly with the ESP32 over Wi-Fi (either via ESP32's SoftAP `BIOTCP-Optical-Transmitter` @ `192.168.4.1` or LAN).
+- **Mode 2: Wi-Fi HTTP REST**: Communicates directly with the ESP32 over Wi-Fi (either via ESP32's SoftAP `OPTIX-Optical-Transmitter` @ `192.168.4.1` or LAN).
 - **Mode 3: Web Serial API**: Connect your ESP32 directly to your phone or laptop using a USB cable for zero-configuration, zero-latency optical control!
 
 ---
@@ -170,10 +170,10 @@ Open your browser at:
 - **Instant Autonomous Boot**:
   Whenever the ESP32 is reconnected to any standard 5V power source (USB power bank, phone wall charger, or battery pack), it boots up in under **2 seconds**.
 - **Automatic Wi-Fi Broadcasting**:
-  The ESP32 immediately launches its private `BIOTCP-Optical-Transmitter` Wi-Fi hotspot upon boot—no host computer or router required.
+  The ESP32 immediately launches its private `OPTIX-Optical-Transmitter` Wi-Fi hotspot upon boot—no host computer or router required.
 - **Wire-Free Field Setup**:
   1. Plug the ESP32 into a **5V USB power bank**.
-  2. On your mobile phone, disable **Mobile Data** and connect to Wi-Fi **`BIOTCP-Optical-Transmitter`** (Password: `12345678`).
+  2. On your mobile phone, disable **Mobile Data** and connect to Wi-Fi **`OPTIX-Optical-Transmitter`** (Password: `12345678`).
   3. Open your mobile browser to **`http://192.168.4.1`**.
   4. Transmit emergency optical Morse signals anywhere in the field!
 
@@ -181,4 +181,4 @@ Open your browser at:
 
 ## 🔧 ESP32 Hardware Setup & Wiring
 
-For complete wiring diagrams (standard 5mm LED direct from GPIO without MOSFET, DevKit V1 pin mappings, and high-power MOSFET driver circuits), refer to [esp32_firmware/README_FIRMWARE.md](file:///c:/Users/shrey/Downloads/BIOTCP/esp32_firmware/README_FIRMWARE.md).
+For complete wiring diagrams (standard 5mm LED direct from GPIO without MOSFET, DevKit V1 pin mappings, and high-power MOSFET driver circuits), refer to [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md).

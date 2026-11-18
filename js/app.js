@@ -1,5 +1,5 @@
 /**
- * BIOTCP - Main Application Controller
+ * OPTIX - Main Application Controller
  * Adaptive Semantic Morse-Based Optical Communication System
  */
 
@@ -122,6 +122,14 @@ function initDOMElements() {
   });
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function initEventListeners() {
   // Navigation Tabs
   el.tabBtns.forEach(btn => {
@@ -132,142 +140,189 @@ function initEventListeners() {
   });
 
   // Text Input
-  el.textInput.addEventListener('input', () => {
-    handleTextInputChange(el.textInput.value);
-  });
+  if (el.textInput) {
+    el.textInput.addEventListener('input', () => {
+      handleTextInputChange(el.textInput.value);
+    });
+  }
 
-  el.clearInputBtn.addEventListener('click', () => {
-    el.textInput.value = '';
-    handleTextInputChange('');
-    el.textInput.focus();
-  });
+  if (el.clearInputBtn) {
+    el.clearInputBtn.addEventListener('click', () => {
+      if (el.textInput) {
+        el.textInput.value = '';
+        el.textInput.focus();
+      }
+      handleTextInputChange('');
+    });
+  }
 
   // Voice Input
-  el.micBtn.addEventListener('click', toggleVoiceRecognition);
+  if (el.micBtn) {
+    el.micBtn.addEventListener('click', toggleVoiceRecognition);
+  }
 
   // Adaptive Semantic Toggle
-  el.adaptiveToggle.addEventListener('change', (e) => {
-    state.adaptiveSemanticEnabled = e.target.checked;
-    handleTextInputChange(el.textInput.value);
-  });
+  if (el.adaptiveToggle) {
+    el.adaptiveToggle.addEventListener('change', (e) => {
+      state.adaptiveSemanticEnabled = e.target.checked;
+      handleTextInputChange(el.textInput ? el.textInput.value : state.rawText);
+    });
+  }
 
   // Sliders
-  el.wpmSlider.addEventListener('input', (e) => {
-    const wpm = parseInt(e.target.value, 10);
-    state.wpm = wpm;
-    state.unitMs = wpmToUnitMs(wpm);
-    el.wpmValue.textContent = `${wpm} WPM`;
-    el.unitMsDisplay.textContent = `${state.unitMs} ms / dot`;
-    updateCalculationsAndWaveform();
-  });
+  if (el.wpmSlider) {
+    el.wpmSlider.addEventListener('input', (e) => {
+      const wpm = parseInt(e.target.value, 10);
+      state.wpm = wpm;
+      state.unitMs = wpmToUnitMs(wpm);
+      if (el.wpmValue) el.wpmValue.textContent = `${wpm} WPM`;
+      if (el.unitMsDisplay) el.unitMsDisplay.textContent = `${state.unitMs} ms / dot`;
+      updateCalculationsAndWaveform();
+    });
+  }
 
-  el.pitchSlider.addEventListener('input', (e) => {
-    const pitch = parseInt(e.target.value, 10);
-    sidetone.setFrequency(pitch);
-    el.pitchValue.textContent = `${pitch} Hz`;
-  });
+  if (el.pitchSlider) {
+    el.pitchSlider.addEventListener('input', (e) => {
+      const pitch = parseInt(e.target.value, 10);
+      sidetone.setFrequency(pitch);
+      if (el.pitchValue) el.pitchValue.textContent = `${pitch} Hz`;
+    });
+  }
 
-  el.soundToggle.addEventListener('change', (e) => {
-    state.audioSidetoneEnabled = e.target.checked;
-    sidetone.setEnabled(e.target.checked);
-  });
+  if (el.soundToggle) {
+    el.soundToggle.addEventListener('change', (e) => {
+      state.audioSidetoneEnabled = e.target.checked;
+      sidetone.setEnabled(e.target.checked);
+    });
+  }
 
-  el.repeatSelect.addEventListener('change', (e) => {
-    state.repeatCount = parseInt(e.target.value, 10);
-  });
+  if (el.repeatSelect) {
+    el.repeatSelect.addEventListener('change', (e) => {
+      state.repeatCount = parseInt(e.target.value, 10);
+    });
+  }
 
   // Copy Morse
-  el.copyMorseBtn.addEventListener('click', async () => {
-    if (!state.morseOutput) return;
-    try {
-      await navigator.clipboard.writeText(state.morseOutput);
-      showToast('Morse sequence copied to clipboard!');
-    } catch (e) {
-      showToast('Copied: ' + state.morseOutput);
-    }
-  });
+  if (el.copyMorseBtn) {
+    el.copyMorseBtn.addEventListener('click', async () => {
+      if (!state.morseOutput) return;
+      try {
+        await navigator.clipboard.writeText(state.morseOutput);
+        showToast('Morse sequence copied to clipboard!');
+      } catch (e) {
+        showToast('Copied: ' + state.morseOutput);
+      }
+    });
+  }
 
   // Play Beacon locally on screen/torch
-  el.playBeaconBtn.addEventListener('click', startLocalOpticalPlayback);
+  if (el.playBeaconBtn) {
+    el.playBeaconBtn.addEventListener('click', startLocalOpticalPlayback);
+  }
 
   // Transmit to ESP32 Hardware
-  el.transmitEsp32Btn.addEventListener('click', startHardwareTransmission);
+  if (el.transmitEsp32Btn) {
+    el.transmitEsp32Btn.addEventListener('click', startHardwareTransmission);
+  }
 
   // Stop button
-  el.stopTransmissionBtn.addEventListener('click', stopAllTransmission);
+  if (el.stopTransmissionBtn) {
+    el.stopTransmissionBtn.addEventListener('click', stopAllTransmission);
+  }
 
   // Torch & Fullscreen
-  el.torchToggle.addEventListener('change', async (e) => {
-    if (e.target.checked) {
-      const ok = await opticalTransmitter.initTorch();
-      if (!ok) {
-        e.target.checked = false;
-        showToast('Camera flash torch not supported on this device/browser');
+  if (el.torchToggle) {
+    el.torchToggle.addEventListener('change', async (e) => {
+      if (e.target.checked) {
+        const ok = await opticalTransmitter.initTorch();
+        if (!ok) {
+          e.target.checked = false;
+          showToast('Camera flash torch not supported on this device/browser');
+        } else {
+          showToast('Camera torch armed for optical transmission');
+        }
       } else {
-        showToast('Camera torch armed for optical transmission');
+        await opticalTransmitter.releaseTorch();
       }
-    } else {
-      await opticalTransmitter.releaseTorch();
-    }
-  });
+    });
+  }
 
-  el.fullscreenToggle.addEventListener('click', toggleFullscreenBeacon);
-  el.fullscreenBeacon.addEventListener('click', exitFullscreenBeacon);
+  if (el.fullscreenToggle) {
+    el.fullscreenToggle.addEventListener('click', toggleFullscreenBeacon);
+  }
+  if (el.fullscreenBeacon) {
+    el.fullscreenBeacon.addEventListener('click', exitFullscreenBeacon);
+  }
 
   // Hardware configuration
-  el.hardwareModeSelect.addEventListener('change', (e) => {
-    esp32Service.mode = e.target.value;
-    esp32Service.saveConfig();
-    updateHardwareUI();
-    esp32Service.log(`Mode switched to: ${e.target.value.toUpperCase()}`);
-  });
+  if (el.hardwareModeSelect) {
+    el.hardwareModeSelect.addEventListener('change', (e) => {
+      esp32Service.mode = e.target.value;
+      esp32Service.saveConfig();
+      updateHardwareUI();
+      esp32Service.log(`Mode switched to: ${e.target.value.toUpperCase()}`);
+    });
+  }
 
-  el.esp32IpInput.addEventListener('change', (e) => {
-    esp32Service.targetIp = e.target.value.trim();
-    esp32Service.saveConfig();
-  });
+  if (el.esp32IpInput) {
+    el.esp32IpInput.addEventListener('change', (e) => {
+      esp32Service.targetIp = e.target.value.trim();
+      esp32Service.saveConfig();
+    });
+  }
 
-  el.esp32PortInput.addEventListener('change', (e) => {
-    esp32Service.targetPort = parseInt(e.target.value, 10) || 80;
-    esp32Service.saveConfig();
-  });
+  if (el.esp32PortInput) {
+    el.esp32PortInput.addEventListener('change', (e) => {
+      esp32Service.targetPort = parseInt(e.target.value, 10) || 80;
+      esp32Service.saveConfig();
+    });
+  }
 
-  el.useProxyCheck.addEventListener('change', (e) => {
-    esp32Service.useProxy = e.target.checked;
-    esp32Service.saveConfig();
-  });
+  if (el.useProxyCheck) {
+    el.useProxyCheck.addEventListener('change', (e) => {
+      esp32Service.useProxy = e.target.checked;
+      esp32Service.saveConfig();
+    });
+  }
 
-  el.pingEsp32Btn.addEventListener('click', async () => {
-    el.pingEsp32Btn.disabled = true;
-    el.hardwareStatusText.textContent = 'Pinging...';
-    try {
-      await esp32Service.ping();
-      showToast('ESP32 Heartbeat ACK Received!');
-    } catch (err) {
-      showToast(`ESP32 Unreachable: ${err.message}`, true);
-    } finally {
-      el.pingEsp32Btn.disabled = false;
-    }
-  });
-
-  el.connectSerialBtn.addEventListener('click', async () => {
-    if (esp32Service.serialPort) {
-      await esp32Service.disconnectSerial();
-      el.connectSerialBtn.textContent = 'Connect USB Serial';
-    } else {
+  if (el.pingEsp32Btn) {
+    el.pingEsp32Btn.addEventListener('click', async () => {
+      el.pingEsp32Btn.disabled = true;
+      if (el.hardwareStatusText) el.hardwareStatusText.textContent = 'PING...';
       try {
-        await esp32Service.connectSerial();
-        el.connectSerialBtn.textContent = 'Disconnect USB';
-        showToast('USB Serial connected to ESP32!');
+        await esp32Service.ping();
+        showToast('ESP32 Heartbeat ACK Received!');
       } catch (err) {
-        showToast(`Serial error: ${err.message}`, true);
+        showToast(`ESP32 Unreachable: ${err.message}`, true);
+      } finally {
+        el.pingEsp32Btn.disabled = false;
+        updateHardwareUI();
       }
-    }
-  });
+    });
+  }
 
-  el.clearLogBtn.addEventListener('click', () => {
-    el.activityLog.innerHTML = '';
-  });
+  if (el.connectSerialBtn) {
+    el.connectSerialBtn.addEventListener('click', async () => {
+      if (esp32Service.serialPort) {
+        await esp32Service.disconnectSerial();
+        el.connectSerialBtn.textContent = 'Connect USB Serial';
+      } else {
+        try {
+          await esp32Service.connectSerial();
+          el.connectSerialBtn.textContent = 'Disconnect USB';
+          showToast('USB Serial connected to ESP32!');
+        } catch (err) {
+          showToast(`Serial error: ${err.message}`, true);
+        }
+      }
+    });
+  }
+
+  if (el.clearLogBtn) {
+    el.clearLogBtn.addEventListener('click', () => {
+      if (el.activityLog) el.activityLog.innerHTML = '';
+    });
+  }
 
   // Manual Tapper Key Handlers
   initManualTapper();
@@ -310,12 +365,9 @@ function renderPresets() {
     const chip = document.createElement('button');
     chip.className = `preset-chip ${preset.category}`;
     chip.title = `${preset.desc} — Click to encode`;
-    chip.innerHTML = `
-      <span class="preset-chip-label">${preset.label}</span>
-      <span class="preset-code">${preset.code}</span>
-    `;
+    chip.innerHTML = `<span class="preset-code">${preset.code}</span><span class="preset-chip-label">${preset.label}</span>`;
     chip.addEventListener('click', () => {
-      el.textInput.value = preset.code;
+      if (el.textInput) el.textInput.value = preset.code;
       handleTextInputChange(preset.code);
       switchTab('input');
     });
@@ -339,16 +391,14 @@ function handleTextInputChange(inputText) {
     const comp = applySemanticCompression(inputText);
     if (comp.savingsPercent > 0 && comp.compressed !== inputText.toUpperCase()) {
       textToEncode = comp.compressed;
-      el.semanticInfo.classList.remove('hidden');
-      el.semanticInfo.innerHTML = `
-        <span class="badge">Adaptive Compression Active</span>
-        Optimized from <strong>"${inputText}"</strong> to <strong>"${comp.compressed}"</strong>
-        (Saves <strong>${comp.savingsPercent}%</strong> optical transmission energy / ${comp.originalUnits - comp.compressedUnits} dot units)
-      `;
-    } else {
+      if (el.semanticInfo) {
+        el.semanticInfo.classList.remove('hidden');
+        el.semanticInfo.innerHTML = `<span class="badge">Compressed</span> "${escapeHtml(inputText)}" → <strong>${escapeHtml(comp.compressed)}</strong> (−${comp.savingsPercent}% time)`;
+      }
+    } else if (el.semanticInfo) {
       el.semanticInfo.classList.add('hidden');
     }
-  } else {
+  } else if (el.semanticInfo) {
     el.semanticInfo.classList.add('hidden');
   }
 
@@ -363,16 +413,23 @@ function handleTextInputChange(inputText) {
  */
 function renderMorseOutput(morse, originalText) {
   if (!morse) {
-    el.morseDisplay.textContent = 'Morse code will appear here...';
-    el.morseDisplay.classList.add('empty');
-    el.breakdownContainer.innerHTML = '';
+    if (el.morseDisplay) {
+      el.morseDisplay.textContent = 'Morse code will appear here...';
+      el.morseDisplay.classList.add('empty');
+    }
+    if (el.breakdownContainer) {
+      el.breakdownContainer.innerHTML = '';
+    }
     return;
   }
 
-  el.morseDisplay.textContent = morse;
-  el.morseDisplay.classList.remove('empty');
+  if (el.morseDisplay) {
+    el.morseDisplay.textContent = morse;
+    el.morseDisplay.classList.remove('empty');
+  }
 
   // Breakdown tokens
+  if (!el.breakdownContainer) return;
   el.breakdownContainer.innerHTML = '';
   const words = originalText.toUpperCase().split(/\s+/).filter(Boolean);
 
@@ -409,10 +466,10 @@ function updateCalculationsAndWaveform() {
   const metrics = calculateMorseUnits(state.morseOutput);
   const durationSec = ((metrics.totalUnits * state.unitMs) / 1000).toFixed(2);
 
-  el.statUnits.textContent = metrics.totalUnits;
-  el.statDuration.textContent = `${durationSec}s`;
-  el.statChars.textContent = metrics.charCount;
-  el.statWpm.textContent = state.wpm;
+  if (el.statUnits) el.statUnits.textContent = metrics.totalUnits;
+  if (el.statDuration) el.statDuration.textContent = `${durationSec}s`;
+  if (el.statChars) el.statChars.textContent = metrics.charCount;
+  if (el.statWpm) el.statWpm.textContent = state.wpm;
 
   // Render optical timeline canvas
   const timeline = generateOpticalTimeline(state.morseOutput, state.unitMs);
@@ -425,29 +482,30 @@ function updateCalculationsAndWaveform() {
 function toggleVoiceRecognition() {
   if (speechHandler.isListening) {
     speechHandler.stop();
-    el.micBtn.classList.remove('listening');
-    el.micStatus.textContent = 'Mic stopped';
+    if (el.micBtn) el.micBtn.classList.remove('listening');
+    if (el.micStatus) el.micStatus.textContent = '';
   } else {
     const started = speechHandler.start({
-      onStatus: ({ listening, msg }) => {
+      onStatus: ({ listening }) => {
         if (listening) {
-          el.micBtn.classList.add('listening');
-          el.micStatus.textContent = 'Listening... Speak emergency message';
+          if (el.micBtn) el.micBtn.classList.add('listening');
+          if (el.micStatus) el.micStatus.textContent = 'Listening...';
         } else {
-          el.micBtn.classList.remove('listening');
-          el.micStatus.textContent = msg || 'Idle';
+          if (el.micBtn) el.micBtn.classList.remove('listening');
+          if (el.micStatus) el.micStatus.textContent = '';
         }
       },
       onResult: ({ final, interim }) => {
         const combined = (final || interim).trim();
         if (combined) {
-          el.textInput.value = combined;
+          if (el.textInput) el.textInput.value = combined;
           handleTextInputChange(combined);
         }
       },
       onError: ({ message }) => {
         showToast(message, true);
-        el.micBtn.classList.remove('listening');
+        if (el.micBtn) el.micBtn.classList.remove('listening');
+        if (el.micStatus) el.micStatus.textContent = '';
       }
     });
 
@@ -469,7 +527,7 @@ function initManualTapper() {
     touchActive = true;
     sidetone.startTone();
     state.manualTapper.keyDownTime = Date.now();
-    el.tapperKey.classList.add('pressed');
+    if (el.tapperKey) el.tapperKey.classList.add('pressed');
     opticalTransmitter.setOpticalState(true);
 
     if (state.manualTapper.pauseTimer) {
@@ -483,7 +541,7 @@ function initManualTapper() {
     if (!touchActive) return;
     touchActive = false;
     sidetone.stopTone();
-    el.tapperKey.classList.remove('pressed');
+    if (el.tapperKey) el.tapperKey.classList.remove('pressed');
     opticalTransmitter.setOpticalState(false);
 
     const pressDuration = Date.now() - state.manualTapper.keyDownTime;
@@ -499,71 +557,95 @@ function initManualTapper() {
     }, state.unitMs * 3.5);
   };
 
-  el.tapperKey.addEventListener('mousedown', startTap);
-  el.tapperKey.addEventListener('mouseup', endTap);
-  el.tapperKey.addEventListener('mouseleave', endTap);
+  if (el.tapperKey) {
+    el.tapperKey.addEventListener('mousedown', startTap);
+    el.tapperKey.addEventListener('mouseup', endTap);
+    el.tapperKey.addEventListener('mouseleave', endTap);
 
-  el.tapperKey.addEventListener('touchstart', startTap, { passive: false });
-  el.tapperKey.addEventListener('touchend', endTap, { passive: false });
-  el.tapperKey.addEventListener('touchcancel', endTap, { passive: false });
+    el.tapperKey.addEventListener('touchstart', startTap, { passive: false });
+    el.tapperKey.addEventListener('touchend', endTap, { passive: false });
+    el.tapperKey.addEventListener('touchcancel', endTap, { passive: false });
+  }
 
   // Discrete manual buttons
-  el.dotBtn.addEventListener('click', () => {
-    sidetone.playPulse(state.unitMs);
-    appendManualMorseSymbol('.');
-  });
+  if (el.dotBtn) {
+    el.dotBtn.addEventListener('click', () => {
+      sidetone.playPulse(state.unitMs);
+      appendManualMorseSymbol('.');
+    });
+  }
 
-  el.dashBtn.addEventListener('click', () => {
-    sidetone.playPulse(state.unitMs * 3);
-    appendManualMorseSymbol('-');
-  });
+  if (el.dashBtn) {
+    el.dashBtn.addEventListener('click', () => {
+      sidetone.playPulse(state.unitMs * 3);
+      appendManualMorseSymbol('-');
+    });
+  }
 
-  el.spaceLetterBtn.addEventListener('click', () => {
-    completeManualLetter();
-  });
+  if (el.spaceLetterBtn) {
+    el.spaceLetterBtn.addEventListener('click', () => {
+      completeManualLetter();
+    });
+  }
 
-  el.spaceWordBtn.addEventListener('click', () => {
-    completeManualWord();
-  });
+  if (el.spaceWordBtn) {
+    el.spaceWordBtn.addEventListener('click', () => {
+      completeManualWord();
+    });
+  }
 
-  el.clearManualBtn.addEventListener('click', () => {
-    state.manualTapper.currentLetterMorse = '';
-    state.manualTapper.fullDecodedText = '';
-    el.manualMorseBuffer.textContent = '';
-    el.manualDecodedText.textContent = '';
-  });
+  if (el.clearManualBtn) {
+    el.clearManualBtn.addEventListener('click', () => {
+      state.manualTapper.currentLetterMorse = '';
+      state.manualTapper.fullDecodedText = '';
+      if (el.manualMorseBuffer) el.manualMorseBuffer.textContent = '';
+      if (el.manualDecodedText) el.manualDecodedText.textContent = '';
+    });
+  }
 
-  el.applyManualBtn.addEventListener('click', () => {
-    completeManualLetter();
-    if (state.manualTapper.fullDecodedText) {
-      el.textInput.value = state.manualTapper.fullDecodedText;
-      handleTextInputChange(state.manualTapper.fullDecodedText);
-      switchTab('input');
-      showToast('Manual Morse imported to Transmission Studio!');
-    }
-  });
+  if (el.applyManualBtn) {
+    el.applyManualBtn.addEventListener('click', () => {
+      completeManualLetter();
+      if (state.manualTapper.fullDecodedText) {
+        if (el.textInput) el.textInput.value = state.manualTapper.fullDecodedText;
+        handleTextInputChange(state.manualTapper.fullDecodedText);
+        switchTab('input');
+        showToast('Manual Morse imported to Transmit!');
+      }
+    });
+  }
 }
 
 function appendManualMorseSymbol(sym) {
   state.manualTapper.currentLetterMorse += sym;
-  el.manualMorseBuffer.textContent = (el.manualMorseBuffer.textContent + sym).trim();
+  if (el.manualMorseBuffer) {
+    el.manualMorseBuffer.textContent = (el.manualMorseBuffer.textContent + sym).trim();
+  }
 }
 
 function completeManualLetter() {
   if (!state.manualTapper.currentLetterMorse) return;
   const letter = morseToText(state.manualTapper.currentLetterMorse);
   state.manualTapper.fullDecodedText += letter;
-  el.manualDecodedText.textContent = state.manualTapper.fullDecodedText;
+  if (el.manualDecodedText) {
+    el.manualDecodedText.textContent = state.manualTapper.fullDecodedText;
+  }
 
   state.manualTapper.currentLetterMorse = '';
-  el.manualMorseBuffer.textContent = el.manualMorseBuffer.textContent + ' ';
+  if (el.manualMorseBuffer) {
+    el.manualMorseBuffer.textContent = el.manualMorseBuffer.textContent + ' ';
+  }
 }
 
 function completeManualWord() {
   completeManualLetter();
   state.manualTapper.fullDecodedText += ' ';
-  el.manualDecodedText.textContent = state.manualTapper.fullDecodedText;
-  el.manualMorseBuffer.textContent = el.manualMorseBuffer.textContent + ' / ';
+  if (el.manualDecodedText) {
+    el.manualDecodedText.textContent = state.manualTapper.fullDecodedText;
+  }
+  if (el.manualMorseBuffer) {
+    el.manualMorseBuffer.textContent = el.manualMorseBuffer.textContent + ' / ';
+  }
 }
 
 /**
@@ -582,13 +664,13 @@ function startLocalOpticalPlayback() {
   setTransmissionUIState(true);
 
   opticalTransmitter.playSequence(timeline, {
-    enableTorch: el.torchToggle.checked,
+    enableTorch: Boolean(el.torchToggle && el.torchToggle.checked),
     enableSound: state.audioSidetoneEnabled,
-    enableFullscreenFlash: el.fullscreenBeacon.classList.contains('active-screen'),
+    enableFullscreenFlash: Boolean(el.fullscreenBeacon && el.fullscreenBeacon.classList.contains('active-screen')),
     onProgress: ({ currentIndex, totalItems }) => {
       const pct = Math.round((currentIndex / totalItems) * 100);
-      el.progressBar.style.transform = `scaleX(${pct / 100})`;
-      el.progressLabel.textContent = `Emitting Optical Signal: ${pct}%`;
+      if (el.progressBar) el.progressBar.style.transform = `scaleX(${pct / 100})`;
+      if (el.progressLabel) el.progressLabel.textContent = `Emitting Optical Signal: ${pct}%`;
     },
     onComplete: () => {
       setTransmissionUIState(false);
@@ -607,10 +689,10 @@ async function startHardwareTransmission() {
   }
 
   setTransmissionUIState(true);
-  el.progressLabel.textContent = 'Dispatching to ESP32 Hardware...';
+  if (el.progressLabel) el.progressLabel.textContent = 'Dispatching to ESP32 Hardware...';
 
   try {
-    const res = await esp32Service.transmitMorse(
+    await esp32Service.transmitMorse(
       state.morseOutput,
       state.rawText,
       state.unitMs,
@@ -622,12 +704,12 @@ async function startHardwareTransmission() {
     // Also run parallel on-screen optical visualization
     const timeline = generateOpticalTimeline(state.morseOutput, state.unitMs);
     opticalTransmitter.playSequence(timeline, {
-      enableTorch: el.torchToggle.checked,
+      enableTorch: Boolean(el.torchToggle && el.torchToggle.checked),
       enableSound: state.audioSidetoneEnabled,
       onProgress: ({ currentIndex, totalItems }) => {
         const pct = Math.round((currentIndex / totalItems) * 100);
-        el.progressBar.style.transform = `scaleX(${pct / 100})`;
-        el.progressLabel.textContent = `ESP32 Transmitting: ${pct}%`;
+        if (el.progressBar) el.progressBar.style.transform = `scaleX(${pct / 100})`;
+        if (el.progressLabel) el.progressLabel.textContent = `ESP32 Transmitting: ${pct}%`;
       },
       onComplete: () => {
         setTransmissionUIState(false);
@@ -654,16 +736,16 @@ async function stopAllTransmission() {
 
 function setTransmissionUIState(isTransmitting) {
   if (isTransmitting) {
-    el.transmissionProgress.classList.remove('hidden');
-    el.stopTransmissionBtn.disabled = false;
-    el.playBeaconBtn.disabled = true;
-    el.transmitEsp32Btn.disabled = true;
+    if (el.transmissionProgress) el.transmissionProgress.classList.remove('hidden');
+    if (el.stopTransmissionBtn) el.stopTransmissionBtn.disabled = false;
+    if (el.playBeaconBtn) el.playBeaconBtn.disabled = true;
+    if (el.transmitEsp32Btn) el.transmitEsp32Btn.disabled = true;
   } else {
-    el.transmissionProgress.classList.add('hidden');
-    el.stopTransmissionBtn.disabled = true;
-    el.playBeaconBtn.disabled = false;
-    el.transmitEsp32Btn.disabled = false;
-    el.progressBar.style.transform = 'scaleX(0)';
+    if (el.transmissionProgress) el.transmissionProgress.classList.add('hidden');
+    if (el.stopTransmissionBtn) el.stopTransmissionBtn.disabled = true;
+    if (el.playBeaconBtn) el.playBeaconBtn.disabled = false;
+    if (el.transmitEsp32Btn) el.transmitEsp32Btn.disabled = false;
+    if (el.progressBar) el.progressBar.style.transform = 'scaleX(0)';
   }
 }
 
@@ -671,6 +753,7 @@ function setTransmissionUIState(isTransmitting) {
  * Fullscreen strobe beacon
  */
 function toggleFullscreenBeacon() {
+  if (!el.fullscreenBeacon) return;
   el.fullscreenBeacon.classList.add('active');
   el.fullscreenBeacon.classList.add('active-screen');
   document.documentElement.requestFullscreen?.().catch(() => {});
@@ -678,6 +761,7 @@ function toggleFullscreenBeacon() {
 }
 
 function exitFullscreenBeacon() {
+  if (!el.fullscreenBeacon) return;
   el.fullscreenBeacon.classList.remove('active');
   el.fullscreenBeacon.classList.remove('active-screen');
   if (document.fullscreenElement) {
@@ -689,23 +773,27 @@ function exitFullscreenBeacon() {
  * Hardware UI updates
  */
 function updateHardwareUI() {
-  el.hardwareModeSelect.value = esp32Service.mode;
-  el.esp32IpInput.value = esp32Service.targetIp;
-  el.esp32PortInput.value = esp32Service.targetPort;
-  el.useProxyCheck.checked = esp32Service.useProxy;
+  if (el.hardwareModeSelect) el.hardwareModeSelect.value = esp32Service.mode;
+  if (el.esp32IpInput) el.esp32IpInput.value = esp32Service.targetIp;
+  if (el.esp32PortInput) el.esp32PortInput.value = esp32Service.targetPort;
+  if (el.useProxyCheck) el.useProxyCheck.checked = esp32Service.useProxy;
 
   const isSerial = esp32Service.mode === 'serial';
-  el.connectSerialBtn.classList.toggle('hidden', !isSerial);
+  if (el.connectSerialBtn) {
+    el.connectSerialBtn.classList.toggle('hidden', !isSerial);
+  }
 
-  if (esp32Service.mode === 'simulation') {
-    el.hardwareStatusBadge.className = 'status-badge sim';
-    el.hardwareStatusText.textContent = 'Simulated Virtual ESP32';
-  } else if (esp32Service.isConnected) {
-    el.hardwareStatusBadge.className = 'status-badge online';
-    el.hardwareStatusText.textContent = 'Online & Ready';
-  } else {
-    el.hardwareStatusBadge.className = 'status-badge offline';
-    el.hardwareStatusText.textContent = 'Standby / Unchecked';
+  if (el.hardwareStatusBadge && el.hardwareStatusText) {
+    if (esp32Service.mode === 'simulation') {
+      el.hardwareStatusBadge.className = 'status-badge sim';
+      el.hardwareStatusText.textContent = 'SIM';
+    } else if (esp32Service.isConnected) {
+      el.hardwareStatusBadge.className = 'status-badge online';
+      el.hardwareStatusText.textContent = 'ONLINE';
+    } else {
+      el.hardwareStatusBadge.className = 'status-badge offline';
+      el.hardwareStatusText.textContent = 'STANDBY';
+    }
   }
 }
 
@@ -743,7 +831,7 @@ function updateMissionClock() {
   const utcHours = String(now.getUTCHours()).padStart(2, '0');
   const utcMins = String(now.getUTCMinutes()).padStart(2, '0');
   const utcSecs = String(now.getUTCSeconds()).padStart(2, '0');
-  el.missionClockDisplay.textContent = `${utcHours}:${utcMins}:${utcSecs} UTC`;
+  el.missionClockDisplay.textContent = `${utcHours}:${utcMins}:${utcSecs}`;
 }
 
 // Initialize App

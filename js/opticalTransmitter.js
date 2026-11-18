@@ -1,5 +1,5 @@
 /**
- * BIOTCP - Optical Signal & Beacon Controller
+ * OPTIX - Optical Signal & Beacon Controller
  * Handles Screen Optical Beacon, Canvas Pulse Waveform, and Mobile Camera Flashlight (Torch)
  */
 
@@ -225,7 +225,7 @@ class OpticalTransmitter {
 
   /**
    * Render the digital pulse timeline on canvas
-   * High-tech oscilloscope / logic analyzer styling with CRT graticule and voltage rails
+   * Warm amber optical instrument oscilloscope with graticule and voltage rails
    */
   drawTimeline(timeline, activeIdx = -1) {
     if (timeline) {
@@ -242,7 +242,7 @@ class OpticalTransmitter {
     ctx.clearRect(0, 0, width, height);
 
     // 1. Draw Oscilloscope Graticule Grid
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+    ctx.strokeStyle = 'rgba(229, 169, 59, 0.06)';
     ctx.lineWidth = 1;
 
     // Horizontal grid lines
@@ -273,25 +273,25 @@ class OpticalTransmitter {
 
     // 2. Voltage Rail Markers
     ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.45)';
+    ctx.fillStyle = 'rgba(212, 201, 168, 0.5)';
     ctx.textAlign = 'left';
-    ctx.fillText('HIGH (3.3V)', 8, highY - 6);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-    ctx.fillText('LOW (0.0V)', 8, lowY + 14);
+    ctx.fillText('HIGH 3.3V', 8, highY - 6);
+    ctx.fillStyle = 'rgba(240, 236, 228, 0.25)';
+    ctx.fillText('LOW 0V', 8, lowY + 14);
 
     if (!timeline || timeline.length === 0) {
       // Draw baseline placeholder
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(240, 236, 228, 0.1)';
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(0, lowY);
       ctx.lineTo(width, lowY);
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.fillStyle = 'rgba(240, 236, 228, 0.3)';
       ctx.font = '11px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('STANDBY // AWAITING OPTICAL TRANSMISSION SEQUENCE', width / 2, height / 2 + 4);
+      ctx.fillText('STANDBY — NO SIGNAL', width / 2, height / 2 + 4);
       return;
     }
 
@@ -301,7 +301,7 @@ class OpticalTransmitter {
     const scaleX = width / totalDuration;
 
     // 3. Draw Low Reference Baseline
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.strokeStyle = 'rgba(240, 236, 228, 0.1)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, lowY);
@@ -316,11 +316,11 @@ class OpticalTransmitter {
         const isCurrent = idx === activeIdx;
         const grad = ctx.createLinearGradient(0, highY, 0, lowY);
         if (isCurrent) {
-          grad.addColorStop(0, 'rgba(0, 255, 157, 0.6)');
-          grad.addColorStop(1, 'rgba(0, 240, 255, 0.15)');
+          grad.addColorStop(0, 'rgba(240, 188, 82, 0.45)');
+          grad.addColorStop(1, 'rgba(229, 169, 59, 0.08)');
         } else {
-          grad.addColorStop(0, 'rgba(0, 240, 255, 0.28)');
-          grad.addColorStop(1, 'rgba(0, 240, 255, 0.04)');
+          grad.addColorStop(0, 'rgba(229, 169, 59, 0.22)');
+          grad.addColorStop(1, 'rgba(229, 169, 59, 0.03)');
         }
         ctx.fillStyle = grad;
         ctx.fillRect(currentX, highY, itemWidth, lowY - highY);
@@ -328,7 +328,7 @@ class OpticalTransmitter {
       currentX += itemWidth;
     });
 
-    // 5. Draw Pulse Waveform Stroke with Glow
+    // 5. Draw Pulse Waveform Stroke
     ctx.save();
     ctx.beginPath();
     currentX = 0;
@@ -346,32 +346,32 @@ class OpticalTransmitter {
       currentX += itemWidth;
     });
 
-    ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 10;
-    ctx.strokeStyle = '#00f0ff';
-    ctx.lineWidth = 2.2;
+    ctx.shadowColor = 'rgba(229, 169, 59, 0.35)';
+    ctx.shadowBlur = 4;
+    ctx.strokeStyle = '#e5a93b';
+    ctx.lineWidth = 2;
     ctx.lineJoin = 'miter';
     ctx.stroke();
     ctx.restore();
 
-    // 6. Draw Active Laser Playhead Cursor
+    // 6. Draw Active Playhead Cursor
     if (activeIdx >= 0 && activeIdx < timeline.length) {
       let playheadX = 0;
       for (let i = 0; i < activeIdx; i++) {
         playheadX += timeline[i].durationMs * scaleX;
       }
-      const activeWidth = timeline[activeIdx].durationMs * scaleX;
 
       ctx.save();
-      ctx.shadowColor = '#ff0055';
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = '#ff0055';
-      ctx.fillRect(playheadX, 0, Math.max(3, activeWidth), height);
+      ctx.shadowColor = 'rgba(212, 69, 58, 0.35)';
+      ctx.shadowBlur = 4;
+      ctx.fillStyle = '#d4453a';
+      ctx.fillRect(playheadX, 0, 2, height);
 
-      // Playhead beacon head
-      ctx.fillStyle = '#ffffff';
+      // Playhead marker on HIGH rail
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#f0ece4';
       ctx.beginPath();
-      ctx.arc(playheadX + Math.max(3, activeWidth) / 2, highY, 4, 0, Math.PI * 2);
+      ctx.arc(playheadX + 1, highY, 3.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }

@@ -1,5 +1,5 @@
 /**
- * BIOTCP - Morse Code & Adaptive Semantic Engine
+ * OPTIX - Morse Code & Adaptive Semantic Engine
  * Compliant with ITU-R M.1677-1 International Morse Code Standard
  */
 

@@ -16,11 +16,11 @@ Field operators, emergency response personnel, search & rescue teams, and embedd
 
 ## Product Purpose
 
-BIOTCP provides a reliable, direct Visible Light Communication (VLC) telecommunications interface. It accepts voice dictation, typed plain text, or manual telegraph keying, computes semantic contractions to minimize optical beacon exposure, modulates the signal to standard ITU-R M.1677-1 Morse code, and drives optical emitters (ESP32 High-Power LEDs, mobile camera torches, and high-luminance screen beacons).
+OPTIX provides a reliable, direct Visible Light Communication (VLC) telecommunications interface. It accepts voice dictation, typed plain text, or manual telegraph keying, computes semantic contractions to minimize optical beacon exposure, modulates the signal to standard ITU-R M.1677-1 Morse code, and drives optical emitters (ESP32 High-Power LEDs, mobile camera torches, and high-luminance screen beacons).
 
 ## Positioning
 
-Adaptive Semantic Optical Telecommunications: Unlike conventional bulk optical modems, BIOTCP incorporates an adaptive semantic tokenization engine that reduces optical burst duration by up to 50% without losing message intelligibility, cutting battery consumption and drastically minimizing optical interception risk.
+Adaptive Semantic Optical Telecommunications: Unlike conventional bulk optical modems, OPTIX incorporates an adaptive semantic tokenization engine that reduces optical burst duration by up to 50% without losing message intelligibility, cutting battery consumption and drastically minimizing optical interception risk.
 
 ## Operating Context
 
@@ -37,7 +37,7 @@ Adaptive Semantic Optical Telecommunications: Unlike conventional bulk optical m
 
 ## Brand Commitments
 
-- **Name**: BIOTCP (Adaptive Semantic Optical Telecommunications)
+- **Name**: OPTIX (Adaptive Semantic Optical Telecommunications)
 - **Tone**: Aerospace mission telemetry, tactical command precision, high-legibility telemetry displays, laboratory-grade instrumentation. No cartoonish gamification, no decorative clutter, zero emoji glyphs.
 
 ## Product Principles

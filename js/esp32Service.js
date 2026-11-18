@@ -1,5 +1,5 @@
 /**
- * BIOTCP - ESP32 Hardware Communication Service
+ * OPTIX - ESP32 Hardware Communication Service
  * Supports Wi-Fi HTTP REST, CORS Relay Proxy, Web Serial USB, and Virtual Hardware Simulation
  */
 
@@ -28,19 +28,19 @@ class Esp32Service {
   }
 
   init(options = {}) {
-    this.targetIp = options.targetIp || localStorage.getItem('biotcp_esp32_ip') || '192.168.4.1';
-    this.targetPort = options.targetPort || parseInt(localStorage.getItem('biotcp_esp32_port') || '80', 10);
-    this.mode = options.mode || localStorage.getItem('biotcp_mode') || 'simulation';
-    this.useProxy = options.useProxy !== undefined ? options.useProxy : (localStorage.getItem('biotcp_proxy') === 'true');
+    this.targetIp = options.targetIp || localStorage.getItem('optix_esp32_ip') || '192.168.4.1';
+    this.targetPort = options.targetPort || parseInt(localStorage.getItem('optix_esp32_port') || '80', 10);
+    this.mode = options.mode || localStorage.getItem('optix_mode') || 'simulation';
+    this.useProxy = options.useProxy !== undefined ? options.useProxy : (localStorage.getItem('optix_proxy') === 'true');
 
     this.log(`ESP32 Service initialized in [${this.mode.toUpperCase()}] mode.`);
   }
 
   saveConfig() {
-    localStorage.setItem('biotcp_esp32_ip', this.targetIp);
-    localStorage.setItem('biotcp_esp32_port', String(this.targetPort));
-    localStorage.setItem('biotcp_mode', this.mode);
-    localStorage.setItem('biotcp_proxy', String(this.useProxy));
+    localStorage.setItem('optix_esp32_ip', this.targetIp);
+    localStorage.setItem('optix_esp32_port', String(this.targetPort));
+    localStorage.setItem('optix_mode', this.mode);
+    localStorage.setItem('optix_proxy', String(this.useProxy));
   }
 
   log(msg, type = 'info') {

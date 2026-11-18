@@ -1,5 +1,5 @@
 {
-  "name": "biotcp-optical-morse",
+  "name": "optix-optical-morse",
   "version": "1.0.0",
   "description": "Adaptive Semantic Morse-Based Optical Communication System - Mobile to ESP32 Web Application",
   "main": "server.js",

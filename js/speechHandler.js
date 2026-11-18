@@ -1,5 +1,5 @@
 /**
- * BIOTCP - Robust Speech Recognition Handler (Mobile & Desktop)
+ * OPTIX - Robust Speech Recognition Handler (Mobile & Desktop)
  * Uses Web Speech API (webkitSpeechRecognition / SpeechRecognition)
  * Includes Secure Context checking, continuous listening, and live audio monitoring
  */

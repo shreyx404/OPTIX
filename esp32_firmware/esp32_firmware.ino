@@ -1,6 +1,6 @@
 /**
  * ==============================================================================================
- * BIOTCP — Adaptive Semantic Morse-Based Optical Communication System
+ * OPTIX — Adaptive Semantic Morse-Based Optical Communication System
  * Phase 1: ESP32 Optical LED Transmitter Firmware
  * 
  * Hardware Target: ESP32 Dev Module / NodeMCU-32S / ESP32-WROOM-32
@@ -8,7 +8,7 @@
  * ==============================================================================================
  * 
  * Key Features:
- * 1. Autonomous SoftAP Mode ("BIOTCP-Optical-Transmitter" @ 192.168.4.1) for offline disaster zones
+ * 1. Autonomous SoftAP Mode ("OPTIX-Optical-Transmitter" @ 192.168.4.1) for offline disaster zones
  * 2. Optional Station (STA) mode to join existing Wi-Fi routers
  * 3. Full HTTP REST API on Port 80 with CORS support (Mobile browser compatible)
  * 4. FreeRTOS Non-blocking Optical Timing Engine (Web server stays responsive during transmission)
@@ -31,7 +31,7 @@
 #define LED_OPTICAL_PIN 4     // External Optical LED / MOSFET driver (GPIO 4)
 
 // Wi-Fi Access Point Configuration (Disaster / Offline Mode)
-const char* AP_SSID = "BIOTCP-Optical-Transmitter";
+const char* AP_SSID = "OPTIX-Optical-Transmitter";
 const char* AP_PASS = "12345678"; // Min 8 chars, or set to NULL for open network
 IPAddress AP_LOCAL_IP(192, 168, 4, 1);
 IPAddress AP_GATEWAY(192, 168, 4, 1);
@@ -172,7 +172,7 @@ void handlePing() {
   StaticJsonDocument<256> doc;
   doc["status"] = "ok";
   doc["device"] = "ESP32-Optical-Transmitter";
-  doc["firmware"] = "BIOTCP-v1.0";
+  doc["firmware"] = "OPTIX-v1.0";
   doc["uptime_sec"] = millis() / 1000;
   doc["gpio_builtin"] = LED_BUILTIN_PIN;
   doc["gpio_optical"] = LED_OPTICAL_PIN;
@@ -275,7 +275,7 @@ void handleRoot() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BIOTCP Optical Transmitter</title>
+  <title>OPTIX Optical Transmitter</title>
   <style>
     body { background: #06090e; color: #fff; font-family: sans-serif; text-align: center; padding: 2rem 1rem; }
     h1 { color: #00f0ff; margin-bottom: 0.5rem; }
@@ -287,7 +287,7 @@ void handleRoot() {
   </style>
 </head>
 <body>
-  <h1>🔦 BIOTCP Optical Transmitter</h1>
+  <h1>🔦 OPTIX Optical Transmitter</h1>
   <p>ESP32 Embedded Optical Node • Autonomous SoftAP</p>
   <div class="card">
     <input type="text" id="morseInput" value="... --- ..." placeholder="Enter Morse code">
@@ -391,7 +391,7 @@ void setup() {
   delay(500);
 
   Serial.println("\n========================================================");
-  Serial.println("🔦 BIOTCP Optical Communication System - ESP32 Firmware");
+  Serial.println("🔦 OPTIX Optical Communication System - ESP32 Firmware");
   Serial.println("========================================================");
 
   // Initialize LED Pins

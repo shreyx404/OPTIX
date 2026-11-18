@@ -3,314 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="description" content="BIOTCP — Adaptive Semantic Morse-Based Optical Communication System (Visible Light Telecommunications Console)">
-  <meta name="theme-color" content="#06090e">
-  <title>BIOTCP — Optical Morse Telecommunications Console</title>
+  <meta name="description" content="OPTIX — Optical Morse Communication System">
+  <meta name="theme-color" content="#08090c">
+  <title>OPTIX — Optical Morse Transmitter</title>
 
-  <!-- Google Fonts: Sora & JetBrains Mono -->
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Core Design System -->
-  <link rel="stylesheet" href="css/styles.css?v=3.2">
+  <link rel="stylesheet" href="css/styles.css?v=4.0">
 </head>
 <body>
 
   <div class="app-container">
     <!-- =========================================================================
-         Mission Command Header
+         Header
          ========================================================================= -->
     <header class="app-header">
-      <div class="brand-wrapper">
-        <div class="brand-icon-pod" title="BIOTCP Optical Carrier Lens">
-          <svg class="brand-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="9" />
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
-          </svg>
-        </div>
-        <div class="brand-text-col">
-          <div class="brand-title-row">
-            <h1 class="brand-title">BIOTCP</h1>
-            <span class="brand-version-badge">v2.4</span>
-          </div>
-          <div class="brand-subtitle">
-            <span class="brand-sub-title">Adaptive Semantic Morse</span>
-            <span class="brand-subtitle-dot" aria-hidden="true"></span>
-            <span class="brand-sub-std">ITU-R M.1677-1</span>
-          </div>
-        </div>
-      </div>
+      <h1 class="brand-title">OPTIX</h1>
 
       <div class="header-status-group">
-        <!-- Live Mission Clock -->
-        <div class="mission-clock-pill" title="Live System Telemetry UTC Clock">
-          <span class="mission-clock-icon" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-          </span>
-          <span id="missionClockDisplay" class="mission-clock-time">00:00:00 UTC</span>
-        </div>
-
-        <!-- Hardware Status Badge -->
-        <div id="hardwareStatusBadge" class="status-badge sim" title="Hardware link telemetry">
+        <div id="hardwareStatusBadge" class="status-badge sim" title="Hardware link status">
           <span class="status-badge-dot"></span>
-          <span id="hardwareStatusText">Simulated ESP32</span>
+          <span id="hardwareStatusText">SIM</span>
         </div>
 
-        <!-- Emergency Stop / Transmission Abort -->
-        <button id="stopTransmissionBtn" class="btn btn-danger header-abort-btn" disabled title="Emergency Optical Transmission Abort">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <rect x="5" y="5" width="14" height="14" rx="2"/>
-          </svg>
-          <span>ABORT</span>
-        </button>
+        <span id="missionClockDisplay" class="mission-clock-time" title="UTC Clock">00:00:00</span>
+
+        <button id="stopTransmissionBtn" class="btn btn-danger header-abort-btn" disabled title="Abort optical transmission">ABORT</button>
       </div>
     </header>
 
     <!-- =========================================================================
-         Segmented Navigation Dock
+         Navigation
          ========================================================================= -->
     <div class="nav-tabs-wrapper">
       <nav class="nav-tabs" aria-label="System Navigation">
-        <button class="nav-tab active" data-tab="input" id="tabInputBtn">
-          <span class="nav-tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-              <line x1="12" x2="12" y1="19" y2="22"/>
-            </svg>
-          </span>
-          <span>Studio Cockpit</span>
-          <span class="nav-tab-badge">01</span>
-        </button>
-
-        <button class="nav-tab" data-tab="tapper" id="tabTapperBtn">
-          <span class="nav-tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="6" width="20" height="12" rx="2"/>
-              <circle cx="7" cy="12" r="1.5" fill="currentColor"/>
-              <line x1="12" y1="12" x2="17" y2="12"/>
-            </svg>
-          </span>
-          <span>Telegraph Key</span>
-          <span class="nav-tab-badge">02</span>
-        </button>
-
-        <button class="nav-tab" data-tab="beacon" id="tabBeaconBtn">
-          <span class="nav-tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="4"/>
-              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-            </svg>
-          </span>
-          <span>Optical Beacon</span>
-          <span class="nav-tab-badge">03</span>
-        </button>
-
-        <button class="nav-tab" data-tab="hardware" id="tabHardwareBtn">
-          <span class="nav-tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="4" y="4" width="16" height="16" rx="2"/>
-              <rect x="9" y="9" width="6" height="6"/>
-              <line x1="9" y1="1" x2="9" y2="4"/>
-              <line x1="15" y1="1" x2="15" y2="4"/>
-              <line x1="9" y1="20" x2="9" y2="23"/>
-              <line x1="15" y1="20" x2="15" y2="23"/>
-            </svg>
-          </span>
-          <span>ESP32 Bridge</span>
-          <span class="nav-tab-badge">04</span>
-        </button>
-
-        <button class="nav-tab" data-tab="settings" id="tabSettingsBtn">
-          <span class="nav-tab-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="4" y1="21" x2="4" y2="14"/>
-              <line x1="4" y1="10" x2="4" y2="3"/>
-              <line x1="12" y1="21" x2="12" y2="12"/>
-              <line x1="12" y1="8" x2="12" y2="3"/>
-              <line x1="20" y1="21" x2="20" y2="16"/>
-              <line x1="20" y1="12" x2="20" y2="3"/>
-              <line x1="1" y1="14" x2="7" y2="14"/>
-              <line x1="9" y1="8" x2="15" y2="8"/>
-              <line x1="17" y1="16" x2="23" y2="16"/>
-            </svg>
-          </span>
-          <span>Carrier & Timings</span>
-          <span class="nav-tab-badge">05</span>
-        </button>
+        <button class="nav-tab active" data-tab="input" id="tabInputBtn">Transmit</button>
+        <button class="nav-tab" data-tab="tapper" id="tabTapperBtn">Key</button>
+        <button class="nav-tab" data-tab="beacon" id="tabBeaconBtn">Beacon</button>
+        <button class="nav-tab" data-tab="hardware" id="tabHardwareBtn">Hardware</button>
+        <button class="nav-tab" data-tab="settings" id="tabSettingsBtn">Settings</button>
       </nav>
     </div>
 
     <!-- =========================================================================
-         TAB 1: Optical Transmission Studio (Cockpit Grid)
+         TAB 1: Transmit
          ========================================================================= -->
     <main class="tab-pane active" id="inputTab">
-      <div class="studio-cockpit-grid">
+      <div class="transmit-workspace">
 
-        <!-- Left Column: Payload Encoder & Presets -->
-        <section class="surface-panel">
-          <div class="panel-header">
-            <div class="panel-title-group">
-              <div class="panel-icon-badge" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
-                </svg>
-              </div>
-              <div>
-                <h2 class="panel-title">Message Payload Encoder</h2>
-                <span class="panel-subtitle">Natural Text or Voice Dictation</span>
-              </div>
-            </div>
-
-            <!-- Adaptive Semantic Toggle Pill -->
-            <label class="adaptive-toggle-card" for="adaptiveToggle" title="Compress natural language to emergency standard tokens to reduce optical transmission duration">
-              <span class="adaptive-toggle-title">Adaptive Compression</span>
-              <span class="switch">
-                <input type="checkbox" id="adaptiveToggle" checked>
-                <span class="slider-toggle"></span>
-              </span>
-            </label>
-          </div>
-
+        <!-- Message Input -->
+        <section class="input-section">
           <div class="text-input-wrap">
             <textarea
               id="textInput"
               class="text-input-field"
-              placeholder="Type emergency transmission, dictate via microphone, or trigger tactical preset..."
-              rows="4"
-              aria-label="Text message transmission payload"
+              placeholder="Type your message..."
+              rows="3"
+              aria-label="Message to transmit"
             >SOS</textarea>
 
             <div class="text-inner-toolbar">
-              <span id="charCounter" class="char-counter-pill">3 chars</span>
-              <button id="clearInputBtn" class="btn btn-ghost" style="padding: 0.25rem 0.65rem; font-size: 0.72rem;" title="Clear payload buffer">
-                Clear Buffer
-              </button>
+              <div class="toolbar-left">
+                <button id="micBtn" class="btn btn-icon btn-mic" title="Voice Dictation" aria-label="Voice Dictation">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" x2="12" y1="19" y2="22"/>
+                  </svg>
+                </button>
+                <span id="micStatus" class="mic-status-label"></span>
+              </div>
+
+              <div class="toolbar-right">
+                <span id="charCounter" class="char-counter-pill">3 chars</span>
+                <button id="clearInputBtn" class="btn btn-text" title="Clear message">Clear</button>
+              </div>
             </div>
           </div>
 
-          <!-- Microphone Dictation Action Bar -->
-          <div class="input-actions-bar">
-            <div class="input-left-actions">
-              <button id="micBtn" class="btn btn-mic" title="Click to begin Speech Dictation via Web Speech API">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                  <line x1="12" x2="12" y1="19" y2="22"/>
-                </svg>
-                <span>Voice Dictation</span>
-              </button>
-              <span id="micStatus" class="mic-status-label">Mic Ready</span>
-            </div>
-          </div>
-
-          <!-- Adaptive Semantic Optimization Banner -->
-          <div id="semanticInfo" class="semantic-banner hidden" role="status"></div>
-
-          <!-- Emergency & Tactical Presets -->
-          <div class="presets-section">
-            <div class="presets-header">
-              <span class="presets-title">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                </svg>
-                Quick Emergency & Tactical Presets
+          <div class="input-meta-row">
+            <label class="adaptive-toggle-inline" for="adaptiveToggle" title="Compress common phrases into short emergency codes">
+              <span class="switch">
+                <input type="checkbox" id="adaptiveToggle" checked>
+                <span class="slider-toggle"></span>
               </span>
-              <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">Instant Transfer</span>
-            </div>
-            <div id="presetsContainer" class="presets-grid"></div>
+              <span class="adaptive-toggle-title">Adaptive Compression</span>
+            </label>
           </div>
+
+          <div id="semanticInfo" class="semantic-banner hidden" role="status"></div>
         </section>
 
-        <!-- Right Column: Generated Morse & Telemetry HUD -->
-        <section class="surface-panel">
-          <div class="panel-header">
-            <div class="panel-title-group">
-              <div class="panel-icon-badge emerald" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-              </div>
-              <div>
-                <h2 class="panel-title">Generated Optical Morse Stream</h2>
-                <span class="panel-subtitle">ITU-R M.1677-1 Dot/Dash Sequence</span>
-              </div>
-            </div>
-            <button id="copyMorseBtn" class="btn btn-ghost" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" title="Copy Morse stream to clipboard">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <!-- Hero Morse Output -->
+        <section class="morse-hero-section">
+          <div class="morse-hero-header">
+            <span class="section-label">Morse Output</span>
+            <button id="copyMorseBtn" class="btn btn-icon" title="Copy Morse code" aria-label="Copy Morse code">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
-              <span>Copy Morse</span>
             </button>
           </div>
 
-          <!-- Morse Display Terminal -->
           <div id="morseDisplay" class="morse-code-box" aria-live="polite">... --- ...</div>
 
-          <!-- Interactive Letter Breakdown -->
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-              <span class="form-label" style="font-size: 0.72rem;">Symbol Decomposition (Click to audition audio)</span>
-            </div>
-            <div id="breakdownContainer" class="breakdown-scroll"></div>
+          <div id="breakdownContainer" class="breakdown-scroll"></div>
+
+          <div class="metrics-inline">
+            <span class="metric-item"><strong id="statUnits" class="metric-val">18</strong> units</span>
+            <span class="metric-sep" aria-hidden="true">·</span>
+            <span class="metric-item"><strong id="statDuration" class="metric-val">1.44s</strong></span>
+            <span class="metric-sep" aria-hidden="true">·</span>
+            <span class="metric-item"><strong id="statChars" class="metric-val">3</strong> chars</span>
+            <span class="metric-sep" aria-hidden="true">·</span>
+            <span class="metric-item"><strong id="statWpm" class="metric-val">15</strong> WPM</span>
           </div>
 
-          <!-- Real-Time Telemetry Metrics -->
-          <div class="metrics-grid">
-            <div class="metric-pill">
-              <div id="statUnits" class="metric-val">18</div>
-              <div class="metric-label">Dot Units</div>
-            </div>
-            <div class="metric-pill">
-              <div id="statDuration" class="metric-val">1.44s</div>
-              <div class="metric-label">Duration</div>
-            </div>
-            <div class="metric-pill">
-              <div id="statChars" class="metric-val">3</div>
-              <div class="metric-label">Characters</div>
-            </div>
-            <div class="metric-pill">
-              <div id="statWpm" class="metric-val">15</div>
-              <div class="metric-label">Speed (WPM)</div>
-            </div>
-          </div>
-
-          <!-- Transmission Execution Triggers -->
           <div class="transmission-actions">
-            <button id="transmitEsp32Btn" class="btn btn-primary" style="flex: 1.3;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
-              <span>DISPATCH TO ESP32</span>
-            </button>
-
-            <button id="playBeaconBtn" class="btn btn-emerald" style="flex: 1;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="5"/>
-                <line x1="12" y1="1" x2="12" y2="3"/>
-                <line x1="12" y1="21" x2="12" y2="23"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                <line x1="1" y1="12" x2="3" y2="12"/>
-                <line x1="21" y1="12" x2="23" y2="12"/>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-              </svg>
-              <span>FIRE BEACON</span>
-            </button>
+            <button id="transmitEsp32Btn" class="btn btn-primary">Send to ESP32</button>
+            <button id="playBeaconBtn" class="btn btn-secondary">Start Beacon</button>
           </div>
 
-          <!-- Live Optical Transmission Progress HUD -->
           <div id="transmissionProgress" class="transmission-progress-wrap hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100">
             <div class="progress-meta">
-              <span id="progressLabel">Modulating Optical Signal...</span>
-              <span style="font-size: 0.72rem; color: var(--accent-emerald); font-weight: 600;">TRANSMITTING</span>
+              <span id="progressLabel">Transmitting...</span>
+              <span class="progress-status">TX</span>
             </div>
             <div class="progress-track">
               <div id="progressBar" class="progress-fill"></div>
@@ -318,223 +140,157 @@
           </div>
         </section>
 
+        <!-- Presets -->
+        <section class="presets-section">
+          <span class="section-label">Presets</span>
+          <div id="presetsContainer" class="presets-row"></div>
+        </section>
+
       </div>
     </main>
 
     <!-- =========================================================================
-         TAB 2: Manual Telegraph Key (Tactile CW Station)
+         TAB 2: Manual Key
          ========================================================================= -->
     <main class="tab-pane" id="tapperTab">
-      <section class="surface-panel" style="max-width: 820px; margin: 0 auto;">
-        <div class="panel-header">
-          <div class="panel-title-group">
-            <div class="panel-icon-badge" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="2"/>
-                <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/>
-              </svg>
-            </div>
-            <div>
-              <h2 class="panel-title">Manual Telegraph Key Station</h2>
-              <span class="panel-subtitle">Real-Time Acoustic & Optical Keying</span>
-            </div>
-          </div>
-          <button id="clearManualBtn" class="btn btn-ghost" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
-            Clear Buffer
-          </button>
+      <section class="workspace-section">
+        <div class="section-header">
+          <h2 class="section-title">Manual Key</h2>
+          <button id="clearManualBtn" class="btn btn-text">Clear</button>
         </div>
 
         <div class="tapper-station">
-          <!-- Tactile Telegraph Paddle -->
           <div class="tapper-key-wrapper">
             <button id="tapperKey" class="tapper-key-btn" aria-label="Morse Code Telegraph Paddle">
               <span>TAP KEY</span>
-              <span class="tapper-hint">Short = Dot • | Long = Dash —</span>
+              <span class="tapper-hint">Short · Dot &nbsp;/&nbsp; Long — Dash</span>
             </button>
           </div>
 
-          <!-- Discrete Mechanical Keypad -->
           <div class="manual-discrete-row">
-            <button id="dotBtn" class="btn btn-ghost">
-              <strong>• DOT (1T)</strong>
-            </button>
-            <button id="dashBtn" class="btn btn-ghost">
-              <strong>— DASH (3T)</strong>
-            </button>
-            <button id="spaceLetterBtn" class="btn btn-ghost">
-              ␣ Letter Gap (3T)
-            </button>
-            <button id="spaceWordBtn" class="btn btn-ghost">
-              / Word Gap (7T)
-            </button>
+            <button id="dotBtn" class="btn btn-ghost">· Dot</button>
+            <button id="dashBtn" class="btn btn-ghost">— Dash</button>
+            <button id="spaceLetterBtn" class="btn btn-ghost">Letter Gap</button>
+            <button id="spaceWordBtn" class="btn btn-ghost">Word Gap</button>
           </div>
 
-          <!-- Live Telemetry Buffers -->
-          <div class="manual-buffers-card">
+          <div class="manual-buffers">
             <div class="buffer-row">
-              <span class="buffer-title">Morse Stream Buffer</span>
+              <span class="buffer-title">Morse</span>
               <span id="manualMorseBuffer" class="buffer-content"></span>
             </div>
             <div class="buffer-row">
-              <span class="buffer-title">Decoded Plaintext</span>
+              <span class="buffer-title">Decoded</span>
               <span id="manualDecodedText" class="buffer-content"></span>
             </div>
           </div>
 
-          <button id="applyManualBtn" class="btn btn-primary" style="width: 100%;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            <span>Transfer Decoded Text to Studio Cockpit</span>
-          </button>
+          <button id="applyManualBtn" class="btn btn-primary full-width">Use in Transmit</button>
         </div>
       </section>
     </main>
 
     <!-- =========================================================================
-         TAB 3: Optical Beacon & Digital Logic Analyzer
+         TAB 3: Beacon & Waveform
          ========================================================================= -->
     <main class="tab-pane" id="beaconTab">
-      <section class="surface-panel" style="max-width: 900px; margin: 0 auto;">
-        <div class="panel-header">
-          <div class="panel-title-group">
-            <div class="panel-icon-badge" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="4"/>
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-              </svg>
-            </div>
-            <div>
-              <h2 class="panel-title">Optical Signal Simulator & Logic Analyzer</h2>
-              <span class="panel-subtitle">Screen Luminescence, Camera Torch & Pulse Waveform</span>
-            </div>
-          </div>
-          <button id="fullscreenToggle" class="btn btn-ghost" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="15 3 21 3 21 9"/>
-              <polyline points="9 21 3 21 3 15"/>
-              <line x1="21" y1="3" x2="14" y2="10"/>
-              <line x1="3" y1="21" x2="10" y2="14"/>
-            </svg>
-            <span>Fullscreen Beacon</span>
-          </button>
+      <section class="workspace-section">
+        <div class="section-header">
+          <h2 class="section-title">Beacon &amp; Waveform</h2>
+          <button id="fullscreenToggle" class="btn btn-ghost">Fullscreen</button>
         </div>
 
         <div class="beacon-display-area">
-          <!-- Optical Fresnel Collimator Lens Emitter -->
           <div class="beacon-bulb-wrapper">
-            <div id="beaconBulb" class="beacon-bulb" title="Simulated Optical Emitter Aperture">
+            <div id="beaconBulb" class="beacon-bulb" title="Optical Emitter">
               <svg class="beacon-bulb-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="8"/>
-                <circle cx="12" cy="12" r="4"/>
-                <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                <circle cx="12" cy="12" r="7"/>
+                <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
               </svg>
             </div>
           </div>
 
-          <!-- Oscilloscope Logic Analyzer Canvas -->
-          <div style="width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-              <span class="form-label" style="font-size: 0.72rem;">Digital Pulse Timeline (TTL 3.3V Logic)</span>
-              <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-cyan);">CH1: OPTICAL_TX</span>
+          <div class="waveform-block">
+            <div class="waveform-header">
+              <span class="section-label">Pulse Timeline</span>
+              <span class="waveform-channel">TTL 3.3V</span>
             </div>
             <div class="waveform-container">
               <canvas id="waveformCanvas" class="waveform-canvas"></canvas>
             </div>
           </div>
 
-          <!-- Hardware Toggles -->
-          <div class="optical-toggles-grid">
-            <div class="toggle-card">
-              <div class="toggle-label-wrap">
+          <div class="optical-toggles-list">
+            <label class="toggle-row" for="torchToggle">
+              <span class="toggle-label-wrap">
                 <span class="toggle-title">Mobile Camera Torch</span>
-                <span class="toggle-sub">Flashes phone's physical LED strobe</span>
-              </div>
-              <label class="switch">
+                <span class="toggle-sub">Physical LED strobe</span>
+              </span>
+              <span class="switch">
                 <input type="checkbox" id="torchToggle">
                 <span class="slider-toggle"></span>
-              </label>
-            </div>
+              </span>
+            </label>
 
-            <div class="toggle-card">
-              <div class="toggle-label-wrap">
-                <span class="toggle-title">Acoustic CW Sidetone</span>
-                <span class="toggle-sub">750Hz harmonic telegraph audio tone</span>
-              </div>
-              <label class="switch">
+            <label class="toggle-row" for="soundToggle">
+              <span class="toggle-label-wrap">
+                <span class="toggle-title">Acoustic Sidetone</span>
+                <span class="toggle-sub">CW audio tone</span>
+              </span>
+              <span class="switch">
                 <input type="checkbox" id="soundToggle" checked>
                 <span class="slider-toggle"></span>
-              </label>
-            </div>
+              </span>
+            </label>
           </div>
         </div>
       </section>
     </main>
 
     <!-- =========================================================================
-         TAB 4: ESP32 Hardware Bridge & Diagnostics
+         TAB 4: Hardware
          ========================================================================= -->
     <main class="tab-pane" id="hardwareTab">
-      <section class="surface-panel" style="max-width: 960px; margin: 0 auto;">
-        <div class="panel-header">
-          <div class="panel-title-group">
-            <div class="panel-icon-badge" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 11a9 9 0 0 1 9 9"/>
-                <path d="M4 4a16 16 0 0 1 16 16"/>
-                <circle cx="5" cy="19" r="1"/>
-              </svg>
-            </div>
-            <div>
-              <h2 class="panel-title">ESP32 Optical Transmitter Hardware Bridge</h2>
-              <span class="panel-subtitle">Wi-Fi HTTP REST, CORS Relay & Web Serial USB</span>
-            </div>
-          </div>
-          <button id="pingEsp32Btn" class="btn btn-primary" style="padding: 0.4rem 0.95rem; font-size: 0.8125rem;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-            <span>Ping ESP32</span>
-          </button>
+      <section class="workspace-section">
+        <div class="section-header">
+          <h2 class="section-title">ESP32 Connection</h2>
+          <button id="pingEsp32Btn" class="btn btn-primary">Ping ESP32</button>
         </div>
 
-        <!-- Hardware Pipeline Diagram -->
         <div class="hardware-pipeline-diagram">
           <div class="pipe-node">
             <div class="pipe-node-box">CLIENT</div>
-            <span class="pipe-node-sub">Web Studio</span>
+            <span class="pipe-node-sub">Web</span>
           </div>
           <div class="pipe-connector"></div>
           <div class="pipe-node">
             <div class="pipe-node-box">BRIDGE</div>
-            <span class="pipe-node-sub">REST / Serial</span>
+            <span class="pipe-node-sub">REST · USB</span>
           </div>
           <div class="pipe-connector"></div>
           <div class="pipe-node">
             <div class="pipe-node-box">ESP32</div>
-            <span class="pipe-node-sub">GPIO 2 (3.3V)</span>
+            <span class="pipe-node-sub">GPIO 2</span>
           </div>
           <div class="pipe-connector"></div>
           <div class="pipe-node">
-            <div class="pipe-node-box" style="border-color: var(--accent-emerald); color: var(--accent-emerald);">OPTICAL LED</div>
-            <span class="pipe-node-sub">VLC Photons</span>
+            <div class="pipe-node-box pipe-node-accent">LED</div>
+            <span class="pipe-node-sub">Optical</span>
           </div>
         </div>
 
         <div class="hardware-form-grid">
           <div class="form-group">
-            <label class="form-label" for="hardwareModeSelect">Communication Pipeline Mode</label>
+            <label class="form-label" for="hardwareModeSelect">Connection Mode</label>
             <select id="hardwareModeSelect" class="form-select">
-              <option value="simulation">Simulated Virtual ESP32 (No Hardware Required)</option>
-              <option value="wifi">Wi-Fi HTTP REST (Direct to ESP32 SoftAP/Station)</option>
-              <option value="serial">Web Serial API (USB Direct Cable Connection)</option>
+              <option value="simulation">Simulated ESP32</option>
+              <option value="wifi">Wi-Fi HTTP REST</option>
+              <option value="serial">Web Serial (USB)</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="esp32IpInput">ESP32 IP Address / Host</label>
+            <label class="form-label" for="esp32IpInput">ESP32 IP / Host</label>
             <input type="text" id="esp32IpInput" class="form-input" value="192.168.4.1" placeholder="192.168.4.1">
           </div>
 
@@ -543,12 +299,12 @@
             <input type="number" id="esp32PortInput" class="form-input" value="80" placeholder="80">
           </div>
 
-          <div class="form-group" style="justify-content: flex-end;">
-            <label class="toggle-card" style="margin: 0; padding: 0.55rem 0.75rem;">
-              <div class="toggle-label-wrap">
-                <span class="toggle-title" style="font-size: 0.78rem;">Server CORS Proxy</span>
+          <div class="form-group form-group-toggle">
+            <label class="toggle-row" for="useProxyCheck">
+              <span class="toggle-label-wrap">
+                <span class="toggle-title">CORS Proxy</span>
                 <span class="toggle-sub">Relay mixed-content requests</span>
-              </div>
+              </span>
               <span class="switch">
                 <input type="checkbox" id="useProxyCheck">
                 <span class="slider-toggle"></span>
@@ -557,125 +313,102 @@
           </div>
         </div>
 
-        <div style="margin-bottom: 0.5rem;">
-          <button id="connectSerialBtn" class="btn btn-primary hidden">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-            <span>Connect USB Serial Port</span>
-          </button>
-        </div>
+        <button id="connectSerialBtn" class="btn btn-secondary hidden">Connect USB Serial</button>
 
-        <!-- Diagnostic Log Console -->
-        <div class="panel-header" style="padding-bottom: 0.5rem; margin-top: 0.5rem;">
-          <h3 class="form-label">Hardware Telemetry & Command Log</h3>
-          <button id="clearLogBtn" class="btn btn-ghost" style="padding: 0.25rem 0.55rem; font-size: 0.72rem;">
-            Clear Console
-          </button>
-        </div>
-        <div id="activityLog" class="terminal-window" role="log" aria-live="polite">
-          <div class="log-row info">System initialized. Awaiting commands...</div>
+        <div class="log-section">
+          <div class="section-header-sm">
+            <span class="section-label">Telemetry Log</span>
+            <button id="clearLogBtn" class="btn btn-text">Clear</button>
+          </div>
+          <div id="activityLog" class="terminal-window" role="log" aria-live="polite">
+            <div class="log-row info">System ready.</div>
+          </div>
         </div>
       </section>
     </main>
 
     <!-- =========================================================================
-         TAB 5: Timing & Carrier Settings
+         TAB 5: Settings
          ========================================================================= -->
     <main class="tab-pane" id="settingsTab">
-      <section class="surface-panel" style="max-width: 820px; margin: 0 auto;">
-        <div class="panel-header">
-          <div class="panel-title-group">
-            <div class="panel-icon-badge" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </div>
-            <div>
-              <h2 class="panel-title">Carrier Timing & Modulation Parameters</h2>
-              <span class="panel-subtitle">ITU-R M.1677-1 Morse Timing Standards</span>
-            </div>
-          </div>
+      <section class="workspace-section">
+        <div class="section-header">
+          <h2 class="section-title">Timing &amp; Audio</h2>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-          <!-- Speed (WPM) Slider -->
+        <div class="settings-stack">
           <div class="slider-control-group">
             <div class="slider-labels-row">
-              <span class="form-label">Transmission Speed (Words Per Minute)</span>
-              <span id="wpmValue" style="color: var(--accent-cyan); font-weight: 700; font-family: var(--font-mono); font-size: 1.125rem;">15 WPM</span>
+              <label class="form-label" for="wpmSlider">Transmission Speed</label>
+              <span id="wpmValue" class="slider-val">15 WPM</span>
             </div>
             <input type="range" id="wpmSlider" class="range-slider" min="5" max="40" value="15" step="1" aria-label="Transmission speed in words per minute">
             <div class="slider-labels-row slider-meta-row">
-              <span>5 WPM (Long Range)</span>
+              <span>5 WPM</span>
               <span id="unitMsDisplay" class="unit-ms-badge">80 ms / dot</span>
-              <span>40 WPM (High Speed)</span>
+              <span>40 WPM</span>
             </div>
           </div>
 
-          <!-- Sidetone Audio Pitch -->
           <div class="slider-control-group">
             <div class="slider-labels-row">
-              <span class="form-label">Acoustic Sidetone Frequency (Hz)</span>
-              <span id="pitchValue" style="color: var(--accent-cyan); font-weight: 700; font-family: var(--font-mono); font-size: 1.125rem;">750 Hz</span>
+              <label class="form-label" for="pitchSlider">Sidetone Frequency</label>
+              <span id="pitchValue" class="slider-val">750 Hz</span>
             </div>
             <input type="range" id="pitchSlider" class="range-slider" min="300" max="1500" value="750" step="25" aria-label="Acoustic sidetone frequency in hertz">
             <div class="slider-labels-row slider-meta-row">
-              <span>300 Hz (Low Buzzer)</span>
-              <span>750 Hz (Standard CW)</span>
-              <span>1500 Hz (High Beep)</span>
+              <span>300 Hz</span>
+              <span>750 Hz</span>
+              <span>1500 Hz</span>
             </div>
           </div>
 
-          <!-- Repeat Loop -->
-          <div class="form-group" style="max-width: 360px;">
-            <label class="form-label" for="repeatSelect">Transmission Burst Repeat Count</label>
+          <div class="form-group">
+            <label class="form-label" for="repeatSelect">Repeat Count</label>
             <select id="repeatSelect" class="form-select">
-              <option value="1">1x (Single Optical Transmission)</option>
-              <option value="3">3x (Standard Emergency Burst)</option>
-              <option value="5">5x (High Reliability Pulse)</option>
-              <option value="999">Infinite Loop (Continuous Optical SOS)</option>
+              <option value="1">1x (Single)</option>
+              <option value="3">3x (Emergency Burst)</option>
+              <option value="5">5x (High Reliability)</option>
+              <option value="999">Infinite Loop</option>
             </select>
           </div>
 
-          <!-- Standards Reference Chart -->
-          <div style="margin-top: 0.5rem; width: 100%; min-width: 0;">
-            <span class="form-label">ITU-R M.1677-1 Timing Ratio Specifications</span>
+          <div class="reference-block">
+            <span class="section-label">ITU-R M.1677-1 Timing Ratios</span>
             <div class="table-responsive">
               <table class="morse-reference-table">
                 <thead>
                   <tr>
                     <th>Element</th>
-                    <th>Relative Duration</th>
+                    <th>Duration</th>
                     <th>Description</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>Dot (Dit)</td>
-                    <td>1 Unit (1T)</td>
-                    <td>Basic optical burst timing unit (1200 / WPM ms)</td>
+                    <td>1T</td>
+                    <td>Base unit (1200 / WPM ms)</td>
                   </tr>
                   <tr>
                     <td>Dash (Dah)</td>
-                    <td>3 Units (3T)</td>
-                    <td>Standard prolonged optical emission</td>
+                    <td>3T</td>
+                    <td>Prolonged pulse</td>
                   </tr>
                   <tr>
-                    <td>Intra-element space</td>
-                    <td>1 Unit (1T)</td>
-                    <td>Optical gap between dots and dashes in character</td>
+                    <td>Intra-element gap</td>
+                    <td>1T</td>
+                    <td>Pause between symbols</td>
                   </tr>
                   <tr>
-                    <td>Inter-character space</td>
-                    <td>3 Units (3T)</td>
-                    <td>Optical gap between successive characters</td>
+                    <td>Inter-character gap</td>
+                    <td>3T</td>
+                    <td>Pause between letters</td>
                   </tr>
                   <tr>
-                    <td>Inter-word space</td>
-                    <td>7 Units (7T)</td>
-                    <td>Optical gap separating individual words</td>
+                    <td>Inter-word gap</td>
+                    <td>7T</td>
+                    <td>Pause between words</td>
                   </tr>
                 </tbody>
               </table>
@@ -684,24 +417,12 @@
         </div>
       </section>
     </main>
-
   </div>
 
   <!-- Fullscreen Optical Strobe Overlay -->
   <div id="fullscreenBeacon" class="fullscreen-beacon-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen Optical Beacon">
-    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="5"/>
-      <line x1="12" y1="1" x2="12" y2="3"/>
-      <line x1="12" y1="21" x2="12" y2="23"/>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-      <line x1="1" y1="12" x2="3" y2="12"/>
-      <line x1="21" y1="12" x2="23" y2="12"/>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-    </svg>
-    <div class="fullscreen-hint" style="font-weight: 700; letter-spacing: 0.05em;">FULLSCREEN OPTICAL BEACON ACTIVE</div>
-    <div class="fullscreen-hint" style="font-size: 0.75rem;">Tap anywhere on screen to exit</div>
+    <div class="fullscreen-hint">OPTICAL BEACON ACTIVE</div>
+    <div class="fullscreen-hint fullscreen-hint-sub">Tap anywhere to exit</div>
   </div>
 
   <!-- Application Logic Modules -->

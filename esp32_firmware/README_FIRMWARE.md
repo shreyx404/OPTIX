@@ -1,6 +1,6 @@
 # 🔦 ESP32 Optical LED Transmitter — Hardware & Firmware Guide
 
-This document describes how to flash, wire, and operate the **ESP32 Optical Transmitter** node for the **BIOTCP Optical Communication System**.
+This document describes how to flash, wire, and operate the **ESP32 Optical Transmitter** node for the **OPTIX Optical Communication System**.
 
 ---
 
@@ -91,7 +91,7 @@ ESP32 GND    ────────────────┴─────�
 
 ### 1. Autonomous SoftAP Mode (Emergency Field Operation)
 - The ESP32 creates its own independent Wi-Fi hotspot:
-  - **SSID**: `BIOTCP-Optical-Transmitter`
+  - **SSID**: `OPTIX-Optical-Transmitter`
   - **Password**: `12345678`
   - **Default Gateway / Node IP**: `http://192.168.4.1`
 
@@ -103,22 +103,22 @@ ESP32 GND    ────────────────┴─────�
 - **Q: Do I need to disconnect the ESP32 Wi-Fi from my laptop before connecting my phone?**  
   **No! Do NOT disconnect the laptop.** The ESP32 SoftAP operates just like a wireless router and supports **multiple client connections concurrently**. You can keep your laptop connected while simultaneously operating from your phone.
 - **Q: Should my phone be connected to the same Wi-Fi?**  
-  **Yes, absolutely.** Your phone must be connected to `BIOTCP-Optical-Transmitter` so it resides on the same local `192.168.4.x` subnet.
+  **Yes, absolutely.** Your phone must be connected to `OPTIX-Optical-Transmitter` so it resides on the same local `192.168.4.x` subnet.
 
 ### 📋 Mobile Prerequisites Checklist
 
 | # | Prerequisite | Action Required | Why It's Crucial |
 | :-: | :--- | :--- | :--- |
 | 1 | **ESP32 Powered On** | Connect via USB data cable to PC or 5V power bank. | Generates the private local RF bubble. |
-| 2 | **Connect to Wi-Fi** | Join `BIOTCP-Optical-Transmitter` using password `12345678`. | Establishes local IP link. |
+| 2 | **Connect to Wi-Fi** | Join `OPTIX-Optical-Transmitter` using password `12345678`. | Establishes local IP link. |
 | 3 | **Disable Mobile Data** | **Turn OFF Cellular / Mobile Data (4G/5G)** on your phone. | **Crucial:** Modern phones detect "No Internet" on the ESP32 Wi-Fi and attempt to route browser traffic to cellular data instead of the local subnet. |
 | 4 | **Acknowledge Wi-Fi Prompt** | Tap **"Stay Connected"** / **"Keep Connection"** when iOS or Android asks. | Prevents the OS from automatically disconnecting. |
 
 ### 📲 Two Ways to Control from Mobile
 
-#### Method A: Full BIOTCP Tactical Console on Mobile *(Rich UI, Voice Dictation & Presets)*
-1. Keep `node server.js` running on your laptop while the laptop is connected to `BIOTCP-Optical-Transmitter`.
-2. Connect your mobile phone to `BIOTCP-Optical-Transmitter` (with Mobile Data disabled).
+#### Method A: Full OPTIX Tactical Console on Mobile *(Rich UI, Voice Dictation & Presets)*
+1. Keep `node server.js` running on your laptop while the laptop is connected to `OPTIX-Optical-Transmitter`.
+2. Connect your mobile phone to `OPTIX-Optical-Transmitter` (with Mobile Data disabled).
 3. In Chrome or Safari on your phone, open:
    ```
    http://192.168.4.2:3000
@@ -132,7 +132,7 @@ ESP32 GND    ────────────────┴─────�
 
 #### Method B: Standalone Embedded Portal *(Zero Laptop Needed — 100% Offline Field Mode)*
 1. Power the ESP32 from any 5V USB power bank or smartphone charger (no computer needed).
-2. Connect your phone to `BIOTCP-Optical-Transmitter` (password: `12345678`).
+2. Connect your phone to `OPTIX-Optical-Transmitter` (password: `12345678`).
 3. Open your phone's browser and go directly to:
    ```
    http://192.168.4.1
@@ -173,7 +173,7 @@ All endpoints include CORS headers (`Access-Control-Allow-Origin: *`) for browse
 {
   "status": "ok",
   "device": "ESP32-Optical-Transmitter",
-  "firmware": "BIOTCP-v1.0",
+  "firmware": "OPTIX-v1.0",
   "uptime_sec": 42,
   "gpio_builtin": 2,
   "gpio_optical": 4
@@ -242,5 +242,5 @@ You can also control the ESP32 directly via USB Serial terminal:
 ## 🔋 Power Independence & Standalone Field Operation
 
 - **Flash Memory Persistence**: Uploading firmware writes the code to the ESP32's onboard SPI flash memory. Disconnecting power **never erases the code**.
-- **Cold Boot Time**: When connected to any standard 5V power source (power bank, USB wall charger, or 5V battery), the ESP32 boots in **< 2 seconds** and immediately begins broadcasting the `BIOTCP-Optical-Transmitter` Wi-Fi network.
+- **Cold Boot Time**: When connected to any standard 5V power source (power bank, USB wall charger, or 5V battery), the ESP32 boots in **< 2 seconds** and immediately begins broadcasting the `OPTIX-Optical-Transmitter` Wi-Fi network.
 - **Autonomous Emergency Node**: In disaster situations, you can power the ESP32 with just a pocket power bank. Responders or survivors can connect with their smartphones directly to `http://192.168.4.1` and transmit optical signals without needing a laptop, internet router, or cellular network.
