@@ -2,7 +2,7 @@
 
 OPTIX drives high-contrast visual strobes, mobile camera flash LEDs, and external high-power ESP32 optical emitters. This document outlines the safety interlocks, accessibility compliance gates, and client/server security boundaries enforced by the system.
 
-> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [HARDWARE_SETUP.md](HARDWARE_SETUP.md) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [ARCHITECTURE.md](ARCHITECTURE.md) · [PROTOCOL.md](PROTOCOL.md) · [PRODUCT.md](PRODUCT.md) · [DESIGN.md](DESIGN.md)
+> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [Project_OPTIX_DCN_Report.docx](Project_OPTIX_DCN_Report.docx) · [HARDWARE_SETUP.md](HARDWARE_SETUP.md) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [ARCHITECTURE.md](ARCHITECTURE.md) · [PROTOCOL.md](PROTOCOL.md) · [PRODUCT.md](PRODUCT.md) · [DESIGN.md](DESIGN.md)
 
 ---
 

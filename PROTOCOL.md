@@ -2,7 +2,7 @@
 
 This specification defines the optical modulation standard, adaptive semantic contraction rules, HTTP REST contract, and USB Web Serial wire protocol implemented across the OPTIX web console and ESP32 firmware.
 
-> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [HARDWARE_SETUP.md](HARDWARE_SETUP.md) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [ARCHITECTURE.md](ARCHITECTURE.md) · [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md) · [PRODUCT.md](PRODUCT.md)
+> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [Project_OPTIX_DCN_Report.docx](Project_OPTIX_DCN_Report.docx) · [HARDWARE_SETUP.md](HARDWARE_SETUP.md) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [ARCHITECTURE.md](ARCHITECTURE.md) · [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md) · [PRODUCT.md](PRODUCT.md)
 
 ---
 

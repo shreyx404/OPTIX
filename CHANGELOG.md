@@ -4,6 +4,26 @@ All notable changes to the **OPTIX Adaptive Semantic Optical Morse Communication
 
 ---
 
+## [4.0.4] — 2026-11-19
+
+### Added — Formal DCN Course Project Report Deliverable (VIT Savitribai Phule Pune University Format)
+- **New Institutional DCN Report Created**: Generated [Project_OPTIX_DCN_Report.docx](Project_OPTIX_DCN_Report.docx) (and [DCN report.docx](DCN%20report.docx)) adhering strictly to the formal Vishwakarma Institute of Technology (VIT Pune) Data Communication and Networking (DCN) course project report template:
+  - **Academic Front Matter**: Implements formal cover page, bonafide Certificate (Internal Guide: Prof. Priyanka Lahu Gaikwad; HOD: Dr. Priya Shelke), Project Synopsis with member tracking table, Acknowledgement, Abstract with standardized DCN keywords, and complete Table of Contents with synchronized page numbers.
+  - **Student Information Left Blank**: Student names, Roll Numbers, PRN numbers, Contact numbers, Email addresses, and signatures are formatted as clean blank lines/cells for manual student entry.
+  - **Comprehensive DCN Chapter Alignment (Chapters 1–8)**:
+    - *Chapter 1 (Introduction)*: Overview, Need of the Network, 8 concrete DCN objectives, and project scope.
+    - *Chapter 2 (Literature Review and Research Gap)*: Analysis of OWC/VLC, IEEE 802.15.7, ITU-R M.1677-1, RFC 1918 private networking, and 6 articulated research gaps.
+    - *Chapter 3 (System Requirements Specification)*: Hardware, software, 10 functional requirements (FR1–FR10), and 5 non-functional engineering standards.
+    - *Chapter 4 (Methodology and Network Architecture)*: 5-stage signal pipeline, 6-subsystem device inventory (Table 4.1), comprehensive addressing plan across IP/UART/timing (Table 4.2), ITU-R PARIS benchmark parameters across 5–40 WPM (Table 4.3), REST/UART services, and end-to-end workflow.
+    - *Chapter 5 (Implementation)*: Toolchain, hardware breadboard wiring and IRLZ44N MOSFET stage (Table 5.1 & Figure 5.1), embedded FreeRTOS firmware listing (Listing 5.1), and 6 operational workspaces.
+    - *Chapter 6 (Experiments and Results)*: Experimental benchtop setup, module evaluation, 9-test verification matrix with 100% Pass rate (Table 6.1), quantitative evaluation metrics, and 9 high-resolution empirical screenshots (Figures 6.1–6.9).
+    - *Chapter 7 (Discussion, Conclusion and Future Scope)*: Strengths, physical/atmospheric limitations, conclusion, 7 key outcomes, and Phase 2 OPTIX-MK2 tactical torch roadmap.
+    - *Chapter 8 (References)*: 15 formal academic citations formatted in IEEE/RFC citation standard.
+- **Template PDF Cleaned**: Removed temporary template `DCN report.pdf` after successfully generating and verifying the final Word document.
+- **System Documentation**: Synchronized document headers and cross-references across all system markdown files.
+
+---
+
 ## [4.0.3] — 2026-11-19
 
 ### Aligned — BIOT (Internet of Things) Subject Syllabus Mapping & Deck Refinement
