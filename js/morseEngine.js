@@ -43,18 +43,37 @@ export const SEMANTIC_PRESETS = [
   { id: 'ack', label: 'Acknowledge', code: 'ACK RCV', category: 'status', desc: 'Message Received & Understood' }
 ];
 
-// Semantic Contraction rules to shorten verbose phrases for optical power saving
+// Semantic Contraction rules to shorten verbose phrases for optical power saving.
+// Deliberately avoids rewriting negated phrases so emergency meaning is never inverted.
 const SEMANTIC_CONTRACTIONS = [
   { regex: /\b(please\s+help(\s+us)?|need\s+urgent\s+help|emergency)\b/gi, replacement: 'SOS' },
   { regex: /\b(doctor|medical\s+assistance|ambulance|medic|injured|hurt)\b/gi, replacement: 'MED' },
   { regex: /\b(fire|burning|smoke|flames)\b/gi, replacement: 'FIRE' },
   { regex: /\b(evacuate|get\s+out|leave\s+immediately|flee)\b/gi, replacement: 'EVAC' },
-  { regex: /\b(we\s+are\s+safe|all\s+clear|no\s+danger)\b/gi, replacement: 'SAFE' },
+  { regex: /\b(we\s+are\s+safe|all\s+clear)\b/gi, replacement: 'SAFE' },
   { regex: /\b(stuck|trapped|collapsed|buried)\b/gi, replacement: 'TRAPPED' },
   { regex: /\b(drinking\s+water|clean\s+water|thirst)\b/gi, replacement: 'WATER' },
   { regex: /\b(food|rations|hunger|starving)\b/gi, replacement: 'FOOD' },
   { regex: /\b(understood|message\s+received|roger\s+that)\b/gi, replacement: 'ACK' }
 ];
+
+// Negation tokens that must never be dropped or rewritten away
+const NEGATION_PATTERN = /\b(no|not|never|without|none|cannot|can't|dont|don't)\b/i;
+
+/**
+ * Returns an array of unique non-whitespace characters that have no ITU-R M.1677-1 Morse mapping
+ */
+export function getUnsupportedChars(text) {
+  if (!text) return [];
+  const unsupported = new Set();
+  for (const ch of Array.from(text.toUpperCase())) {
+    if (/\s/.test(ch)) continue;
+    if (!MORSE_TABLE[ch]) {
+      unsupported.add(ch);
+    }
+  }
+  return Array.from(unsupported);
+}
 
 /**
  * Text to Morse string
@@ -110,29 +129,40 @@ export function validateMorse(morse) {
  * Applies Adaptive Semantic Compression to reduce optical transmission duration
  */
 export function applySemanticCompression(text) {
-  if (!text) return { compressed: '', original: '', savingsPercent: 0 };
-  let result = text.trim();
+  if (!text) {
+    return { compressed: '', original: '', originalUnits: 0, compressedUnits: 0, savingsPercent: 0, changed: false, preservedNegation: false };
+  }
+  const trimmed = text.trim();
+  const hasNegation = NEGATION_PATTERN.test(trimmed);
+  let result = trimmed;
 
   for (const rule of SEMANTIC_CONTRACTIONS) {
+    // Never rewrite into SAFE when the message contains a negation (e.g. "not all clear")
+    if (hasNegation && rule.replacement === 'SAFE') continue;
     result = result.replace(rule.regex, rule.replacement);
   }
 
-  // Remove filler words to compress for optical transmission
-  result = result.replace(/\b(the|a|an|is|are|we|have|has|our|in|at|to)\b/gi, ' ')
+  // Strip only non-semantic articles/prepositions; preserve subjects, possession, and negations
+  // (e.g. keep "WE", "HAVE", "NEED", "NO", "NOT", "WITHOUT" intact).
+  result = result.replace(/\b(the|a|an|is|are|our|in|at|to)\b/gi, ' ')
                  .replace(/\s{2,}/g, ' ')
                  .trim()
                  .toUpperCase();
 
-  const originalUnits = calculateMorseUnits(textToMorse(text)).totalUnits;
+  const normalizedOriginal = trimmed.replace(/\s{2,}/g, ' ').toUpperCase();
+  const originalUnits = calculateMorseUnits(textToMorse(trimmed)).totalUnits;
   const compressedUnits = calculateMorseUnits(textToMorse(result)).totalUnits;
   const savings = originalUnits > 0 ? Math.max(0, Math.round(((originalUnits - compressedUnits) / originalUnits) * 100)) : 0;
+  const changed = Boolean(result) && result !== normalizedOriginal && savings > 0;
 
   return {
-    original: text,
-    compressed: result,
+    original: trimmed,
+    compressed: result || normalizedOriginal,
     originalUnits,
     compressedUnits,
-    savingsPercent: savings
+    savingsPercent: changed ? savings : 0,
+    changed,
+    preservedNegation: hasNegation
   };
 }
 

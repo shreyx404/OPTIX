@@ -11,6 +11,7 @@ class OpticalTransmitter {
     this.beaconEl = null;
     this.canvasEl = null;
     this.ctx = null;
+    this.canvases = []; // Supports primary oscilloscope + synced Transmit preview trace
     this.mediaStream = null;
     this.videoTrack = null;
     this.torchSupported = false;
@@ -23,6 +24,7 @@ class OpticalTransmitter {
     this.totalDurationMs = 0;
     this.stepStartTime = 0;
     this.stepElapsedBeforeCurrent = 0;
+    this._cycleAnchorTime = 0;
 
     this.repeatCount = 1;
     this.currentCycle = 1;
@@ -38,11 +40,16 @@ class OpticalTransmitter {
 
     this.fullscreenBeaconEl = null;
     this.enableFullscreenFlash = false;
+    this.fullscreenStrobeMode = 'amber'; // 'amber' (night-vision) | 'white' (max luminance) | 'none' (reduced-motion safe)
     this.enableTorch = false;
     this.enableSound = true;
     this.stateListeners = new Set();
 
-    // Interactive oscilloscope hover state
+    // Cached logical canvas dimensions to avoid 60fps getBoundingClientRect() layout queries
+    this._canvasWidth = 0;
+    this._canvasHeight = 0;
+
+    // Interactive oscilloscope hover & keyboard inspection state
     this.hoverIndex = -1;
     this.hoverX = -1;
     this._canvasBound = false;
@@ -55,7 +62,7 @@ class OpticalTransmitter {
     return () => this.stateListeners.delete(fn);
   }
 
-  init({ beaconEl, canvasEl, fullscreenBeaconEl, onSeek } = {}) {
+  init({ beaconEl, canvasEl, previewCanvasEl, fullscreenBeaconEl, onSeek } = {}) {
     this.beaconEl = beaconEl;
     this.canvasEl = canvasEl;
     this.fullscreenBeaconEl = fullscreenBeaconEl;
@@ -63,33 +70,41 @@ class OpticalTransmitter {
       this.onSeekCallback = onSeek;
     }
 
-    if (this.canvasEl) {
-      this.ctx = this.canvasEl.getContext('2d');
+    const targets = [canvasEl, previewCanvasEl].filter(Boolean);
+    this.canvases = targets.map((el) => ({
+      el,
+      ctx: el.getContext('2d'),
+      width: 0,
+      height: 0,
+      hoverIndex: -1,
+      hoverX: -1
+    }));
+
+    if (this.canvases.length > 0) {
+      this.ctx = this.canvases[0].ctx;
       this.resizeCanvas();
       window.addEventListener('resize', () => this.resizeCanvas());
 
-      if (window.ResizeObserver && this.canvasEl.parentElement) {
-        const ro = new ResizeObserver(() => {
-          this.resizeCanvas();
-        });
-        ro.observe(this.canvasEl.parentElement);
-      }
-
-      if (!this._canvasBound) {
-        this._bindCanvasInteraction();
-        this._canvasBound = true;
-      }
+      this.canvases.forEach((entry) => {
+        if (window.ResizeObserver && entry.el.parentElement) {
+          const ro = new ResizeObserver(() => this.resizeCanvas());
+          ro.observe(entry.el.parentElement);
+        }
+        this._bindCanvasInteraction(entry);
+      });
+      this._canvasBound = true;
     }
 
     this.checkTorchSupport();
   }
 
-  _bindCanvasInteraction() {
-    if (!this.canvasEl) return;
+  _bindCanvasInteraction(entry) {
+    const canvas = entry.el;
+    if (!canvas) return;
 
     const getIndexAtX = (clientX) => {
       if (!this.timeline || this.timeline.length === 0 || this.totalDurationMs <= 0) return -1;
-      const rect = this.canvasEl.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       if (rect.width <= 0) return -1;
       const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
       const targetMs = (relX / rect.width) * this.totalDurationMs;
@@ -104,45 +119,104 @@ class OpticalTransmitter {
       return this.timeline.length - 1;
     };
 
-    this.canvasEl.addEventListener('mousemove', (e) => {
+    canvas.addEventListener('mousemove', (e) => {
       if (!this.timeline || this.timeline.length === 0) return;
-      const rect = this.canvasEl.getBoundingClientRect();
-      this.hoverX = e.clientX - rect.left;
-      this.hoverIndex = getIndexAtX(e.clientX);
+      const rect = canvas.getBoundingClientRect();
+      entry.hoverX = e.clientX - rect.left;
+      entry.hoverIndex = getIndexAtX(e.clientX);
       if (!this.isPlaying) {
         this.drawTimeline(this.timeline, this.currentIndex);
       }
     });
 
-    this.canvasEl.addEventListener('mouseleave', () => {
-      this.hoverIndex = -1;
-      this.hoverX = -1;
+    canvas.addEventListener('mouseleave', () => {
+      entry.hoverIndex = -1;
+      entry.hoverX = -1;
       if (!this.isPlaying) {
         this.drawTimeline(this.timeline, this.currentIndex);
       }
     });
 
-    this.canvasEl.addEventListener('click', (e) => {
+    canvas.addEventListener('click', (e) => {
       const idx = getIndexAtX(e.clientX);
       if (idx < 0) return;
       if (this.onSeekCallback) {
         this.onSeekCallback(idx, this.timeline[idx]);
       }
     });
+
+    // Keyboard inspection & seek parity (ArrowLeft / ArrowRight / Home / End / Enter / Space)
+    canvas.addEventListener('keydown', (e) => {
+      if (!this.timeline || this.timeline.length === 0) return;
+      const len = this.timeline.length;
+      let nextIdx = entry.hoverIndex;
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextIdx = nextIdx < 0 ? 0 : Math.min(len - 1, nextIdx + 1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        nextIdx = nextIdx < 0 ? len - 1 : Math.max(0, nextIdx - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        nextIdx = 0;
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        nextIdx = len - 1;
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const seekIdx = entry.hoverIndex >= 0 ? entry.hoverIndex : 0;
+        if (this.onSeekCallback) {
+          this.onSeekCallback(seekIdx, this.timeline[seekIdx]);
+        }
+        return;
+      } else {
+        return;
+      }
+
+      entry.hoverIndex = nextIdx;
+      const width = entry.width || canvas.getBoundingClientRect().width || 1;
+      const elapsedBefore = this._getElapsedBeforeIndex(nextIdx);
+      const item = this.timeline[nextIdx];
+      entry.hoverX = this.totalDurationMs > 0
+        ? ((elapsedBefore + item.durationMs / 2) / this.totalDurationMs) * width
+        : 0;
+      this.drawTimeline(this.timeline, this.currentIndex);
+    });
+
+    canvas.addEventListener('blur', () => {
+      if (entry.hoverIndex !== -1) {
+        entry.hoverIndex = -1;
+        entry.hoverX = -1;
+        if (!this.isPlaying) {
+          this.drawTimeline(this.timeline, this.currentIndex);
+        }
+      }
+    });
   }
 
   resizeCanvas() {
-    if (!this.canvasEl) return;
-    const rect = this.canvasEl.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
+    if (!this.canvases || this.canvases.length === 0) return;
     const dpr = window.devicePixelRatio || 1;
-    this.canvasEl.width = Math.round(rect.width * dpr);
-    this.canvasEl.height = Math.round(rect.height * dpr);
-    if (this.ctx) {
-      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-      this.ctx.scale(dpr, dpr);
+    let resizedAny = false;
+
+    this.canvases.forEach((entry) => {
+      const rect = entry.el.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      entry.width = rect.width;
+      entry.height = rect.height;
+      entry.el.width = Math.round(rect.width * dpr);
+      entry.el.height = Math.round(rect.height * dpr);
+      if (entry.ctx) {
+        entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        entry.ctx.scale(dpr, dpr);
+      }
+      resizedAny = true;
+    });
+
+    if (resizedAny) {
+      this.drawTimeline(this.timeline, this.currentIndex, this._getSmoothElapsedMs());
     }
-    this.drawTimeline(this.timeline, this.currentIndex, this._getSmoothElapsedMs());
   }
 
   /**
@@ -211,10 +285,20 @@ class OpticalTransmitter {
   /**
    * Dynamically toggle fullscreen strobe overlay flashing even mid-transmission
    */
-  setFullscreenFlash(enabled) {
+  setFullscreenFlash(enabled, strobeMode = null) {
     this.enableFullscreenFlash = Boolean(enabled);
+    if (strobeMode) {
+      this.fullscreenStrobeMode = strobeMode;
+    }
     if (!this.enableFullscreenFlash && this.fullscreenBeaconEl) {
-      this.fullscreenBeaconEl.classList.remove('flash-on');
+      this.fullscreenBeaconEl.classList.remove('flash-on', 'flash-amber');
+    }
+  }
+
+  setFullscreenStrobeMode(strobeMode) {
+    this.fullscreenStrobeMode = strobeMode || 'amber';
+    if (this.fullscreenBeaconEl) {
+      this.fullscreenBeaconEl.classList.remove('flash-on', 'flash-amber');
     }
   }
 
@@ -282,11 +366,13 @@ class OpticalTransmitter {
       this.beaconEl.classList.toggle('active', active);
     }
 
-    // 2. Fullscreen flash overlay (if enabled)
-    if (this.fullscreenBeaconEl && this.enableFullscreenFlash) {
-      this.fullscreenBeaconEl.classList.toggle('flash-on', active);
-    } else if (this.fullscreenBeaconEl && !active) {
-      this.fullscreenBeaconEl.classList.remove('flash-on');
+    // 2. Fullscreen flash overlay (if enabled & not in reduced-motion non-strobe mode)
+    if (this.fullscreenBeaconEl && this.enableFullscreenFlash && this.fullscreenStrobeMode !== 'none') {
+      const useAmber = this.fullscreenStrobeMode === 'amber';
+      this.fullscreenBeaconEl.classList.toggle('flash-amber', active && useAmber);
+      this.fullscreenBeaconEl.classList.toggle('flash-on', active && !useAmber);
+    } else if (this.fullscreenBeaconEl) {
+      this.fullscreenBeaconEl.classList.remove('flash-on', 'flash-amber');
     }
 
     // 3. Audio Sidetone
@@ -356,6 +442,7 @@ class OpticalTransmitter {
     this.enableTorch = Boolean(options.enableTorch);
     this.enableSound = options.enableSound !== false;
     this.enableFullscreenFlash = Boolean(options.enableFullscreenFlash);
+    this._cycleAnchorTime = performance.now() - this._getElapsedBeforeIndex(startIdx);
 
     this._startAnimationLoop();
     this.stepTimeline();
@@ -422,6 +509,7 @@ class OpticalTransmitter {
           this.inInterCycleGap = false;
           this.currentCycle++;
           this.currentIndex = 0;
+          this._cycleAnchorTime = performance.now();
           this.stepTimeline();
         }, this.interCycleGapMs);
         return;
@@ -457,10 +545,13 @@ class OpticalTransmitter {
       });
     }
 
+    // Drift-compensated monotonic scheduling relative to cycle start
+    const targetEndTime = this._cycleAnchorTime + this.stepElapsedBeforeCurrent + item.durationMs;
+    const delayMs = Math.max(0, Math.round(targetEndTime - performance.now()));
     this.timerId = setTimeout(() => {
       this.currentIndex++;
       this.stepTimeline();
-    }, item.durationMs);
+    }, delayMs);
   }
 
   stopSequence() {
@@ -482,20 +573,40 @@ class OpticalTransmitter {
 
   /**
    * Render the calibrated digital pulse oscilloscope on canvas
-   * Warm amber optical instrument oscilloscope with graticule, voltage rails,
-   * dot/dash glyph markers, time ticks, smooth playhead, and hover inspector
+   * Swiss Purism light-mode TTL instrument oscilloscope with fine graticule,
+   * voltage rails, dot/dash glyph markers, time ticks, smooth playhead, and hover inspector
    */
   drawTimeline(timeline, activeIdx = -1, smoothElapsedMs = -1) {
     if (timeline) {
       this.timeline = timeline;
       this.totalDurationMs = timeline.reduce((sum, item) => sum + item.durationMs, 0);
     }
-    if (!this.canvasEl || !this.ctx) return;
+    if (!this.canvases || this.canvases.length === 0) return;
 
-    const ctx = this.ctx;
-    const rect = this.canvasEl.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    const rootStyles = window.getComputedStyle ? getComputedStyle(document.documentElement) : null;
+    const accentPrimary = (rootStyles && rootStyles.getPropertyValue('--accent-primary').trim()) || '#111111';
+    const accentDanger = (rootStyles && rootStyles.getPropertyValue('--accent-danger').trim()) || '#d92d20';
+    const textPrimary = (rootStyles && rootStyles.getPropertyValue('--text-primary').trim()) || '#111111';
+    const textMuted = (rootStyles && rootStyles.getPropertyValue('--text-muted').trim()) || '#666666';
+
+    this.canvases.forEach((entry) => {
+      this._drawCanvasEntry(entry, activeIdx, smoothElapsedMs, { accentPrimary, accentDanger, textPrimary, textMuted });
+    });
+  }
+
+  _drawCanvasEntry(entry, activeIdx, smoothElapsedMs, palette) {
+    const ctx = entry.ctx;
+    if (!ctx) return;
+
+    if (!entry.width || !entry.height) {
+      const rect = entry.el.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      entry.width = rect.width;
+      entry.height = rect.height;
+    }
+
+    const width = entry.width;
+    const height = entry.height;
     if (width === 0 || height === 0) return;
 
     ctx.clearRect(0, 0, width, height);
@@ -505,15 +616,15 @@ class OpticalTransmitter {
     const highY = topPad + (height - topPad - bottomPad) * 0.14;
     const lowY = height - bottomPad - (height - topPad - bottomPad) * 0.12;
 
-    // 1. Oscilloscope Graticule Grid
-    ctx.strokeStyle = 'rgba(229, 169, 59, 0.065)';
+    // 1. Oscilloscope Graticule Grid (Swiss hairline)
+    ctx.strokeStyle = '#ececec';
     ctx.lineWidth = 1;
 
     const hDivs = 4;
     for (let i = 1; i < hDivs; i++) {
       const y = (height / hDivs) * i;
       ctx.beginPath();
-      ctx.setLineDash([3, 4]);
+      ctx.setLineDash([2, 4]);
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
       ctx.stroke();
@@ -523,77 +634,77 @@ class OpticalTransmitter {
     for (let i = 1; i < vDivs; i++) {
       const x = (width / vDivs) * i;
       ctx.beginPath();
-      ctx.setLineDash([3, 4]);
+      ctx.setLineDash([2, 4]);
       ctx.moveTo(x, 0);
       ctx.lineTo(x, height - 16);
       ctx.stroke();
     }
     ctx.setLineDash([]);
 
-    // 2. Voltage Rail Labels
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(212, 201, 168, 0.52)';
+    // 2. WCAG AA+ Calibrated Voltage Rail Labels on #ffffff
+    ctx.font = '500 10.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#454545';
     ctx.textAlign = 'left';
     ctx.fillText('HIGH 3.3V', 8, Math.max(13, highY - 7));
-    ctx.fillStyle = 'rgba(240, 236, 228, 0.28)';
-    ctx.fillText('LOW 0V', 8, lowY + 13);
+    ctx.fillStyle = '#666666';
+    ctx.fillText('LOW 0V', 8, lowY + 14);
 
     if (!this.timeline || this.timeline.length === 0 || this.totalDurationMs <= 0) {
-      ctx.strokeStyle = 'rgba(240, 236, 228, 0.12)';
+      ctx.strokeStyle = '#d4d4d4';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(0, lowY);
       ctx.lineTo(width, lowY);
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(240, 236, 228, 0.34)';
-      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#595959';
+      ctx.font = '500 11.5px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('STANDBY — ENTER MESSAGE TO MODULATE', width / 2, height / 2 + 4);
+      ctx.fillText('STANDBY — NO SIGNAL', width / 2, height / 2 + 4);
       return;
     }
 
     const scaleX = width / this.totalDurationMs;
 
     // 3. Low Reference Baseline
-    ctx.strokeStyle = 'rgba(240, 236, 228, 0.1)';
+    ctx.strokeStyle = '#e0e0e0';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, lowY);
     ctx.lineTo(width, lowY);
     ctx.stroke();
 
-    // 4. Fill Under High Pulses & Draw Pulse Markers
+    // 4. Subtle Architectural Shading Under High Pulses & Glyph Markers
+    const activeGrad = ctx.createLinearGradient(0, highY, 0, lowY);
+    activeGrad.addColorStop(0, 'rgba(217, 45, 32, 0.22)');
+    activeGrad.addColorStop(1, 'rgba(217, 45, 32, 0.04)');
+
+    const hoverGrad = ctx.createLinearGradient(0, highY, 0, lowY);
+    hoverGrad.addColorStop(0, 'rgba(17, 17, 17, 0.14)');
+    hoverGrad.addColorStop(1, 'rgba(17, 17, 17, 0.03)');
+
+    const idleGrad = ctx.createLinearGradient(0, highY, 0, lowY);
+    idleGrad.addColorStop(0, 'rgba(17, 17, 17, 0.075)');
+    idleGrad.addColorStop(1, 'rgba(17, 17, 17, 0.015)');
+
     let currentX = 0;
     this.timeline.forEach((item, idx) => {
       const itemWidth = item.durationMs * scaleX;
       const isCurrent = idx === activeIdx;
-      const isHovered = idx === this.hoverIndex;
+      const isHovered = idx === entry.hoverIndex;
 
       if (isHovered && !item.state) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.fillStyle = 'rgba(17, 17, 17, 0.04)';
         ctx.fillRect(currentX, highY, itemWidth, lowY - highY);
       }
 
       if (item.state) {
-        const grad = ctx.createLinearGradient(0, highY, 0, lowY);
-        if (isCurrent) {
-          grad.addColorStop(0, 'rgba(255, 214, 118, 0.58)');
-          grad.addColorStop(1, 'rgba(229, 169, 59, 0.12)');
-        } else if (isHovered) {
-          grad.addColorStop(0, 'rgba(240, 188, 82, 0.38)');
-          grad.addColorStop(1, 'rgba(229, 169, 59, 0.07)');
-        } else {
-          grad.addColorStop(0, 'rgba(229, 169, 59, 0.22)');
-          grad.addColorStop(1, 'rgba(229, 169, 59, 0.03)');
-        }
-        ctx.fillStyle = grad;
+        ctx.fillStyle = isCurrent ? activeGrad : (isHovered ? hoverGrad : idleGrad);
         ctx.fillRect(currentX, highY, itemWidth, lowY - highY);
 
-        // Subtle symbol label above pulse if wide enough
         if (itemWidth >= 14) {
-          ctx.fillStyle = isCurrent ? '#fff3d1' : 'rgba(229, 169, 59, 0.65)';
-          ctx.font = '600 10px "JetBrains Mono", monospace';
+          ctx.fillStyle = isCurrent ? palette.accentDanger : '#454545';
+          ctx.font = '600 11px "JetBrains Mono", monospace';
           ctx.textAlign = 'center';
           const glyph = item.type === 'dash' ? '—' : '·';
           ctx.fillText(glyph, currentX + itemWidth / 2, Math.max(13, highY - 5));
@@ -603,7 +714,7 @@ class OpticalTransmitter {
       currentX += itemWidth;
     });
 
-    // 5. Draw Pulse Waveform Trace
+    // 5. Crisp Ink Pulse Waveform Trace (Zero neon glow)
     ctx.save();
     ctx.beginPath();
     currentX = 0;
@@ -617,17 +728,15 @@ class OpticalTransmitter {
       currentX += itemWidth;
     });
 
-    ctx.shadowColor = 'rgba(229, 169, 59, 0.38)';
-    ctx.shadowBlur = 5;
-    ctx.strokeStyle = '#e5a93b';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = palette.accentPrimary;
+    ctx.lineWidth = 1.75;
     ctx.lineJoin = 'miter';
     ctx.stroke();
     ctx.restore();
 
-    // 6. Time Scale Ticks along Bottom Rail
-    ctx.font = '9.5px "JetBrains Mono", monospace';
-    ctx.fillStyle = 'rgba(168, 162, 158, 0.45)';
+    // 6. Time Scale Ticks along Bottom Rail (WCAG AA on #ffffff)
+    ctx.font = '500 10.5px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#595959';
     const tickCount = 4;
     for (let i = 0; i <= tickCount; i++) {
       const ratio = i / tickCount;
@@ -635,17 +744,17 @@ class OpticalTransmitter {
       const sec = ((this.totalDurationMs * ratio) / 1000).toFixed(2) + 's';
       if (i === 0) {
         ctx.textAlign = 'left';
-        ctx.fillText(sec, 6, height - 6);
+        ctx.fillText(sec, 6, height - 5);
       } else if (i === tickCount) {
         ctx.textAlign = 'right';
-        ctx.fillText(sec, width - 6, height - 6);
+        ctx.fillText(sec, width - 6, height - 5);
       } else {
         ctx.textAlign = 'center';
-        ctx.fillText(sec, x, height - 6);
+        ctx.fillText(sec, x, height - 5);
       }
     }
 
-    // 7. Smooth Active Playhead Cursor
+    // 7. Smooth Active Playhead Cursor (650nm Optical Red)
     let playheadX = -1;
     if (smoothElapsedMs >= 0 && this.totalDurationMs > 0) {
       playheadX = Math.min(width - 1, Math.max(0, smoothElapsedMs * scaleX));
@@ -658,22 +767,22 @@ class OpticalTransmitter {
       const markerY = activeItem && activeItem.state ? highY : lowY;
 
       ctx.save();
-      ctx.shadowColor = 'rgba(212, 69, 58, 0.45)';
-      ctx.shadowBlur = 6;
-      ctx.fillStyle = '#e25348';
-      ctx.fillRect(playheadX, 0, 2, height - 16);
+      ctx.fillStyle = palette.accentDanger;
+      ctx.fillRect(playheadX, 0, 1.5, height - 16);
 
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = '#fffbf0';
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = palette.accentDanger;
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(playheadX + 1, markerY, 4, 0, Math.PI * 2);
+      ctx.arc(playheadX + 0.75, markerY, 4, 0, Math.PI * 2);
       ctx.fill();
+      ctx.stroke();
       ctx.restore();
     }
 
-    // 8. Hover Crosshair & Segment Inspector Pill
-    if (this.hoverIndex >= 0 && this.hoverIndex < this.timeline.length && this.hoverX >= 0) {
-      const hItem = this.timeline[this.hoverIndex];
+    // 8. Hover / Keyboard Crosshair & Segment Inspector Pill
+    if (entry.hoverIndex >= 0 && entry.hoverIndex < this.timeline.length && entry.hoverX >= 0) {
+      const hItem = this.timeline[entry.hoverIndex];
       const typeNames = {
         dot: 'DOT (1T)',
         dash: 'DASH (3T)',
@@ -684,33 +793,30 @@ class OpticalTransmitter {
       const label = `${typeNames[hItem.type] || 'PULSE'} · ${hItem.durationMs}ms`;
 
       ctx.save();
-      ctx.strokeStyle = 'rgba(240, 236, 228, 0.22)';
+      ctx.strokeStyle = 'rgba(17, 17, 17, 0.25)';
       ctx.lineWidth = 1;
       ctx.setLineDash([2, 3]);
       ctx.beginPath();
-      ctx.moveTo(this.hoverX, 0);
-      ctx.lineTo(this.hoverX, height - 16);
+      ctx.moveTo(entry.hoverX, 0);
+      ctx.lineTo(entry.hoverX, height - 16);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.font = '500 10px "JetBrains Mono", monospace';
+      ctx.font = '500 10.5px "JetBrains Mono", monospace';
       const tw = ctx.measureText(label).width;
       const pillW = tw + 14;
-      const pillH = 19;
-      const pillX = Math.min(width - pillW - 6, Math.max(6, this.hoverX - pillW / 2));
+      const pillH = 20;
+      const pillX = Math.min(width - pillW - 6, Math.max(6, entry.hoverX - pillW / 2));
       const pillY = 4;
 
-      ctx.fillStyle = 'rgba(15, 17, 20, 0.92)';
-      ctx.strokeStyle = 'rgba(229, 169, 59, 0.45)';
-      ctx.lineWidth = 1;
+      ctx.fillStyle = '#111111';
       ctx.beginPath();
-      ctx.roundRect(pillX, pillY, pillW, pillH, 4);
+      ctx.roundRect(pillX, pillY, pillW, pillH, 2);
       ctx.fill();
-      ctx.stroke();
 
-      ctx.fillStyle = '#f0ece4';
+      ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'left';
-      ctx.fillText(label, pillX + 7, pillY + 13);
+      ctx.fillText(label, pillX + 7, pillY + 13.5);
       ctx.restore();
     }
   }

@@ -1,184 +1,111 @@
-# Adaptive Semantic Morse-Based Optical Communication System
-### Phase 1 — Mobile-to-ESP32 Optical Communication Proof of Concept
+# OPTIX — Adaptive Semantic Optical Morse Communication System
 
-> A prototype for transmitting text and voice-derived messages as Morse-code light signals using a mobile web application and ESP32-based optical transmitter.
+**Version 4.0.2 · Quiet Minimal / Swiss Purism Optical Instrument**
 
----
-
-## 📌 Overview
-
-Conventional communication systems such as cellular networks, Wi-Fi, and Bluetooth may become unavailable or unreliable in certain emergency or infrastructure-limited situations.
-
-This project explores an alternative communication mechanism using **optical signaling through visible light**.
-
-The proposed system converts emergency messages into compact semantic representations and transmits them using adaptive optical Morse signaling.
-
-### Phase 1 focuses on validating the fundamental communication pipeline:
-
-**Mobile Input → Web Application → Morse Conversion → ESP32 → LED → Optical Signal**
-
-The mobile device is temporarily used for microphone input and computational processing. Future phases will progressively move toward a more independent and intelligent embedded system.
+> Visible Light Communication (VLC) transmitter and telemetry workstation for encoding voice dictation, plain text, emergency tokens, and manual telegraph keying into ITU-R M.1677-1 Morse optical bursts — driving ESP32 LEDs, mobile camera torches, and calibrated screen beacons.
 
 ---
 
-## 🎯 Phase 1 Objective
+## Documentation Index
 
-To develop a working proof-of-concept that can:
-
-- [x] Accept voice input from a mobile device (Web Speech API)
-- [x] Accept typed text as an alternative input
-- [x] Accept manually entered Morse code (Interactive telegraph tapper paddle)
-- [x] Convert text into Morse code (ITU-R M.1677-1 standard)
-- [x] Adaptive Semantic Compression (Reduces optical transmission duration by up to 50%)
-- [x] Send the Morse sequence from a web application to an ESP32 (Wi-Fi HTTP REST & Web Serial USB)
-- [x] Control an LED using the ESP32 (Precision non-blocking FreeRTOS hardware timing)
-- [x] Transmit the Morse sequence through visible light (Onboard LED, High-Power LED, Phone Flashlight Torch)
+| Document | Scope |
+| :--- | :--- |
+| [README.md](README.md) | Project overview, quick start, workspaces, and field deployment |
+| [PRODUCT.md](PRODUCT.md) | Product truth, target operators, capabilities, and brand commitments |
+| [DESIGN.md](DESIGN.md) | Quiet Minimal / Swiss Purism visual system, tokens, typography, and mobile rules |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | End-to-end system architecture, ES module graph, timing engine, and Phase 2 digital twin |
+| [PROTOCOL.md](PROTOCOL.md) | ITU-R M.1677-1 timing math, semantic compression invariants, REST API, and UART protocol |
+| [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md) | WCAG 2.3.1 strobe safety gate, optical safety, HTTPS mic policy, and XSS/CORS boundaries |
+| [CHANGELOG.md](CHANGELOG.md) | Release history from v1.0 POC through v4.0.2 Quiet Minimal redesign |
+| [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) | ESP32 wiring schematics, MOSFET driver circuit, flashing, and standalone SoftAP operation |
 
 ---
 
-## 🏗️ System Architecture
+## System Pipeline
 
 ```text
-                 ┌──────────────────────┐
-                 │      MOBILE PHONE    │
-                 │                      │
-                 │  🎙️ Voice Input      │
-                 │  ⌨️ Text Input       │
-                 │  • Morse Input       │
-                 └──────────┬───────────┘
-                            │
-                            ▼
-                 ┌──────────────────────┐
-                 │    CUSTOM WEB APP    │
-                 │                      │
-                 │ Speech → Text        │
-                 │ Text → Morse         │
-                 │ Morse Validation     │
-                 │ Transmission Control │
-                 └──────────┬───────────┘
-                            │
-                       Wi-Fi / HTTP / USB
-                            │
-                            ▼
-                 ┌──────────────────────┐
-                 │        ESP32         │
-                 │                      │
-                 │ Receive Morse Data   │
-                 │ Generate Timing      │
-                 │ Control LED          │
-                 └──────────┬───────────┘
-                            │
-                            ▼
-                    ┌───────────────┐
-                    │   🔦 LED      │
-                    │               │
-                    │  • = Short    │
-                    │  - = Long     │
-                    └───────┬───────┘
-                            │
-                            ▼
-                     OPTICAL SIGNAL
+HOST [WEB / MOBILE] ────> BRIDGE [HTTP REST / USB UART / SIM] ────> ESP32 (GPIO 2 / 4) ────> OPTICAL EMITTER
+  · Voice Dictation          · Wi-Fi SoftAP (192.168.4.1)             · FreeRTOS Keying        · High-Power LED
+  · Text & Emergency Tokens  · Web Serial (115200 baud)               · Microsecond Timing     · Camera Torch
+  · Manual Telegraph Key     · Offline Virtual Simulator              · Hardware Abort         · Screen Beacon
 ```
 
 ---
 
-## 📦 Project Directory Structure
+## Key Capabilities
+
+- **Six Operational Workspaces**:
+  - `01. Transmit` — Borderless payload stream, opt-in Adaptive Compression (Huffman-Morse semantic contraction preserving negations), Standard Emergency Tokens (`SOS`, `MED HELP`, `FIRE EVAC`, `NEED WATER`, `ALL SAFE`, +3 extended), live `SIGNAL ROUTING PATH`, interactive **Optical Diode D1** aperture dial (`N 0° 00'`, `100mW`, `λ 650nm`, `F/1.4`), stacked `S / O / S` symbol stream with click-to-audition tones, collapsible 3.3V TTL signal trace, and `TRANSMIT VIA ESP32 ↵` / `LOOP BEACON` triggers.
+  - `02. Manual Key` — Tactile circular telegraph paddle with automatic dit/dah duration detection (`1.8T` threshold), keyboard spacebar support, discrete dot/dash/gap keys, live Morse and decoded text buffers, and clickable ITU-R M.1677-1 character reference matrix (`A–Z · 0–9`).
+  - `03. Beacon` — Synchronized local optical emitter stage, calibrated light-mode 3.3V TTL oscilloscope with mouse/keyboard pulse inspection and click-to-seek, speed slider (`5–40 WPM`), burst loop controls (`1x`, `3x`, `5x`, `∞ LOOP`), Mobile Camera Torch strobe, Acoustic CW Sidetone, and WCAG 2.3.1 gated Fullscreen Strobe.
+  - `04. Hardware` — ESP32 connection pipeline diagram, mode selector (`Simulated ESP32`, `Wi-Fi HTTP REST`, `Web Serial USB`), SoftAP host/port configuration, CORS proxy switch, live heartbeat ping, and XSS-safe UTC telemetry log.
+  - `05. Parameters` — Transmission speed (`5–40 WPM` with live `ms / dot` calculation), sidetone frequency (`300–1500 Hz`), burst repeat selector, and ITU-R M.1677-1 timing ratio specification table.
+  - `06. 3D Torch` — Lazy-loaded offline Three.js interactive digital twin of the Phase 2 **OPTIX-MK2** self-contained torch (Raspberry Pi CM5 + 10W collimated LED + 4 hardware buttons + Assembled/X-Ray/Exploded inspection), live-synced to the optical keying engine.
+- **Mobile-First Field Ergonomics**: Sticky thumb-zone action bar on mobile (`<= 640px`), iOS/Android notch safe-area insets (`env(safe-area-inset-*)`), `>= 44px` coarse-pointer touch targets, `>= 16px` mobile input floor to prevent iOS focus zoom, and horizontal snap-scrolling tab bar.
+- **Resilient Multimodal Fallback**: If an external ESP32 endpoint is unreachable, OPTIX logs the fault and automatically cascades transmission to the local Mobile Camera Torch / Screen Beacon so emergency signaling never fails silently.
+
+---
+
+## Directory Structure
 
 ```text
 OPTIX/
-├── index.html                   # Mobile-responsive Transmission Studio UI
+├── index.html                        # Unified Quiet Minimal web console (6 workspaces)
 ├── css/
-│   └── styles.css               # Cyber-tactical glassmorphism dark mode styles
+│   └── styles.css                    # 3-layer Swiss Purism light-mode design tokens & responsive layout
 ├── js/
-│   ├── app.js                   # Application coordinator & event bindings
-│   ├── morseEngine.js           # ITU Morse encoder/decoder & Adaptive Semantic engine
-│   ├── audioSidetone.js         # Web Audio API 750Hz acoustic telegraph synthesizer
-│   ├── opticalTransmitter.js    # Screen beacon, phone camera torch & waveform visualizer
-│   ├── speechHandler.js         # Web Speech API voice-to-text recognition
-│   └── esp32Service.js          # Hardware driver: Wi-Fi REST, Web Serial USB & Virtual Sim
+│   ├── app.js                        # Main state coordinator, DOM bindings & live telemetry sync
+│   ├── morseEngine.js                # ITU-R M.1677-1 encoder/decoder, semantic compressor & timeline builder
+│   ├── opticalTransmitter.js         # Light-mode TTL oscilloscope, screen beacon, torch & playback scheduler
+│   ├── audioSidetone.js              # Web Audio API harmonic CW acoustic sidetone (300–1500 Hz)
+│   ├── speechHandler.js              # Web Speech API voice dictation controller
+│   ├── esp32Service.js               # Wi-Fi HTTP REST, CORS proxy, Web Serial (115200) & virtual simulator
+│   ├── torchDigitalTwin.js           # Lazy-loaded Three.js Phase 2 OPTIX-MK2 3D hardware simulator
+│   └── vendor/
+│       └── three.module.min.js       # Bundled offline Three.js ES module (zero CDN dependency)
 ├── esp32_firmware/
-│   ├── esp32_firmware.ino       # ESP32 C++ firmware with FreeRTOS optical timing
-│   └── README_FIRMWARE.md       # Circuit schematics, MOSFET driver & flashing instructions
-├── server.js                    # Node.js dev server, CORS relay proxy & Mock ESP32 engine
-├── server.py                    # Lightweight Python 3 zero-dependency server alternative
-└── package.json                 # Project configuration & start scripts
+│   ├── esp32_firmware.ino            # ESP32 C++ FreeRTOS optical timing firmware & standalone portal
+│   └── README_FIRMWARE.md            # Hardware BOM, wiring schematics, flashing & field access guide
+├── server.js                         # Node.js HTTP/HTTPS dev server, CORS relay proxy & mock ESP32 API
+├── server.py                         # Zero-dependency Python 3 server alternative
+├── package.json                      # Package metadata & npm scripts
+├── PRODUCT.md                        # Product definition & operational principles
+├── DESIGN.md                         # Visual design system specification
+├── ARCHITECTURE.md                   # System & software architecture reference
+├── PROTOCOL.md                       # Optical timing, compression & hardware wire protocol spec
+├── SECURITY_AND_SAFETY.md            # Photosensitive strobe safety, optical & transport security
+└── CHANGELOG.md                      # Version history
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start
 
-### 1. Launch the Web Application
+### Option A: Node.js (Recommended — HTTP + Mobile HTTPS)
 
-#### Option A: Using Node.js
 ```bash
 npm start
 # or: node server.js
 ```
 
-#### Option B: Using Python
+### Option B: Python 3 (Zero-Dependency Fallback)
+
 ```bash
 python server.py
 ```
 
-Open your browser at:
-- **Desktop**: [http://localhost:3000](http://localhost:3000)
-- **Mobile Device (Full Console)**: Connect phone to `OPTIX-Optical-Transmitter` Wi-Fi (pass: `12345678`), turn **Mobile Data OFF**, and open `http://<YOUR_COMPUTER_IP>:3000` (e.g., `http://192.168.4.2:3000`).
-- **Mobile Device (Standalone Offline Portal)**: Open `http://192.168.4.1` (served directly from ESP32 flash memory, zero computer required!).
+### Access Endpoints
 
-> 💡 *See [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) for full mobile prerequisites, DevKit V1 GPIO wiring without MOSFET, and troubleshooting.*
-
----
-
-## 💡 How to Use the System
-
-### 1. Transmission Studio (`🎙️ / ⌨️ Studio`)
-- **Voice Input**: Tap `🎙️ Voice Input` and speak your emergency message (e.g., *"Emergency need medical help"*).
-- **Text Input**: Type any message directly.
-- **Quick Semantic Presets**: Tap emergency buttons such as **SOS**, **MED HELP**, **FIRE EVAC**, or **TRAPPED SOS**.
-- **Adaptive Semantic Compression**: When enabled, the engine shortens verbose phrases into standardized emergency abbreviations, saving up to 50% in optical battery energy and transmission time.
-- **Actions**:
-  - `🚀 Transmit to ESP32`: Dispatches the Morse payload to the ESP32 hardware via Wi-Fi HTTP or Web Serial.
-  - `🔦 Play Optical Beacon`: Flashes the on-screen optical strobe, plays acoustic sidetone, and triggers the phone's physical camera LED torch.
-
-### 2. Manual Morse Key (`•- Tapper Key`)
-- Tap the large circular key for short bursts (`•` Dot) or hold for long presses (`—` Dash).
-- Hear real-time acoustic sidetone feedback (750Hz sine tone).
-- Watch your taps automatically decode into English text in real time.
-- Click `📥 Transfer Decoded Text to Transmission Studio` to send your tapped message to the transmitter.
-
-### 3. Optical Signal Simulator (`💡 Optical Beacon`)
-- High-intensity luminescent strobe bulb pulsing in perfect synchrony with the optical Morse signal.
-- Real-time digital pulse waveform canvas showing the high/low optical states.
-- **Mobile Camera Torch Switch**: Enables the smartphone's rear camera flashlight to physically pulse the optical Morse code.
-- **Fullscreen Strobe**: Converts the entire phone screen into a high-visibility optical emergency beacon.
-
-### 4. ESP32 Hardware Bridge (`📡 ESP32 Bridge`)
-- **Mode 1: Simulated Virtual ESP32**: Allows 100% full testing and development on any computer or phone without physical hardware.
-- **Mode 2: Wi-Fi HTTP REST**: Communicates directly with the ESP32 over Wi-Fi (either via ESP32's SoftAP `OPTIX-Optical-Transmitter` @ `192.168.4.1` or LAN).
-- **Mode 3: Web Serial API**: Connect your ESP32 directly to your phone or laptop using a USB cable for zero-configuration, zero-latency optical control!
+- **Desktop**: `http://localhost:3000`
+- **Local HTTPS (Required for Mobile Microphone Dictation)**: `https://localhost:3443` or `https://<LAN_IP>:3443`
+- **Mobile Field Console via ESP32 SoftAP**: Connect phone to Wi-Fi `OPTIX-Optical-Transmitter` (password: `12345678`), disable Mobile Data, and open `http://<HOST_IP>:3000`.
+- **Standalone Offline ESP32 Portal (Zero Laptop Required)**: Power the flashed ESP32 from any 5V USB power bank, join `OPTIX-Optical-Transmitter`, and open `http://192.168.4.1`.
 
 ---
 
-## 🔋 Power Independence & Field Deployment (Zero Laptop Required)
+## Verification & Quality Gates
 
-### Frequently Asked: Can I unplug the ESP32 from the laptop and use an external power source?
-**Yes, 100%! Everything works completely normally.**
-
-- **Code Persistence in Non-Volatile Flash**:
-  Once flashed from the Arduino IDE, the firmware is stored permanently in the ESP32's onboard SPI flash memory. **Disconnecting power or turning off your computer will NEVER erase your program.**
-- **Instant Autonomous Boot**:
-  Whenever the ESP32 is reconnected to any standard 5V power source (USB power bank, phone wall charger, or battery pack), it boots up in under **2 seconds**.
-- **Automatic Wi-Fi Broadcasting**:
-  The ESP32 immediately launches its private `OPTIX-Optical-Transmitter` Wi-Fi hotspot upon boot—no host computer or router required.
-- **Wire-Free Field Setup**:
-  1. Plug the ESP32 into a **5V USB power bank**.
-  2. On your mobile phone, disable **Mobile Data** and connect to Wi-Fi **`OPTIX-Optical-Transmitter`** (Password: `12345678`).
-  3. Open your mobile browser to **`http://192.168.4.1`**.
-  4. Transmit emergency optical Morse signals anywhere in the field!
-
----
-
-## 🔧 ESP32 Hardware Setup & Wiring
-
-For complete wiring diagrams (standard 5mm LED direct from GPIO without MOSFET, DevKit V1 pin mappings, and high-power MOSFET driver circuits), refer to [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md).
+- Zero external build step or runtime bundler required — runs directly from static ES modules.
+- Automated UI audit verified via `impeccable detect --json http://localhost:3000` (`0` warnings / `0` anti-patterns).
+- Syntax verification across all JavaScript modules via `node --check`.
+- See [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) for wiring diagrams, pinout safety, and hardware troubleshooting.

@@ -3,729 +3,935 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="OPTIX — Optical Morse Communication System">
-  <meta name="theme-color" content="#08090c">
+  <meta name="description" content="OPTIX — Quiet Minimal Optical Morse Communication System">
+  <meta name="theme-color" content="#f7f7f7">
   <title>OPTIX — Optical Morse Transmitter</title>
 
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <!-- Google Fonts: JetBrains Mono & Public Sans (Swiss Neo-Grotesque) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Core Design System -->
-  <link rel="stylesheet" href="css/styles.css?v=5.3">
+  <link rel="stylesheet" href="css/styles.css?v=6.2">
 </head>
 <body>
+  <a href="#mainWorkspace" class="skip-link">Skip to main content</a>
 
-  <div class="app-container">
+  <div class="app-shell">
     <!-- =========================================================================
-         Header
+         Unified Top Header Bar (Brand + System Status + Numbered Nav + Abort)
          ========================================================================= -->
     <header class="app-header">
-      <h1 class="brand-title">OPTIX</h1>
-
-      <div class="header-status-group">
-        <div id="hardwareStatusBadge" class="status-badge sim" title="Hardware link status">
-          <span class="status-badge-dot"></span>
-          <span id="hardwareStatusText">SIM</span>
+      <div class="header-left">
+        <h1 class="brand-title">OPTIX</h1>
+        <div id="hardwareStatusBadge" class="status-badge sim" role="status" aria-live="polite" title="Hardware link status">
+          <span class="status-badge-dot" aria-hidden="true"></span>
+          <span id="hardwareStatusText" class="status-text">SYS.SIMULATED</span>
+          <span class="status-slash" aria-hidden="true">/</span>
+          <span id="missionClockDisplay" class="mission-clock-time" title="UTC Clock">00:00:00 UTC</span>
         </div>
+      </div>
 
-        <span id="missionClockDisplay" class="mission-clock-time" title="UTC Clock">00:00:00</span>
+      <nav class="nav-tabs-wrapper" aria-label="System Navigation">
+        <div class="nav-tabs" role="tablist" aria-label="OPTIX Workspaces">
+          <button type="button" class="nav-tab active" role="tab" aria-selected="true" aria-controls="inputTab" tabindex="0" data-tab="input" id="tabInputBtn">01. Transmit</button>
+          <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="tapperTab" tabindex="-1" data-tab="tapper" id="tabTapperBtn">02. Manual Key</button>
+          <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="beaconTab" tabindex="-1" data-tab="beacon" id="tabBeaconBtn">03. Beacon</button>
+          <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="hardwareTab" tabindex="-1" data-tab="hardware" id="tabHardwareBtn">04. Hardware</button>
+          <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="settingsTab" tabindex="-1" data-tab="settings" id="tabSettingsBtn">05. Parameters</button>
+          <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="torchTab" tabindex="-1" data-tab="torch" id="tabTorchBtn">06. 3D Torch</button>
+        </div>
+      </nav>
 
-        <button id="stopTransmissionBtn" class="btn btn-danger header-abort-btn" disabled title="Abort optical transmission">ABORT</button>
+      <div class="header-right">
+        <button type="button" id="stopTransmissionBtn" class="btn-abort" disabled title="Abort optical transmission (Esc)">
+          <span class="abort-dot" aria-hidden="true"></span>
+          <span>ABORT</span>
+        </button>
       </div>
     </header>
 
-    <!-- =========================================================================
-         Navigation
-         ========================================================================= -->
-    <div class="nav-tabs-wrapper">
-      <nav class="nav-tabs" aria-label="System Navigation">
-        <button class="nav-tab active" data-tab="input" id="tabInputBtn">Transmit</button>
-        <button class="nav-tab" data-tab="tapper" id="tabTapperBtn">Key</button>
-        <button class="nav-tab" data-tab="beacon" id="tabBeaconBtn">Beacon</button>
-        <button class="nav-tab" data-tab="torch" id="tabTorchBtn">3D Torch</button>
-        <button class="nav-tab" data-tab="hardware" id="tabHardwareBtn">Hardware</button>
-        <button class="nav-tab" data-tab="settings" id="tabSettingsBtn">Settings</button>
-      </nav>
-    </div>
+    <main id="mainWorkspace" class="workspace-main">
+      <!-- =========================================================================
+           TAB 1: 01. Transmit
+           ========================================================================= -->
+      <div class="tab-pane active" id="inputTab" role="tabpanel" aria-labelledby="tabInputBtn">
+        <h2 class="sr-only">Transmit Workspace</h2>
+        <div class="transmit-workspace">
 
-    <!-- =========================================================================
-         TAB 1: Transmit
-         ========================================================================= -->
-    <main class="tab-pane active" id="inputTab">
-      <div class="transmit-workspace">
-
-        <!-- Message Input -->
-        <section class="input-section">
-          <div class="text-input-wrap">
-            <textarea
-              id="textInput"
-              class="text-input-field"
-              placeholder="Type your message..."
-              rows="3"
-              aria-label="Message to transmit"
-            >SOS</textarea>
-
-            <div class="text-inner-toolbar">
-              <div class="toolbar-left">
-                <button id="micBtn" class="btn btn-icon btn-mic" title="Voice Dictation" aria-label="Voice Dictation">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                    <line x1="12" x2="12" y1="19" y2="22"/>
-                  </svg>
-                </button>
-                <span id="micStatus" class="mic-status-label"></span>
+          <!-- LEFT COLUMN: Payload Stream, Emergency Tokens, Signal Routing Path -->
+          <div class="transmit-col-left">
+            <!-- Payload / Text Stream -->
+            <section class="payload-section">
+              <div class="field-meta-bar">
+                <label class="micro-label" for="textInput">PAYLOAD / TEXT STREAM</label>
+                <span id="charCounter" class="char-counter">3 Chars</span>
               </div>
 
-              <div class="toolbar-right">
-                <span id="charCounter" class="char-counter-pill">3 chars</span>
-                <button id="clearInputBtn" class="btn btn-text" title="Clear message">Clear</button>
+              <div class="payload-input-row">
+                <textarea
+                  id="textInput"
+                  class="text-input-field"
+                  placeholder="ENTER SIGNAL..."
+                  rows="1"
+                  spellcheck="false"
+                  aria-label="Message to transmit"
+                >SOS</textarea>
+
+                <div class="payload-inline-tools">
+                  <button type="button" id="micBtn" class="btn-icon-quiet" title="Voice Dictation" aria-label="Voice Dictation" aria-pressed="false">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                      <line x1="12" x2="12" y1="19" y2="22"/>
+                    </svg>
+                  </button>
+                  <button type="button" id="clearInputBtn" class="btn-text-quiet" title="Clear message">CLEAR</button>
+                </div>
+              </div>
+              <span id="micStatus" class="mic-status-label" aria-live="polite"></span>
+
+              <div class="compression-row">
+                <label class="swiss-check" for="adaptiveToggle" title="Optional: compress verbose phrases into short emergency codes while preserving negations">
+                  <input type="checkbox" id="adaptiveToggle" class="swiss-check-input">
+                  <span class="swiss-check-box" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter">
+                      <polyline points="2 6.5 4.8 9.2 10 3"/>
+                    </svg>
+                  </span>
+                  <span class="swiss-check-label">Adaptive Compression (Huffman-Morse)</span>
+                </label>
+                <span class="spec-tag">ITU-R M.1677-1</span>
+              </div>
+
+              <div id="semanticInfo" class="semantic-banner hidden" role="status" aria-live="polite"></div>
+              <div id="unsupportedCharsWarn" class="unsupported-warn hidden" role="status" aria-live="polite"></div>
+            </section>
+
+            <!-- Standard Emergency Tokens -->
+            <section class="tokens-section">
+              <div class="field-meta-bar">
+                <span class="micro-label">STANDARD EMERGENCY TOKENS</span>
+                <button type="button" id="toggleAllTokensBtn" class="btn-text-quiet" aria-expanded="false" title="Toggle extended token bank">+3 MORE</button>
+              </div>
+              <div id="presetsContainer" class="presets-grid"></div>
+            </section>
+
+            <!-- Signal Routing Path -->
+            <section class="routing-section">
+              <div class="field-meta-bar">
+                <span class="micro-label">SIGNAL ROUTING PATH</span>
+                <span id="routingLinkStatus" class="routing-link-status online">
+                  <span class="routing-link-dot" aria-hidden="true"></span>
+                  <span id="routingLinkText">LINK ONLINE</span>
+                </span>
+              </div>
+              <div class="routing-path-box" aria-label="Signal routing pipeline">
+                <span class="route-node">HOST [WEB]</span>
+                <span class="route-arrow" aria-hidden="true">────&gt;</span>
+                <span id="routingBridgeLabel" class="route-node">BRIDGE [UART]</span>
+                <span class="route-arrow" aria-hidden="true">────&gt;</span>
+                <span class="route-node">ESP32 (GPIO 2)</span>
+                <span class="route-arrow" aria-hidden="true">────&gt;</span>
+                <span id="routingEmitterNode" class="route-node route-emitter">EMITTER</span>
+              </div>
+            </section>
+          </div>
+
+          <!-- RIGHT COLUMN: Hero Optical Diode Aperture, Symbol Stream, Primary Actions -->
+          <div class="transmit-col-right">
+            <!-- Hero Optical Diode Dial -->
+            <section class="emitter-hero-section">
+              <div class="emitter-dial-stage">
+                <div
+                  id="transmitEmitterDial"
+                  class="emitter-dial"
+                  role="button"
+                  tabindex="0"
+                  title="Hold optical diode aperture to fire manual test pulse"
+                  aria-label="Optical Diode D1 Aperture — press and hold to test optical pulse"
+                >
+                  <div class="emitter-dial-reticle" aria-hidden="true"></div>
+                  <span class="dial-mark dial-mark-n" aria-hidden="true">N 0° 00'</span>
+                  <span class="dial-mark dial-mark-e" aria-hidden="true">100mW</span>
+                  <span class="dial-mark dial-mark-s" aria-hidden="true">λ 650nm</span>
+                  <span class="dial-mark dial-mark-w" aria-hidden="true">F/1.4</span>
+                  <div id="transmitEmitterAperture" class="emitter-aperture" aria-hidden="true">
+                    <span class="emitter-core-dot"></span>
+                  </div>
+                </div>
+
+                <div class="emitter-caption">
+                  <span class="emitter-caption-muted">EMITTER:</span>
+                  <span class="emitter-caption-strong">OPTICAL DIODE D1</span>
+                  <span class="emitter-caption-sep" aria-hidden="true">|</span>
+                  <span class="emitter-caption-muted">STATE:</span>
+                  <span id="transmitEmitterState" class="emitter-caption-strong">READY</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Symbol Stream Representation & Actions -->
+            <section class="symbol-stream-section">
+              <div class="symbol-stream-header">
+                <div class="symbol-stream-title-group">
+                  <span class="micro-label">SYMBOL STREAM REPRESENTATION</span>
+                  <button type="button" id="copyMorseBtn" class="btn-micro-tool" title="Copy Morse code" aria-label="Copy Morse code">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="9" y="9" width="13" height="13" rx="1"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                  </button>
+                  <button type="button" id="toggleTransmitTraceBtn" class="btn-micro-tool" aria-expanded="false" aria-controls="transmitWaveformBlock" title="Toggle live 3.3V TTL oscilloscope trace">TRACE</button>
+                  <button type="button" id="transmitSosBtn" class="btn-micro-tool btn-micro-danger" title="One-tap emergency SOS optical transmission">SOS</button>
+                </div>
+
+                <div class="metrics-inline">
+                  <span class="metric-item"><strong id="statUnits" class="metric-val">27</strong> units</span>
+                  <span class="metric-item"><strong id="statDuration" class="metric-val">2.16s</strong></span>
+                  <span class="metric-item"><strong id="statWpm" class="metric-val">15</strong> WPM</span>
+                  <span id="statChars" class="sr-only">3</span>
+                </div>
+              </div>
+
+              <div class="symbol-stream-box">
+                <div id="morseDisplay" class="sr-only" aria-live="polite">... --- ...</div>
+                <div id="breakdownContainer" class="breakdown-stream" role="group" aria-label="Character Morse breakdown — select a character to preview audio"></div>
+              </div>
+
+              <!-- Collapsible Synchronized Live TTL Signal Trace -->
+              <div id="transmitWaveformBlock" class="transmit-waveform-block hidden">
+                <div class="waveform-header">
+                  <div class="waveform-header-left">
+                    <span class="micro-label">TTL SIGNAL TRACE</span>
+                    <span id="transmitVoltageBadge" class="waveform-voltage-badge">0.0V LOW</span>
+                  </div>
+                  <span class="waveform-hint">Click trace to seek</span>
+                </div>
+                <div class="waveform-container waveform-container-compact">
+                  <canvas
+                    id="transmitWaveformCanvas"
+                    class="waveform-canvas"
+                    role="img"
+                    tabindex="0"
+                    aria-label="Transmit TTL 3.3V Morse pulse oscilloscope preview"
+                  ></canvas>
+                </div>
+              </div>
+
+              <!-- Primary Action Bar -->
+              <div class="transmission-actions">
+                <button type="button" id="transmitEsp32Btn" class="btn btn-primary">TRANSMIT VIA ESP32 ↵</button>
+                <button type="button" id="playBeaconBtn" class="btn btn-secondary">LOOP BEACON</button>
+              </div>
+
+              <div id="transmissionProgress" class="transmission-progress-wrap hidden" role="progressbar" aria-label="Optical transmission progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="progress-meta">
+                  <span id="progressLabel">TRANSMITTING...</span>
+                  <span class="progress-status">TX</span>
+                </div>
+                <div class="progress-track">
+                  <div id="progressBar" class="progress-fill"></div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =========================================================================
+           TAB 2: 02. Manual Key
+           ========================================================================= -->
+      <div class="tab-pane" id="tapperTab" role="tabpanel" aria-labelledby="tabTapperBtn">
+        <section class="workspace-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">02 / MANUAL TELEGRAPH KEY</h2>
+              <p class="section-subtitle">Direct paddle keying with ITU-R M.1677-1 automatic dit/dah duration detection</p>
+            </div>
+            <div class="section-header-actions">
+              <button type="button" id="backspaceManualBtn" class="btn btn-secondary btn-sm" title="Delete last symbol or character">BACKSPACE</button>
+              <button type="button" id="clearManualBtn" class="btn btn-secondary btn-sm">CLEAR</button>
+            </div>
+          </div>
+
+          <div class="tapper-station">
+            <div class="tapper-left">
+              <div class="tapper-key-wrapper">
+                <button type="button" id="tapperKey" class="tapper-key-btn" aria-label="Morse Code Telegraph Paddle — hold or press Space for dot or dash">
+                  <span class="tapper-reticle" aria-hidden="true"></span>
+                  <span class="tapper-core">
+                    <span class="tapper-core-label">KEY</span>
+                  </span>
+                </button>
+                <span class="tapper-hint">SHORT · DIT &nbsp;/&nbsp; LONG — DAH &nbsp;·&nbsp; SPACEBAR SUPPORTED</span>
+              </div>
+
+              <div class="manual-discrete-row">
+                <button type="button" id="dotBtn" class="btn btn-secondary btn-sm">· DOT</button>
+                <button type="button" id="dashBtn" class="btn btn-secondary btn-sm">— DASH</button>
+                <button type="button" id="spaceLetterBtn" class="btn btn-secondary btn-sm">LETTER GAP</button>
+                <button type="button" id="spaceWordBtn" class="btn btn-secondary btn-sm">WORD GAP</button>
+              </div>
+            </div>
+
+            <div class="tapper-right">
+              <div class="manual-buffers">
+                <div class="buffer-block">
+                  <span class="micro-label">MORSE STREAM BUFFER</span>
+                  <div id="manualMorseBuffer" class="buffer-content buffer-morse" aria-live="polite"></div>
+                </div>
+                <div class="buffer-block">
+                  <span class="micro-label">DECODED TEXT STREAM</span>
+                  <div id="manualDecodedText" class="buffer-content buffer-decoded" aria-live="polite"></div>
+                </div>
+              </div>
+
+              <button type="button" id="applyManualBtn" class="btn btn-primary full-width">LOAD INTO TRANSMIT ↵</button>
+            </div>
+          </div>
+
+          <details class="reference-disclosure">
+            <summary class="reference-disclosure-summary">ITU-R M.1677-1 CHARACTER MATRIX (A–Z · 0–9) — CLICK ANY SYMBOL TO AUDITION</summary>
+            <div id="morseAlphaGrid" class="morse-alpha-grid" role="group" aria-label="International Morse alphabet and numerals"></div>
+          </details>
+        </section>
+      </div>
+
+      <!-- =========================================================================
+           TAB 3: 03. Beacon & Waveform
+           ========================================================================= -->
+      <div class="tab-pane" id="beaconTab" role="tabpanel" aria-labelledby="tabBeaconBtn">
+        <section class="workspace-section beacon-workspace">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">03 / OPTICAL BEACON &amp; OSCILLOSCOPE</h2>
+              <p class="section-subtitle">Calibrated local emitter stage &amp; 3.3V TTL pulse trace</p>
+            </div>
+            <div class="beacon-header-actions">
+              <button type="button" id="fullscreenToggle" class="btn btn-secondary btn-sm" title="Launch fullscreen optical strobe">FULLSCREEN STROBE</button>
+              <button type="button" id="beaconTransmitBtn" class="btn btn-primary btn-sm" title="Transmit Morse sequence locally">TRANSMIT BEACON</button>
+            </div>
+          </div>
+
+          <!-- Active Signal Payload Bar -->
+          <div class="beacon-payload-bar">
+            <div class="beacon-payload-top">
+              <div class="beacon-payload-input-wrap">
+                <span id="beaconPayloadTag" class="beacon-payload-tag">PAYLOAD</span>
+                <input
+                  type="text"
+                  id="beaconQuickInput"
+                  class="beacon-quick-input"
+                  value="SOS"
+                  placeholder="ENTER MESSAGE TO EMIT..."
+                  aria-label="Beacon message payload"
+                >
+              </div>
+              <div class="beacon-payload-actions">
+                <button type="button" id="beaconSosBtn" class="btn btn-danger btn-sm" title="Instant SOS emergency strobe">SOS</button>
+                <button type="button" id="beaconEsp32Btn" class="btn btn-secondary btn-sm" title="Dispatch signal to ESP32 hardware">SEND TO ESP32</button>
+              </div>
+            </div>
+            <div id="beaconMorseReadout" class="beacon-morse-readout" aria-live="polite">... --- ...</div>
+          </div>
+
+          <div class="beacon-display-area">
+            <!-- Left: Optical Emitter Stage + Live Telemetry -->
+            <div class="beacon-stage">
+              <div class="beacon-stage-top">
+                <div class="beacon-live-status">
+                  <span id="beaconStateDot" class="beacon-state-dot" aria-hidden="true"></span>
+                  <span id="beaconStateLabel" class="beacon-state-label" aria-live="polite">STANDBY · 0.0V</span>
+                </div>
+                <span id="beaconCycleBadge" class="beacon-cycle-badge">1x BURST</span>
+              </div>
+
+              <div class="beacon-bulb-wrapper">
+                <div
+                  id="beaconBulb"
+                  class="beacon-bulb emitter-dial"
+                  role="button"
+                  tabindex="0"
+                  title="Hold to fire manual optical test strobe"
+                  aria-label="Optical Emitter Bulb — hold for manual test pulse"
+                >
+                  <div class="emitter-dial-reticle" aria-hidden="true"></div>
+                  <span class="dial-mark dial-mark-n" aria-hidden="true">N 0° 00'</span>
+                  <span class="dial-mark dial-mark-e" aria-hidden="true">100mW</span>
+                  <span class="dial-mark dial-mark-s" aria-hidden="true">λ 650nm</span>
+                  <span class="dial-mark dial-mark-w" aria-hidden="true">F/1.4</span>
+                  <div class="emitter-aperture" aria-hidden="true">
+                    <span class="emitter-core-dot"></span>
+                  </div>
+                </div>
+                <span class="beacon-bulb-hint">HOLD APERTURE FOR MANUAL TEST PULSE</span>
+              </div>
+
+              <div class="beacon-telemetry-strip">
+                <div class="beacon-telem-cell">
+                  <span class="beacon-telem-k">SPEED</span>
+                  <span id="beaconTelemSpeed" class="beacon-telem-v">15 WPM · 80ms</span>
+                </div>
+                <div class="beacon-telem-cell">
+                  <span class="beacon-telem-k">ELAPSED</span>
+                  <span id="beaconTelemElapsed" class="beacon-telem-v">0.00s / 2.16s</span>
+                </div>
+                <div class="beacon-telem-cell">
+                  <span class="beacon-telem-k">DUTY CYCLE</span>
+                  <span id="beaconTelemDuty" class="beacon-telem-v">55.6% ON</span>
+                </div>
+                <div class="beacon-telem-cell">
+                  <span class="beacon-telem-k">PULSES</span>
+                  <span id="beaconTelemPulses" class="beacon-telem-v">6 · / 3 —</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Calibrated Pulse Oscilloscope + Controls -->
+            <div class="beacon-right-col">
+              <div class="waveform-block">
+                <div class="waveform-header">
+                  <div class="waveform-header-left">
+                    <span class="micro-label">PULSE TIMELINE (3.3V TTL)</span>
+                    <span id="waveformVoltageBadge" class="waveform-voltage-badge">0.0V LOW</span>
+                  </div>
+                  <div class="waveform-header-right">
+                    <span class="waveform-hint">Click trace to seek</span>
+                    <span id="beaconProgressPct" class="waveform-channel">0%</span>
+                  </div>
+                </div>
+                <div class="waveform-container">
+                  <canvas
+                    id="waveformCanvas"
+                    class="waveform-canvas"
+                    role="img"
+                    tabindex="0"
+                    aria-label="TTL 3.3V Morse pulse oscilloscope. Use Left and Right arrow keys to inspect pulses, Enter to seek."
+                  ></canvas>
+                </div>
+                <p class="sr-only">Interactive TTL 3.3V Morse pulse oscilloscope. Focus the waveform and use Left or Right arrow keys to inspect pulses, or press Enter to seek playback.</p>
+                <div class="beacon-progress-track" aria-hidden="true">
+                  <div id="beaconProgressBar" class="beacon-progress-fill"></div>
+                </div>
+              </div>
+
+              <!-- Live Instrument Controls -->
+              <div class="beacon-controls-row">
+                <div class="beacon-speed-control">
+                  <div class="beacon-control-head">
+                    <label class="micro-label" for="beaconWpmSlider">OPTICAL SPEED</label>
+                    <span id="beaconWpmVal" class="beacon-control-val">15 WPM</span>
+                  </div>
+                  <input type="range" id="beaconWpmSlider" class="range-slider" min="5" max="40" value="15" step="1" aria-label="Beacon optical speed in WPM">
+                </div>
+
+                <div class="beacon-repeat-control">
+                  <span class="micro-label">BURST MODE</span>
+                  <div class="beacon-repeat-pills" role="group" aria-label="Beacon repeat count">
+                    <button type="button" class="beacon-repeat-btn active" data-repeat="1" aria-pressed="true">1x</button>
+                    <button type="button" class="beacon-repeat-btn" data-repeat="3" aria-pressed="false">3x</button>
+                    <button type="button" class="beacon-repeat-btn" data-repeat="5" aria-pressed="false">5x</button>
+                    <button type="button" class="beacon-repeat-btn" data-repeat="999" aria-pressed="false">∞ LOOP</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Output Channel Toggles -->
+              <div class="optical-toggles-list">
+                <label class="toggle-row" for="torchToggle">
+                  <span class="toggle-label-wrap">
+                    <span class="toggle-title">Mobile Camera Torch</span>
+                    <span id="torchSubLabel" class="toggle-sub">Physical LED strobe (mobile rear flash)</span>
+                  </span>
+                  <span class="swiss-check-box-wrap">
+                    <input type="checkbox" id="torchToggle" class="swiss-check-input">
+                    <span class="swiss-check-box" aria-hidden="true">
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter">
+                        <polyline points="2 6.5 4.8 9.2 10 3"/>
+                      </svg>
+                    </span>
+                  </span>
+                </label>
+
+                <label class="toggle-row" for="soundToggle">
+                  <span class="toggle-label-wrap">
+                    <span class="toggle-title">Acoustic Sidetone</span>
+                    <span id="soundSubLabel" class="toggle-sub">CW audio tone · 750 Hz</span>
+                  </span>
+                  <span class="swiss-check-box-wrap">
+                    <input type="checkbox" id="soundToggle" class="swiss-check-input" checked>
+                    <span class="swiss-check-box" aria-hidden="true">
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter">
+                        <polyline points="2 6.5 4.8 9.2 10 3"/>
+                      </svg>
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- =========================================================================
+           TAB 4: 04. Hardware
+           ========================================================================= -->
+      <div class="tab-pane" id="hardwareTab" role="tabpanel" aria-labelledby="tabHardwareBtn">
+        <section class="workspace-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">04 / ESP32 HARDWARE BRIDGE</h2>
+              <p class="section-subtitle">Wi-Fi SoftAP HTTP REST, Web Serial (115200 baud), or local virtual simulator</p>
+            </div>
+            <button type="button" id="pingEsp32Btn" class="btn btn-primary btn-sm">PING ESP32</button>
+          </div>
+
+          <div class="hardware-pipeline-diagram">
+            <div class="pipe-node">
+              <div class="pipe-node-box">HOST [WEB]</div>
+              <span class="pipe-node-sub">Browser Client</span>
+            </div>
+            <div class="pipe-connector" aria-hidden="true">────&gt;</div>
+            <div class="pipe-node">
+              <div class="pipe-node-box">BRIDGE [UART / HTTP]</div>
+              <span class="pipe-node-sub">REST · Web Serial</span>
+            </div>
+            <div class="pipe-connector" aria-hidden="true">────&gt;</div>
+            <div class="pipe-node">
+              <div class="pipe-node-box">ESP32 (GPIO 2)</div>
+              <span class="pipe-node-sub">FreeRTOS Keying</span>
+            </div>
+            <div class="pipe-connector" aria-hidden="true">────&gt;</div>
+            <div class="pipe-node">
+              <div class="pipe-node-box pipe-node-accent">EMITTER</div>
+              <span class="pipe-node-sub">Optical Diode D1</span>
+            </div>
+          </div>
+
+          <div class="hardware-form-grid">
+            <div class="form-group">
+              <label class="micro-label" for="hardwareModeSelect">CONNECTION MODE</label>
+              <select id="hardwareModeSelect" class="form-select">
+                <option value="simulation">Simulated ESP32</option>
+                <option value="wifi">Wi-Fi HTTP REST</option>
+                <option value="serial">Web Serial (USB)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="micro-label" for="esp32IpInput">ESP32 IP / HOST</label>
+              <input type="text" id="esp32IpInput" class="form-input" value="192.168.4.1" placeholder="192.168.4.1">
+            </div>
+
+            <div class="form-group">
+              <label class="micro-label" for="esp32PortInput">HTTP PORT</label>
+              <input type="number" id="esp32PortInput" class="form-input" value="80" min="1" max="65535" placeholder="80">
+            </div>
+
+            <div class="form-group form-group-toggle">
+              <label class="toggle-row" for="useProxyCheck">
+                <span class="toggle-label-wrap">
+                  <span class="toggle-title">CORS Relay Proxy</span>
+                  <span class="toggle-sub">Relay mixed-content requests</span>
+                </span>
+                <span class="swiss-check-box-wrap">
+                  <input type="checkbox" id="useProxyCheck" class="swiss-check-input">
+                  <span class="swiss-check-box" aria-hidden="true">
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter">
+                      <polyline points="2 6.5 4.8 9.2 10 3"/>
+                    </svg>
+                  </span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <button type="button" id="connectSerialBtn" class="btn btn-secondary btn-sm hidden">CONNECT USB SERIAL</button>
+
+          <div class="log-section">
+            <div class="field-meta-bar">
+              <span class="micro-label">TELEMETRY LOG</span>
+              <button type="button" id="clearLogBtn" class="btn-text-quiet">CLEAR</button>
+            </div>
+            <div id="activityLog" class="terminal-window" role="log" aria-live="polite">
+              <div class="log-row info">System ready.</div>
+            </div>
+          </div>
+
+          <details class="reference-disclosure">
+            <summary class="reference-disclosure-summary">ESP32 WIRING, SOFTAP &amp; SERIAL PROTOCOL SPECIFICATION</summary>
+            <div class="hw-docs-grid">
+              <div class="hw-doc-item">
+                <span class="hw-doc-k">SIMULATED MODE (SYS.SIMULATED)</span>
+                <span class="hw-doc-v">Runs natively in-browser with zero network dependency for offline validation and training.</span>
+              </div>
+              <div class="hw-doc-item">
+                <span class="hw-doc-k">WI-FI SOFTAP ENDPOINT</span>
+                <span class="hw-doc-v">Default host <code>192.168.4.1:80</code> · REST routes <code>GET /api/ping</code>, <code>POST /api/transmit</code>, <code>POST /api/stop</code>.</span>
+              </div>
+              <div class="hw-doc-item">
+                <span class="hw-doc-k">USB WEB SERIAL (115200 BAUD)</span>
+                <span class="hw-doc-v">Commands: <code>TX &lt;morse&gt; &lt;unitMs&gt; &lt;repeat&gt;</code> and <code>STOP</code> · LED drive on <code>GPIO 2</code>.</span>
+              </div>
+            </div>
+          </details>
+        </section>
+      </div>
+
+      <!-- =========================================================================
+           TAB 5: 05. Parameters (Settings)
+           ========================================================================= -->
+      <div class="tab-pane" id="settingsTab" role="tabpanel" aria-labelledby="tabSettingsBtn">
+        <section class="workspace-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">05 / CALIBRATION PARAMETERS</h2>
+              <p class="section-subtitle">Optical keying cadence, acoustic sidetone frequency, and ITU-R M.1677-1 timing standard</p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <div class="settings-controls-col">
+              <div class="slider-control-group">
+                <div class="slider-labels-row">
+                  <label class="micro-label" for="wpmSlider">TRANSMISSION SPEED</label>
+                  <span id="wpmValue" class="slider-val">15 WPM</span>
+                </div>
+                <input type="range" id="wpmSlider" class="range-slider" min="5" max="40" value="15" step="1" aria-label="Transmission speed in words per minute">
+                <div class="slider-labels-row slider-meta-row">
+                  <span>5 WPM</span>
+                  <span id="unitMsDisplay" class="unit-ms-badge">80 ms / dot</span>
+                  <span>40 WPM</span>
+                </div>
+              </div>
+
+              <div class="slider-control-group">
+                <div class="slider-labels-row">
+                  <label class="micro-label" for="pitchSlider">SIDETONE FREQUENCY</label>
+                  <span id="pitchValue" class="slider-val">750 Hz</span>
+                </div>
+                <input type="range" id="pitchSlider" class="range-slider" min="300" max="1500" value="750" step="25" aria-label="Acoustic sidetone frequency in hertz">
+                <div class="slider-labels-row slider-meta-row">
+                  <span>300 Hz</span>
+                  <span>750 Hz</span>
+                  <span>1500 Hz</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="micro-label" for="repeatSelect">BURST REPEAT COUNT</label>
+                <select id="repeatSelect" class="form-select">
+                  <option value="1">1x (Single Burst)</option>
+                  <option value="3">3x (Emergency Burst)</option>
+                  <option value="5">5x (High Reliability)</option>
+                  <option value="999">Infinite Loop</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="reference-block">
+              <span class="micro-label">ITU-R M.1677-1 TIMING RATIOS</span>
+              <div class="table-responsive">
+                <table class="morse-reference-table">
+                  <thead>
+                    <tr>
+                      <th>ELEMENT</th>
+                      <th>RATIO</th>
+                      <th>SPECIFICATION</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Dot (Dit)</td>
+                      <td class="mono-cell">1T</td>
+                      <td>Base unit (1200 / WPM ms)</td>
+                    </tr>
+                    <tr>
+                      <td>Dash (Dah)</td>
+                      <td class="mono-cell">3T</td>
+                      <td>Prolonged optical pulse</td>
+                    </tr>
+                    <tr>
+                      <td>Intra-element gap</td>
+                      <td class="mono-cell">1T</td>
+                      <td>Dark interval between symbols</td>
+                    </tr>
+                    <tr>
+                      <td>Inter-character gap</td>
+                      <td class="mono-cell">3T</td>
+                      <td>Dark interval between letters</td>
+                    </tr>
+                    <tr>
+                      <td>Inter-word gap</td>
+                      <td class="mono-cell">7T</td>
+                      <td>Dark interval between words</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- =========================================================================
+           TAB 6: 06. 3D Torch Digital Twin
+           ========================================================================= -->
+      <div class="tab-pane" id="torchTab" role="tabpanel" aria-labelledby="tabTorchBtn">
+        <section class="workspace-section torch-twin-workspace">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">06 / OPTIX-MK2 3D DIGITAL TWIN</h2>
+              <p class="section-subtitle">Phase 2 Self-Contained Hardware Vision · Raspberry Pi CM5 + 10W Collimated Optics</p>
+            </div>
+            <div class="torch-header-actions">
+              <button type="button" id="torchFullscreenBtn" class="btn btn-secondary btn-sm" title="Run 3D simulation in fullscreen">FULLSCREEN</button>
+              <button type="button" id="torchTransmitBtn" class="btn btn-primary btn-sm">TRANSMIT ON TORCH</button>
+            </div>
+          </div>
+
+          <!-- Interactive 3D WebGL Viewport -->
+          <div id="torchStageShell" class="torch-stage-shell">
+            <div id="torchViewport" class="torch-viewport" aria-label="Interactive 3D Tactical Torch Simulator"></div>
+
+            <!-- Top-Left Mode & Interaction HUD -->
+            <div class="torch-hud-tl">
+              <span id="torchHudMode" class="torch-hud-badge">X-RAY CUTAWAY</span>
+              <span class="torch-hud-hint">Drag to orbit · Scroll to zoom · Click parts or buttons</span>
+            </div>
+
+            <!-- Top-Right Camera Angle Presets & Fullscreen Toggle -->
+            <div class="torch-hud-tr" role="group" aria-label="Camera Presets">
+              <button type="button" class="torch-cam-btn active" data-cam="iso">3/4</button>
+              <button type="button" class="torch-cam-btn" data-cam="optics">Optics</button>
+              <button type="button" class="torch-cam-btn" data-cam="controls">Controls</button>
+              <button type="button" class="torch-cam-btn" data-cam="internals">RPi CM5</button>
+              <button type="button" class="torch-cam-btn" data-cam="usbc">USB-C</button>
+              <span class="torch-hud-divider" aria-hidden="true"></span>
+              <button type="button" id="torchHudFullscreenBtn" class="torch-cam-btn torch-fs-toggle-btn" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+                <svg class="fs-icon-expand" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="15 3 21 3 21 9"/>
+                  <polyline points="9 21 3 21 3 15"/>
+                  <line x1="21" y1="3" x2="14" y2="10"/>
+                  <line x1="3" y1="21" x2="10" y2="14"/>
+                </svg>
+                <svg class="fs-icon-compress" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="4 14 10 14 10 20"/>
+                  <polyline points="20 10 14 10 14 4"/>
+                  <line x1="14" y1="10" x2="21" y2="3"/>
+                  <line x1="3" y1="21" x2="10" y2="14"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Bottom-Left Live Signal Sync Telemetry -->
+            <div class="torch-hud-bl">
+              <span id="torchSyncDot" class="torch-sync-dot"></span>
+              <span id="torchSyncStatus" class="torch-sync-text">STANDBY · READY</span>
+            </div>
+
+            <!-- Fullscreen-Only Presentation Dock -->
+            <div class="torch-fs-dock" aria-label="Fullscreen Simulation Controls">
+              <div class="torch-fs-callout">
+                <span id="fsPartCategory" class="torch-fs-cat">PHASE 2 SELF-CONTAINED TORCH</span>
+                <div class="torch-fs-title-row">
+                  <strong id="fsPartTitle" class="torch-fs-title">OPTIX-MK2 Complete Assembly</strong>
+                  <span id="fsPartCost" class="torch-fs-cost">~$118 Est. BOM</span>
+                </div>
+                <span id="fsPartSpec" class="torch-fs-spec">Zero-Network Handheld Optical AI Communicator</span>
+              </div>
+
+              <div class="torch-fs-controls-row">
+                <div class="torch-view-group" role="group" aria-label="Fullscreen Enclosure View Mode">
+                  <button type="button" class="torch-mode-btn" data-view="assembled">Assembled</button>
+                  <button type="button" class="torch-mode-btn active" data-view="xray">X-Ray</button>
+                  <button type="button" class="torch-mode-btn" data-view="exploded">Exploded</button>
+                </div>
+
+                <div class="torch-fs-explode">
+                  <span class="torch-fs-explode-lbl">Explode <strong id="fsExplodeVal">0%</strong></span>
+                  <input type="range" id="fsExplodeSlider" class="range-slider" min="0" max="100" value="0" step="1" aria-label="Fullscreen explode separation">
+                </div>
+
+                <div class="torch-fs-actions">
+                  <button type="button" class="torch-fs-action-btn" data-hw-btn="ptt">PTT Voice</button>
+                  <button type="button" class="torch-fs-action-btn fs-btn-primary" data-hw-btn="tx">TX Morse</button>
+                  <button type="button" class="torch-fs-action-btn fs-btn-danger" data-hw-btn="sos">SOS</button>
+                  <button type="button" class="torch-fs-action-btn" data-hw-btn="mode" id="fsModeBtn">Steady Beam</button>
+                  <button type="button" id="torchFsExitBtn" class="torch-fs-action-btn">Exit</button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="input-meta-row">
-            <label class="adaptive-toggle-inline" for="adaptiveToggle" title="Compress common phrases into short emergency codes">
-              <span class="switch">
-                <input type="checkbox" id="adaptiveToggle" checked>
-                <span class="slider-toggle"></span>
+          <!-- View Mode & Explode Controls -->
+          <div class="torch-controls-bar">
+            <div class="torch-view-group" role="group" aria-label="Enclosure View Mode">
+              <button type="button" class="torch-mode-btn" data-view="assembled">ASSEMBLED</button>
+              <button type="button" class="torch-mode-btn active" data-view="xray">X-RAY</button>
+              <button type="button" class="torch-mode-btn" data-view="exploded">EXPLODED</button>
+            </div>
+
+            <div class="torch-explode-control">
+              <label class="torch-explode-label" for="torchExplodeSlider">
+                <span class="micro-label">EXPLODE</span>
+                <span id="torchExplodeVal" class="torch-explode-val">0%</span>
+              </label>
+              <input type="range" id="torchExplodeSlider" class="range-slider" min="0" max="100" value="0" step="1" aria-label="Exploded view separation">
+            </div>
+
+            <label class="swiss-check" for="torchAutoRotateCheck">
+              <input type="checkbox" id="torchAutoRotateCheck" class="swiss-check-input" checked>
+              <span class="swiss-check-box" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter">
+                  <polyline points="2 6.5 4.8 9.2 10 3"/>
+                </svg>
               </span>
-              <span class="adaptive-toggle-title">Adaptive Compression</span>
+              <span class="swiss-check-label">Auto-Orbit</span>
             </label>
           </div>
 
-          <div id="semanticInfo" class="semantic-banner hidden" role="status"></div>
-        </section>
-
-        <!-- Hero Morse Output -->
-        <section class="morse-hero-section">
-          <div class="morse-hero-header">
-            <span class="section-label">Morse Output</span>
-            <button id="copyMorseBtn" class="btn btn-icon" title="Copy Morse code" aria-label="Copy Morse code">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-            </button>
-          </div>
-
-          <div id="morseDisplay" class="morse-code-box" aria-live="polite">... --- ...</div>
-
-          <div id="breakdownContainer" class="breakdown-scroll"></div>
-
-          <div class="metrics-inline">
-            <span class="metric-item"><strong id="statUnits" class="metric-val">18</strong> units</span>
-            <span class="metric-sep" aria-hidden="true">·</span>
-            <span class="metric-item"><strong id="statDuration" class="metric-val">1.44s</strong></span>
-            <span class="metric-sep" aria-hidden="true">·</span>
-            <span class="metric-item"><strong id="statChars" class="metric-val">3</strong> chars</span>
-            <span class="metric-sep" aria-hidden="true">·</span>
-            <span class="metric-item"><strong id="statWpm" class="metric-val">15</strong> WPM</span>
-          </div>
-
-          <div class="transmission-actions">
-            <button id="transmitEsp32Btn" class="btn btn-primary">Send to ESP32</button>
-            <button id="playBeaconBtn" class="btn btn-secondary">Start Beacon</button>
-          </div>
-
-          <div id="transmissionProgress" class="transmission-progress-wrap hidden" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-            <div class="progress-meta">
-              <span id="progressLabel">Transmitting...</span>
-              <span class="progress-status">TX</span>
+          <!-- Onboard 4-Button Hardware Deck Simulator -->
+          <div class="torch-deck-section">
+            <div class="field-meta-bar">
+              <span class="micro-label">ONBOARD HARDWARE DECK (CLICK 3D MODEL OR TRIGGERS)</span>
+              <span class="spec-tag">GPIO 5 / 6 / 13 / 26</span>
             </div>
-            <div class="progress-track">
-              <div id="progressBar" class="progress-fill"></div>
+            <div class="torch-hw-buttons">
+              <button type="button" id="torchHwPttBtn" class="torch-hw-btn" data-hw-btn="ptt">
+                <span class="hw-btn-key">BTN 1 · PTT</span>
+                <span class="hw-btn-desc">Voice AI Dictate</span>
+              </button>
+              <button type="button" id="torchHwTxBtn" class="torch-hw-btn hw-btn-primary" data-hw-btn="tx">
+                <span class="hw-btn-key">BTN 2 · TX</span>
+                <span class="hw-btn-desc">Pulse Morse Now</span>
+              </button>
+              <button type="button" id="torchHwSosBtn" class="torch-hw-btn hw-btn-danger" data-hw-btn="sos">
+                <span class="hw-btn-key">BTN 3 · SOS</span>
+                <span class="hw-btn-desc">Instant Distress</span>
+              </button>
+              <button type="button" id="torchHwModeBtn" class="torch-hw-btn" data-hw-btn="mode">
+                <span class="hw-btn-key">BTN 4 · MODE</span>
+                <span id="torchModeBtnDesc" class="hw-btn-desc">Steady Beam: OFF</span>
+              </button>
             </div>
           </div>
-        </section>
 
-        <!-- Presets -->
-        <section class="presets-section">
-          <span class="section-label">Presets</span>
-          <div id="presetsContainer" class="presets-row"></div>
-        </section>
+          <!-- Subsystem Selector Chips -->
+          <div class="torch-parts-nav" id="torchPartChips" role="tablist" aria-label="Torch Subsystems">
+            <button type="button" class="torch-part-chip active" data-part="overview">Overview</button>
+            <button type="button" class="torch-part-chip" data-part="compute">Raspberry Pi CM5</button>
+            <button type="button" class="torch-part-chip" data-part="optics">10W LED &amp; Optics</button>
+            <button type="button" class="torch-part-chip" data-part="driver">MOSFET Driver</button>
+            <button type="button" class="torch-part-chip" data-part="controls">OLED &amp; 4 Buttons</button>
+            <button type="button" class="torch-part-chip" data-part="mic">MEMS Mic</button>
+            <button type="button" class="torch-part-chip" data-part="battery">2S 18650 Battery</button>
+            <button type="button" class="torch-part-chip" data-part="usbc">USB-C PD BMS</button>
+            <button type="button" class="torch-part-chip" data-part="enclosure">3D-Printed Case</button>
+          </div>
 
+          <!-- Subsystem Technical Inspector Card -->
+          <div class="torch-inspector-card" id="torchInspectorCard">
+            <div class="inspector-top">
+              <div>
+                <span id="inspectorCategory" class="micro-label">PHASE 2 SELF-CONTAINED TORCH</span>
+                <h3 id="inspectorTitle" class="inspector-title">OPTIX-MK2 Complete Assembly</h3>
+              </div>
+              <span id="inspectorCost" class="inspector-cost">~$118 Est. Prototype BOM (~₹9,800)</span>
+            </div>
+
+            <p id="inspectorSummary" class="inspector-summary">
+              Complete self-contained tactical torch for military, hikers, and disaster response. All speech-to-text, AI semantic compression, ITU-R M.1677-1 Morse modulation, and high-power LED keying execute onboard with zero external infrastructure.
+            </p>
+
+            <div class="inspector-specs-grid">
+              <div class="inspector-spec-item">
+                <span class="spec-k">HARDWARE SPECIFICATION</span>
+                <span id="inspectorModel" class="spec-v">Zero-Network Handheld Optical AI Communicator</span>
+              </div>
+              <div class="inspector-spec-item">
+                <span class="spec-k">BUS &amp; PINOUT INTERFACE</span>
+                <span id="inspectorInterface" class="spec-v">100% Autonomous (No Phone / No Cellular / No Wi-Fi)</span>
+              </div>
+              <div class="inspector-spec-item">
+                <span class="spec-k">POWER &amp; PERFORMANCE</span>
+                <span id="inspectorPower" class="spec-v">Idle 1.8W · Voice AI 5.5W · Optical TX Peak 12W</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 1 vs Phase 2 Engineering Summary Strip -->
+          <div class="torch-roadmap-strip">
+            <div class="roadmap-col">
+              <span class="roadmap-tag">PHASE 1 · LIVE DEMO TODAY</span>
+              <p class="roadmap-text">ESP32 + Breadboard + OPTIX Web Console validates speech-to-Morse, adaptive compression (-50% burst time), and FreeRTOS optical timing.</p>
+            </div>
+            <div class="roadmap-col roadmap-col-accent">
+              <span class="roadmap-tag">PHASE 2 · FUTURE SCOPE (THIS TWIN)</span>
+              <p class="roadmap-text">Migrates STT (Whisper-tiny) + quantized AI compressor onto RPi CM5 inside a custom 3D-printed IP65 torch with USB-C PD &amp; 10W collimated optics.</p>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
 
     <!-- =========================================================================
-         TAB 2: Manual Key
+         Bottom Instrument Calibration Footer
          ========================================================================= -->
-    <main class="tab-pane" id="tapperTab">
-      <section class="workspace-section">
-        <div class="section-header">
-          <h2 class="section-title">Manual Key</h2>
-          <button id="clearManualBtn" class="btn btn-text">Clear</button>
-        </div>
-
-        <div class="tapper-station">
-          <div class="tapper-key-wrapper">
-            <button id="tapperKey" class="tapper-key-btn" aria-label="Morse Code Telegraph Paddle">
-              <span>TAP KEY</span>
-              <span class="tapper-hint">Short · Dot &nbsp;/&nbsp; Long — Dash</span>
-            </button>
-          </div>
-
-          <div class="manual-discrete-row">
-            <button id="dotBtn" class="btn btn-ghost">· Dot</button>
-            <button id="dashBtn" class="btn btn-ghost">— Dash</button>
-            <button id="spaceLetterBtn" class="btn btn-ghost">Letter Gap</button>
-            <button id="spaceWordBtn" class="btn btn-ghost">Word Gap</button>
-          </div>
-
-          <div class="manual-buffers">
-            <div class="buffer-row">
-              <span class="buffer-title">Morse</span>
-              <span id="manualMorseBuffer" class="buffer-content"></span>
-            </div>
-            <div class="buffer-row">
-              <span class="buffer-title">Decoded</span>
-              <span id="manualDecodedText" class="buffer-content"></span>
-            </div>
-          </div>
-
-          <button id="applyManualBtn" class="btn btn-primary full-width">Use in Transmit</button>
-        </div>
-      </section>
-    </main>
-
-    <!-- =========================================================================
-         TAB 3: Beacon & Waveform
-         ========================================================================= -->
-    <main class="tab-pane" id="beaconTab">
-      <section class="workspace-section beacon-workspace">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Beacon &amp; Waveform</h2>
-            <p class="section-subtitle">Local Optical Emitter · Calibrated TTL Oscilloscope</p>
-          </div>
-          <div class="beacon-header-actions">
-            <button id="fullscreenToggle" class="btn btn-ghost" title="Launch fullscreen optical strobe">Fullscreen</button>
-            <button id="beaconTransmitBtn" class="btn btn-primary" title="Transmit Morse sequence locally">Transmit Beacon</button>
-          </div>
-        </div>
-
-        <!-- Active Signal Payload Bar (synced 1:1 with Transmit tab) -->
-        <div class="beacon-payload-bar">
-          <div class="beacon-payload-top">
-            <div class="beacon-payload-input-wrap">
-              <span id="beaconPayloadTag" class="beacon-payload-tag">PAYLOAD</span>
-              <input
-                type="text"
-                id="beaconQuickInput"
-                class="beacon-quick-input"
-                value="SOS"
-                placeholder="Type message to emit..."
-                aria-label="Beacon message payload"
-              >
-            </div>
-            <div class="beacon-payload-actions">
-              <button id="beaconSosBtn" class="btn btn-danger beacon-mini-btn" title="Instant SOS emergency strobe">SOS</button>
-              <button id="beaconEsp32Btn" class="btn btn-secondary beacon-mini-btn" title="Dispatch signal to ESP32 hardware">Send ESP32</button>
-            </div>
-          </div>
-          <div id="beaconMorseReadout" class="beacon-morse-readout" aria-live="polite">... --- ...</div>
-        </div>
-
-        <div class="beacon-display-area">
-          <!-- Optical Emitter Stage + Live Telemetry -->
-          <div class="beacon-stage">
-            <div class="beacon-stage-top">
-              <div class="beacon-live-status">
-                <span id="beaconStateDot" class="beacon-state-dot"></span>
-                <span id="beaconStateLabel" class="beacon-state-label">STANDBY · 0.0V</span>
-              </div>
-              <span id="beaconCycleBadge" class="beacon-cycle-badge">1x BURST</span>
-            </div>
-
-            <div class="beacon-bulb-wrapper">
-              <div
-                id="beaconBulb"
-                class="beacon-bulb"
-                role="button"
-                tabindex="0"
-                title="Hold to fire manual optical test strobe"
-                aria-label="Optical Emitter Bulb — hold for manual test pulse"
-              >
-                <svg class="beacon-bulb-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="7"/>
-                  <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
-                </svg>
-              </div>
-              <span class="beacon-bulb-hint">Hold emitter to test flash · Press Transmit to run sequence</span>
-            </div>
-
-            <div class="beacon-telemetry-strip">
-              <div class="beacon-telem-cell">
-                <span class="beacon-telem-k">Speed</span>
-                <span id="beaconTelemSpeed" class="beacon-telem-v">15 WPM · 80ms</span>
-              </div>
-              <div class="beacon-telem-cell">
-                <span class="beacon-telem-k">Elapsed</span>
-                <span id="beaconTelemElapsed" class="beacon-telem-v">0.00s / 2.16s</span>
-              </div>
-              <div class="beacon-telem-cell">
-                <span class="beacon-telem-k">Duty Cycle</span>
-                <span id="beaconTelemDuty" class="beacon-telem-v">55.6% ON</span>
-              </div>
-              <div class="beacon-telem-cell">
-                <span class="beacon-telem-k">Pulses</span>
-                <span id="beaconTelemPulses" class="beacon-telem-v">6 · / 3 —</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Calibrated Pulse Oscilloscope -->
-          <div class="waveform-block">
-            <div class="waveform-header">
-              <div class="waveform-header-left">
-                <span class="section-label">Pulse Timeline</span>
-                <span id="waveformVoltageBadge" class="waveform-voltage-badge">0.0V LOW</span>
-              </div>
-              <div class="waveform-header-right">
-                <span class="waveform-hint">Click trace to seek</span>
-                <span id="beaconProgressPct" class="waveform-channel">0%</span>
-              </div>
-            </div>
-            <div class="waveform-container">
-              <canvas id="waveformCanvas" class="waveform-canvas"></canvas>
-            </div>
-            <div class="beacon-progress-track" aria-hidden="true">
-              <div id="beaconProgressBar" class="beacon-progress-fill"></div>
-            </div>
-          </div>
-
-          <!-- Live Instrument Controls (Speed & Repeat/Loop synced with Settings) -->
-          <div class="beacon-controls-row">
-            <div class="beacon-speed-control">
-              <div class="beacon-control-head">
-                <label class="section-label" for="beaconWpmSlider">Optical Speed</label>
-                <span id="beaconWpmVal" class="beacon-control-val">15 WPM</span>
-              </div>
-              <input type="range" id="beaconWpmSlider" class="range-slider" min="5" max="40" value="15" step="1" aria-label="Beacon optical speed in WPM">
-            </div>
-
-            <div class="beacon-repeat-control">
-              <span class="section-label">Burst Mode</span>
-              <div class="beacon-repeat-pills" role="group" aria-label="Beacon repeat count">
-                <button class="beacon-repeat-btn active" data-repeat="1">1x</button>
-                <button class="beacon-repeat-btn" data-repeat="3">3x</button>
-                <button class="beacon-repeat-btn" data-repeat="5">5x</button>
-                <button class="beacon-repeat-btn" data-repeat="999">∞ Loop</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Output Channel Toggles -->
-          <div class="optical-toggles-list">
-            <label class="toggle-row" for="torchToggle">
-              <span class="toggle-label-wrap">
-                <span class="toggle-title">Mobile Camera Torch</span>
-                <span id="torchSubLabel" class="toggle-sub">Physical LED strobe (mobile rear flash)</span>
-              </span>
-              <span class="switch">
-                <input type="checkbox" id="torchToggle">
-                <span class="slider-toggle"></span>
-              </span>
-            </label>
-
-            <label class="toggle-row" for="soundToggle">
-              <span class="toggle-label-wrap">
-                <span class="toggle-title">Acoustic Sidetone</span>
-                <span id="soundSubLabel" class="toggle-sub">CW audio tone · 750 Hz</span>
-              </span>
-              <span class="switch">
-                <input type="checkbox" id="soundToggle" checked>
-                <span class="slider-toggle"></span>
-              </span>
-            </label>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- =========================================================================
-         TAB 4: 3D Torch Digital Twin (Phase 2 Self-Contained Hardware Vision)
-         ========================================================================= -->
-    <main class="tab-pane" id="torchTab">
-      <section class="workspace-section torch-twin-workspace">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">OPTIX-MK2 Self-Contained Torch</h2>
-            <p class="section-subtitle">Phase 2 Digital Twin · Raspberry Pi CM5 Offline AI + 10W Optics · Synced Live</p>
-          </div>
-          <div class="torch-header-actions">
-            <button id="torchFullscreenBtn" class="btn btn-ghost" title="Run 3D simulation in fullscreen">Fullscreen</button>
-            <button id="torchTransmitBtn" class="btn btn-primary">Transmit on Torch</button>
-          </div>
-        </div>
-
-        <!-- Interactive 3D WebGL Viewport -->
-        <div id="torchStageShell" class="torch-stage-shell">
-          <div id="torchViewport" class="torch-viewport" aria-label="Interactive 3D Tactical Torch Simulator"></div>
-
-          <!-- Top-Left Mode & Interaction HUD -->
-          <div class="torch-hud-tl">
-            <span id="torchHudMode" class="torch-hud-badge">X-RAY CUTAWAY</span>
-            <span class="torch-hud-hint">Drag to orbit · Scroll to zoom · Click parts or buttons</span>
-          </div>
-
-          <!-- Top-Right Camera Angle Presets & Fullscreen Toggle -->
-          <div class="torch-hud-tr" role="group" aria-label="Camera Presets">
-            <button class="torch-cam-btn active" data-cam="iso">3/4</button>
-            <button class="torch-cam-btn" data-cam="optics">Optics</button>
-            <button class="torch-cam-btn" data-cam="controls">Controls</button>
-            <button class="torch-cam-btn" data-cam="internals">RPi CM5</button>
-            <button class="torch-cam-btn" data-cam="usbc">USB-C</button>
-            <span class="torch-hud-divider" aria-hidden="true"></span>
-            <button id="torchHudFullscreenBtn" class="torch-cam-btn torch-fs-toggle-btn" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
-              <svg class="fs-icon-expand" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="15 3 21 3 21 9"/>
-                <polyline points="9 21 3 21 3 15"/>
-                <line x1="21" y1="3" x2="14" y2="10"/>
-                <line x1="3" y1="21" x2="10" y2="14"/>
-              </svg>
-              <svg class="fs-icon-compress" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="4 14 10 14 10 20"/>
-                <polyline points="20 10 14 10 14 4"/>
-                <line x1="14" y1="10" x2="21" y2="3"/>
-                <line x1="3" y1="21" x2="10" y2="14"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Bottom-Left Live Signal Sync Telemetry -->
-          <div class="torch-hud-bl">
-            <span id="torchSyncDot" class="torch-sync-dot"></span>
-            <span id="torchSyncStatus" class="torch-sync-text">STANDBY · READY</span>
-          </div>
-
-          <!-- Fullscreen-Only Presentation Dock (floating controls + live part spec callout) -->
-          <div class="torch-fs-dock" aria-label="Fullscreen Simulation Controls">
-            <div class="torch-fs-callout">
-              <span id="fsPartCategory" class="torch-fs-cat">PHASE 2 SELF-CONTAINED TORCH</span>
-              <div class="torch-fs-title-row">
-                <strong id="fsPartTitle" class="torch-fs-title">OPTIX-MK2 Complete Assembly</strong>
-                <span id="fsPartCost" class="torch-fs-cost">~$118 Est. BOM</span>
-              </div>
-              <span id="fsPartSpec" class="torch-fs-spec">Zero-Network Handheld Optical AI Communicator</span>
-            </div>
-
-            <div class="torch-fs-controls-row">
-              <div class="torch-view-group" role="group" aria-label="Fullscreen Enclosure View Mode">
-                <button class="torch-mode-btn" data-view="assembled">Assembled</button>
-                <button class="torch-mode-btn active" data-view="xray">X-Ray</button>
-                <button class="torch-mode-btn" data-view="exploded">Exploded</button>
-              </div>
-
-              <div class="torch-fs-explode">
-                <span class="torch-fs-explode-lbl">Explode <strong id="fsExplodeVal">0%</strong></span>
-                <input type="range" id="fsExplodeSlider" class="range-slider" min="0" max="100" value="0" step="1" aria-label="Fullscreen explode separation">
-              </div>
-
-              <div class="torch-fs-actions">
-                <button class="torch-fs-action-btn" data-hw-btn="ptt">PTT Voice</button>
-                <button class="torch-fs-action-btn fs-btn-amber" data-hw-btn="tx">TX Morse</button>
-                <button class="torch-fs-action-btn fs-btn-danger" data-hw-btn="sos">SOS</button>
-                <button class="torch-fs-action-btn" data-hw-btn="mode" id="fsModeBtn">Steady Beam</button>
-                <button id="torchFsExitBtn" class="torch-fs-action-btn">Exit</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- View Mode & Explode Controls -->
-        <div class="torch-controls-bar">
-          <div class="torch-view-group" role="group" aria-label="Enclosure View Mode">
-            <button class="torch-mode-btn" data-view="assembled">Assembled</button>
-            <button class="torch-mode-btn active" data-view="xray">X-Ray</button>
-            <button class="torch-mode-btn" data-view="exploded">Exploded</button>
-          </div>
-
-          <div class="torch-explode-control">
-            <label class="torch-explode-label" for="torchExplodeSlider">
-              <span>Explode</span>
-              <span id="torchExplodeVal" class="torch-explode-val">0%</span>
-            </label>
-            <input type="range" id="torchExplodeSlider" class="range-slider" min="0" max="100" value="0" step="1" aria-label="Exploded view separation">
-          </div>
-
-          <label class="torch-autorotate-toggle" for="torchAutoRotateCheck">
-            <input type="checkbox" id="torchAutoRotateCheck" checked>
-            <span>Auto-Orbit</span>
-          </label>
-        </div>
-
-        <!-- Onboard 4-Button Hardware Deck Simulator -->
-        <div class="torch-deck-section">
-          <div class="torch-deck-header">
-            <span class="section-label">Onboard Hardware Buttons (Click 3D Buttons or Triggers Below)</span>
-            <span class="torch-deck-spec">GPIO 5 / 6 / 13 / 26</span>
-          </div>
-          <div class="torch-hw-buttons">
-            <button id="torchHwPttBtn" class="torch-hw-btn" data-hw-btn="ptt">
-              <span class="hw-btn-key">BTN 1 · PTT</span>
-              <span class="hw-btn-desc">Voice AI Dictate</span>
-            </button>
-            <button id="torchHwTxBtn" class="torch-hw-btn hw-btn-amber" data-hw-btn="tx">
-              <span class="hw-btn-key">BTN 2 · TX</span>
-              <span class="hw-btn-desc">Pulse Morse Now</span>
-            </button>
-            <button id="torchHwSosBtn" class="torch-hw-btn hw-btn-danger" data-hw-btn="sos">
-              <span class="hw-btn-key">BTN 3 · SOS</span>
-              <span class="hw-btn-desc">Instant Distress</span>
-            </button>
-            <button id="torchHwModeBtn" class="torch-hw-btn" data-hw-btn="mode">
-              <span class="hw-btn-key">BTN 4 · MODE</span>
-              <span id="torchModeBtnDesc" class="hw-btn-desc">Steady Beam: OFF</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Subsystem Selector Chips -->
-        <div class="torch-parts-nav" id="torchPartChips" role="tablist" aria-label="Torch Subsystems">
-          <button class="torch-part-chip active" data-part="overview">Overview</button>
-          <button class="torch-part-chip" data-part="compute">Raspberry Pi CM5</button>
-          <button class="torch-part-chip" data-part="optics">10W LED &amp; Optics</button>
-          <button class="torch-part-chip" data-part="driver">MOSFET Driver</button>
-          <button class="torch-part-chip" data-part="controls">OLED &amp; 4 Buttons</button>
-          <button class="torch-part-chip" data-part="mic">MEMS Mic</button>
-          <button class="torch-part-chip" data-part="battery">2S 18650 Battery</button>
-          <button class="torch-part-chip" data-part="usbc">USB-C PD BMS</button>
-          <button class="torch-part-chip" data-part="enclosure">3D-Printed Case</button>
-        </div>
-
-        <!-- Subsystem Technical Inspector Card -->
-        <div class="torch-inspector-card" id="torchInspectorCard">
-          <div class="inspector-top">
-            <div>
-              <span id="inspectorCategory" class="inspector-category">PHASE 2 SELF-CONTAINED TORCH</span>
-              <h3 id="inspectorTitle" class="inspector-title">OPTIX-MK2 Complete Assembly</h3>
-            </div>
-            <span id="inspectorCost" class="inspector-cost">~$118 Est. Prototype BOM (~₹9,800)</span>
-          </div>
-
-          <p id="inspectorSummary" class="inspector-summary">
-            Complete self-contained tactical torch for military, hikers, and disaster response. All speech-to-text, AI semantic compression, ITU-R M.1677-1 Morse modulation, and high-power LED keying execute onboard with zero external infrastructure.
-          </p>
-
-          <div class="inspector-specs-grid">
-            <div class="inspector-spec-item">
-              <span class="spec-k">Hardware Specification</span>
-              <span id="inspectorModel" class="spec-v">Zero-Network Handheld Optical AI Communicator</span>
-            </div>
-            <div class="inspector-spec-item">
-              <span class="spec-k">Bus &amp; Pinout Interface</span>
-              <span id="inspectorInterface" class="spec-v">100% Autonomous (No Phone / No Cellular / No Wi-Fi)</span>
-            </div>
-            <div class="inspector-spec-item">
-              <span class="spec-k">Power &amp; Performance</span>
-              <span id="inspectorPower" class="spec-v">Idle 1.8W · Voice AI 5.5W · Optical TX Peak 12W</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Phase 1 vs Phase 2 Engineering Summary Strip -->
-        <div class="torch-roadmap-strip">
-          <div class="roadmap-col">
-            <span class="roadmap-tag">PHASE 1 · LIVE DEMO TODAY</span>
-            <p class="roadmap-text">ESP32 + Breadboard + OPTIX Web Console validates speech-to-Morse, adaptive compression (-50% burst time), and FreeRTOS optical timing.</p>
-          </div>
-          <div class="roadmap-col roadmap-col-accent">
-            <span class="roadmap-tag">PHASE 2 · FUTURE SCOPE (THIS TWIN)</span>
-            <p class="roadmap-text">Migrates STT (Whisper-tiny) + quantized AI compressor onto RPi CM5 inside a custom 3D-printed IP65 torch with USB-C PD &amp; 10W collimated optics.</p>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- =========================================================================
-         TAB 5: Hardware
-         ========================================================================= -->
-    <main class="tab-pane" id="hardwareTab">
-      <section class="workspace-section">
-        <div class="section-header">
-          <h2 class="section-title">ESP32 Connection</h2>
-          <button id="pingEsp32Btn" class="btn btn-primary">Ping ESP32</button>
-        </div>
-
-        <div class="hardware-pipeline-diagram">
-          <div class="pipe-node">
-            <div class="pipe-node-box">CLIENT</div>
-            <span class="pipe-node-sub">Web</span>
-          </div>
-          <div class="pipe-connector"></div>
-          <div class="pipe-node">
-            <div class="pipe-node-box">BRIDGE</div>
-            <span class="pipe-node-sub">REST · USB</span>
-          </div>
-          <div class="pipe-connector"></div>
-          <div class="pipe-node">
-            <div class="pipe-node-box">ESP32</div>
-            <span class="pipe-node-sub">GPIO 2</span>
-          </div>
-          <div class="pipe-connector"></div>
-          <div class="pipe-node">
-            <div class="pipe-node-box pipe-node-accent">LED</div>
-            <span class="pipe-node-sub">Optical</span>
-          </div>
-        </div>
-
-        <div class="hardware-form-grid">
-          <div class="form-group">
-            <label class="form-label" for="hardwareModeSelect">Connection Mode</label>
-            <select id="hardwareModeSelect" class="form-select">
-              <option value="simulation">Simulated ESP32</option>
-              <option value="wifi">Wi-Fi HTTP REST</option>
-              <option value="serial">Web Serial (USB)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="esp32IpInput">ESP32 IP / Host</label>
-            <input type="text" id="esp32IpInput" class="form-input" value="192.168.4.1" placeholder="192.168.4.1">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="esp32PortInput">HTTP Port</label>
-            <input type="number" id="esp32PortInput" class="form-input" value="80" placeholder="80">
-          </div>
-
-          <div class="form-group form-group-toggle">
-            <label class="toggle-row" for="useProxyCheck">
-              <span class="toggle-label-wrap">
-                <span class="toggle-title">CORS Proxy</span>
-                <span class="toggle-sub">Relay mixed-content requests</span>
-              </span>
-              <span class="switch">
-                <input type="checkbox" id="useProxyCheck">
-                <span class="slider-toggle"></span>
-              </span>
-            </label>
-          </div>
-        </div>
-
-        <button id="connectSerialBtn" class="btn btn-secondary hidden">Connect USB Serial</button>
-
-        <div class="log-section">
-          <div class="section-header-sm">
-            <span class="section-label">Telemetry Log</span>
-            <button id="clearLogBtn" class="btn btn-text">Clear</button>
-          </div>
-          <div id="activityLog" class="terminal-window" role="log" aria-live="polite">
-            <div class="log-row info">System ready.</div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- =========================================================================
-         TAB 5: Settings
-         ========================================================================= -->
-    <main class="tab-pane" id="settingsTab">
-      <section class="workspace-section">
-        <div class="section-header">
-          <h2 class="section-title">Timing &amp; Audio</h2>
-        </div>
-
-        <div class="settings-stack">
-          <div class="slider-control-group">
-            <div class="slider-labels-row">
-              <label class="form-label" for="wpmSlider">Transmission Speed</label>
-              <span id="wpmValue" class="slider-val">15 WPM</span>
-            </div>
-            <input type="range" id="wpmSlider" class="range-slider" min="5" max="40" value="15" step="1" aria-label="Transmission speed in words per minute">
-            <div class="slider-labels-row slider-meta-row">
-              <span>5 WPM</span>
-              <span id="unitMsDisplay" class="unit-ms-badge">80 ms / dot</span>
-              <span>40 WPM</span>
-            </div>
-          </div>
-
-          <div class="slider-control-group">
-            <div class="slider-labels-row">
-              <label class="form-label" for="pitchSlider">Sidetone Frequency</label>
-              <span id="pitchValue" class="slider-val">750 Hz</span>
-            </div>
-            <input type="range" id="pitchSlider" class="range-slider" min="300" max="1500" value="750" step="25" aria-label="Acoustic sidetone frequency in hertz">
-            <div class="slider-labels-row slider-meta-row">
-              <span>300 Hz</span>
-              <span>750 Hz</span>
-              <span>1500 Hz</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="repeatSelect">Repeat Count</label>
-            <select id="repeatSelect" class="form-select">
-              <option value="1">1x (Single)</option>
-              <option value="3">3x (Emergency Burst)</option>
-              <option value="5">5x (High Reliability)</option>
-              <option value="999">Infinite Loop</option>
-            </select>
-          </div>
-
-          <div class="reference-block">
-            <span class="section-label">ITU-R M.1677-1 Timing Ratios</span>
-            <div class="table-responsive">
-              <table class="morse-reference-table">
-                <thead>
-                  <tr>
-                    <th>Element</th>
-                    <th>Duration</th>
-                    <th>Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Dot (Dit)</td>
-                    <td>1T</td>
-                    <td>Base unit (1200 / WPM ms)</td>
-                  </tr>
-                  <tr>
-                    <td>Dash (Dah)</td>
-                    <td>3T</td>
-                    <td>Prolonged pulse</td>
-                  </tr>
-                  <tr>
-                    <td>Intra-element gap</td>
-                    <td>1T</td>
-                    <td>Pause between symbols</td>
-                  </tr>
-                  <tr>
-                    <td>Inter-character gap</td>
-                    <td>3T</td>
-                    <td>Pause between letters</td>
-                  </tr>
-                  <tr>
-                    <td>Inter-word gap</td>
-                    <td>7T</td>
-                    <td>Pause between words</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="footer-item">OPTIX v4.0.2 / ARCH: QUIET MINIMAL</span>
+        <span class="footer-sep" aria-hidden="true">|</span>
+        <span class="footer-item footer-strong">DIODE CURRENT: <strong id="footerDiodeCurrent">24.2 mA</strong></span>
+      </div>
+      <div class="footer-right">
+        <span class="footer-item footer-muted">SWISS / PURISM SPEC</span>
+        <span class="footer-item footer-muted">KENYA HARA INSP.</span>
+        <span id="footerViewportSpec" class="footer-item footer-strong">1440 × 900 CALIBRATED</span>
+      </div>
+    </footer>
   </div>
 
+  <!-- Accessible Toast Stack Region -->
+  <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="false"></div>
+
   <!-- Fullscreen Optical Strobe Overlay -->
-  <div id="fullscreenBeacon" class="fullscreen-beacon-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen Optical Beacon">
+  <div id="fullscreenBeacon" class="fullscreen-beacon-overlay" role="dialog" aria-modal="true" aria-labelledby="fsBeaconPayload">
+    <!-- WCAG 2.3.1 Photosensitive Strobe Safety Gate -->
+    <div id="fsSafetyGate" class="fullscreen-safety-gate" role="region" aria-label="Photosensitive strobe safety confirmation">
+      <div class="fs-safety-title">OPTICAL STROBE SAFETY CHECK</div>
+      <p id="fsSafetyDesc" class="fs-safety-desc">
+        Full-screen optical strobing flashes at <strong>6.25 Hz</strong> (15 WPM), exceeding the 3 Hz photosensitive threshold.
+      </p>
+      <p id="fsReducedMotionNote" class="fs-safety-note hidden">
+        System reduced-motion preference detected — non-strobe mode recommended to prevent flashing.
+      </p>
+      <div class="fs-safety-mode-row" role="group" aria-label="Fullscreen strobe color mode">
+        <button type="button" class="fs-beacon-btn active" data-fs-color="amber" aria-pressed="true">Night-Vision Amber</button>
+        <button type="button" class="fs-beacon-btn" data-fs-color="white" aria-pressed="false">High-Luminance White</button>
+        <button type="button" class="fs-beacon-btn" data-fs-color="none" aria-pressed="false">No Strobe (Safe)</button>
+      </div>
+      <div class="fs-safety-actions">
+        <button type="button" id="fsArmStrobeBtn" class="fs-beacon-btn fs-beacon-btn-primary">Arm Beacon (2s)</button>
+        <button type="button" id="fsCancelGateBtn" class="fs-beacon-btn">Cancel</button>
+      </div>
+    </div>
+
     <div class="fullscreen-beacon-hud">
       <div class="fullscreen-payload-readout">
         <span id="fsBeaconPayload" class="fullscreen-hint">SOS</span>
         <span id="fsBeaconMorse" class="fullscreen-morse">... --- ...</span>
       </div>
       <div class="fullscreen-controls-row" id="fsBeaconControls">
-        <button id="fsBeaconPlayBtn" class="fs-beacon-btn fs-beacon-btn-primary">Stop</button>
-        <button id="fsBeaconLoopBtn" class="fs-beacon-btn">Loop: OFF</button>
-        <button id="fsBeaconExitBtn" class="fs-beacon-btn">Exit</button>
+        <button type="button" id="fsBeaconPlayBtn" class="fs-beacon-btn fs-beacon-btn-primary">Transmit</button>
+        <button type="button" id="fsBeaconColorBtn" class="fs-beacon-btn" title="Switch night-vision amber vs white strobe">Mode: Amber</button>
+        <button type="button" id="fsBeaconLoopBtn" class="fs-beacon-btn" aria-pressed="false">Loop: OFF</button>
+        <button type="button" id="fsBeaconExitBtn" class="fs-beacon-btn">Exit &amp; Stop</button>
       </div>
-      <div class="fullscreen-hint fullscreen-hint-sub">Tap screen or press ESC to exit</div>
+      <div class="fullscreen-hint fullscreen-hint-sub">Tap backdrop or press ESC to stop and exit</div>
     </div>
   </div>
 

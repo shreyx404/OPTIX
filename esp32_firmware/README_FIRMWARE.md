@@ -116,19 +116,19 @@ ESP32 GND    ────────────────┴─────�
 
 ### 📲 Two Ways to Control from Mobile
 
-#### Method A: Full OPTIX Tactical Console on Mobile *(Rich UI, Voice Dictation & Presets)*
+#### Method A: Full OPTIX Web Console on Mobile *(Quiet Minimal UI, Voice Dictation & Presets)*
 1. Keep `node server.js` running on your laptop while the laptop is connected to `OPTIX-Optical-Transmitter`.
 2. Connect your mobile phone to `OPTIX-Optical-Transmitter` (with Mobile Data disabled).
 3. In Chrome or Safari on your phone, open:
    ```
    http://192.168.4.2:3000
    ```
-   *(Replace `192.168.4.2` with your laptop's local IP address if different).*
-4. Navigate to the **ESP32 Hardware** tab on your phone:
-   - Set **Communication Pipeline Mode** to **`Wi-Fi HTTP REST (Direct to ESP32 SoftAP/Station)`**.
-   - Ensure the IP field is `192.168.4.1` and tap **Ping ESP32** to confirm connection.
-5. In the **Transmission Studio** tab:
-   - Use voice dictation or type a message, then tap **`DISPATCH TO ESP32`**.
+   *(Replace `192.168.4.2` with your laptop's local IP address if different; use `https://<HOST_IP>:3443` if you need browser microphone dictation).*
+4. Navigate to **`04. Hardware`** on your phone:
+   - Set **Connection Mode** to **`Wi-Fi HTTP REST`**.
+   - Ensure **ESP32 IP / Host** is `192.168.4.1` and tap **`PING ESP32`** to confirm `SYS.ONLINE` / `LINK ONLINE`.
+5. In **`01. Transmit`**:
+   - Tap an emergency token, use voice dictation, or type a payload, then tap **`TRANSMIT VIA ESP32 ↵`** in the sticky bottom bar.
 
 #### Method B: Standalone Embedded Portal *(Zero Laptop Needed — 100% Offline Field Mode)*
 1. Power the ESP32 from any 5V USB power bank or smartphone charger (no computer needed).
@@ -141,11 +141,11 @@ ESP32 GND    ────────────────┴─────�
 
 ---
 
-### 🔍 Troubleshooting & Common Issues
+### Troubleshooting & Common Issues
 
-- **Issue 1: Only sounds play from laptop speakers, but the LED doesn't blink:**
-  - In the web app, check the **ESP32 Hardware** tab. If the mode is set to `Simulated Virtual ESP32`, requests go to a local software mock instead of the physical board. Change it to **`Wi-Fi HTTP REST`**.
-  - In the Transmission Studio, ensure you click **`DISPATCH TO ESP32`** (the blue button), **not** `FIRE BEACON` (the green button is only for screen strobe and audio preview).
+- **Issue 1: Only sounds play from speakers, but the ESP32 LED doesn't blink:**
+  - Open **`04. Hardware`**. If **Connection Mode** is set to `Simulated ESP32` (`SYS.SIMULATED`), transmissions run on the built-in local simulator instead of physical hardware. Switch to **`Wi-Fi HTTP REST`** or **`Web Serial (USB)`**.
+  - In **`01. Transmit`**, tap **`TRANSMIT VIA ESP32 ↵`** (solid black primary button), not **`LOOP BEACON`** (bordered white button, which runs local screen/camera-torch playback).
 - **Issue 2: "Site Can't Be Reached" / Timeout on Mobile:**
   - You must turn **OFF Mobile Data / Cellular Data** on your phone. Mobile OS network managers silently bypass Wi-Fi connections that do not possess upstream internet access unless cellular data is disabled.
 - **Issue 3: Built-in Blue LED (`D2`) blinks, but external LED (`D4`) stays dark:**

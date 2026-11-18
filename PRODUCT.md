@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Vanilla HTML5, Modern CSS, ES Modules JavaScript, Web Audio API, Web Speech API, Web Serial API, FreeRTOS ESP32 C++ Firmware.
+Vanilla HTML5, Modern CSS (3-layer design tokens, mobile-first safe areas), ES Modules JavaScript, Web Audio API, Web Speech API, Web Serial API, Three.js (bundled offline), Node.js / Python 3 local bridge servers, and FreeRTOS ESP32 C++ Firmware.
 
 ## Users
 
@@ -16,33 +16,35 @@ Field operators, emergency response personnel, search & rescue teams, and embedd
 
 ## Product Purpose
 
-OPTIX provides a reliable, direct Visible Light Communication (VLC) telecommunications interface. It accepts voice dictation, typed plain text, or manual telegraph keying, computes semantic contractions to minimize optical beacon exposure, modulates the signal to standard ITU-R M.1677-1 Morse code, and drives optical emitters (ESP32 High-Power LEDs, mobile camera torches, and high-luminance screen beacons).
+OPTIX provides a reliable, direct Visible Light Communication (VLC) telecommunications interface. It accepts voice dictation, typed plain text, emergency token presets, or manual telegraph keying, computes opt-in semantic contractions to minimize optical beacon exposure, modulates the signal to standard ITU-R M.1677-1 Morse code, and drives optical emitters (ESP32 High-Power LEDs, mobile camera torches, and calibrated screen beacons) alongside an interactive Phase 2 3D hardware digital twin.
 
 ## Positioning
 
-Adaptive Semantic Optical Telecommunications: Unlike conventional bulk optical modems, OPTIX incorporates an adaptive semantic tokenization engine that reduces optical burst duration by up to 50% without losing message intelligibility, cutting battery consumption and drastically minimizing optical interception risk.
+Adaptive Semantic Optical Telecommunications: Unlike conventional bulk optical modems, OPTIX pairs an opt-in adaptive semantic tokenization engine (saving up to 50% optical air time while strictly preserving negations) with a laboratory-calibrated Swiss Purism interface that remains legible on desktops, tablets, and field smartphones.
 
 ## Operating Context
 
-- **Environment**: Low-light emergency shelters, maritime optical signaling, tactical field stations, or embedded hardware engineering testbenches.
-- **Hardware Integration**: ESP32 microcontrollers over Wi-Fi HTTP SoftAP (192.168.4.1) or USB Web Serial, driving high-intensity LEDs via GPIO 2 with microsecond FreeRTOS hardware timing.
-- **Physical Affordances**: Screen luminescence beacon, high-speed camera torch strobe, and 750Hz harmonic CW acoustic sidetone.
+- **Environment**: Emergency field shelters, maritime optical signaling, outdoor daylight or indoor testbenches, and embedded hardware prototyping stations.
+- **Hardware Integration**: ESP32 microcontrollers over Wi-Fi HTTP SoftAP (`192.168.4.1`) or USB Web Serial (`115200` baud), driving LEDs via GPIO 2/4 with non-blocking FreeRTOS hardware timing; plus a client-side virtual simulator for zero-hardware offline validation.
+- **Physical Affordances**: Screen luminescence beacon with WCAG 2.3.1 safety gate, high-speed rear camera torch strobe, 300–1500 Hz harmonic CW acoustic sidetone, and press-and-hold optical diode manual test aperture.
 
 ## Capabilities and Constraints
 
-- **Input Modalities**: Voice dictation (Web Speech API), raw text payload entry, tactical preset bank, and manual Morse telegraph paddle with automatic dot/dash duration detection.
-- **Modulation & Timing**: ITU-R M.1677-1 Morse standard (1T dot, 3T dash, 1T intra-character space, 3T letter space, 7T word space), adjustable speed (5–40 WPM), adjustable audio sidetone frequency (300–1500 Hz).
-- **Telemetry & Monitoring**: Live UTC mission clock, real-time TTL 3.3V logic pulse oscilloscope waveform, character/unit counters, optical burst duration estimator, and continuous hardware telemetry log.
-- **Safety**: Dedicated high-priority emergency transmission abort.
+- **Input Modalities**: Voice dictation (Web Speech API over HTTPS/localhost), borderless text stream input, standard emergency token bank (`SOS`, `MED HELP`, `FIRE EVAC`, `NEED WATER`, `ALL SAFE`, plus extended tokens), and manual Morse telegraph paddle with automatic dot/dash duration detection (`1.8T` threshold).
+- **Modulation & Timing**: ITU-R M.1677-1 Morse standard (`1T` dot, `3T` dash, `1T` intra-element gap, `3T` inter-character gap, `7T` inter-word gap), adjustable speed (`5–40 WPM`), adjustable audio sidetone frequency (`300–1500 Hz`), and burst repeat counts (`1x`, `3x`, `5x`, `∞ LOOP`).
+- **Telemetry & Monitoring**: Live UTC mission clock, interactive 3.3V TTL pulse oscilloscope with mouse/keyboard scrubbing, character/unit/duration counters, live optical diode current readout (`24.2 mA` standby / `180.0 mA` emitting), signal routing path indicator, and continuous UTC hardware telemetry log.
+- **Workspaces**: Six numbered modules (`01. Transmit`, `02. Manual Key`, `03. Beacon`, `04. Hardware`, `05. Parameters`, `06. 3D Torch`).
+- **Safety**: Dedicated high-priority `ABORT` button (`Esc` global shortcut), WCAG 2.3.1 photosensitive strobe safety gate with live Hz disclosure, 2-second arming countdown, reduced-motion non-strobe default, and automatic stop-on-exit.
 
 ## Brand Commitments
 
 - **Name**: OPTIX (Adaptive Semantic Optical Telecommunications)
-- **Tone**: Aerospace mission telemetry, tactical command precision, high-legibility telemetry displays, laboratory-grade instrumentation. No cartoonish gamification, no decorative clutter, zero emoji glyphs.
+- **Visual Identity**: Quiet Minimal / Swiss Purism (Kenya Hara inspired) — alabaster gallery ground (`#f7f7f7`), pure white framed instrument surfaces (`#ffffff`), 1px hairlines (`#e5e5e5`), matte jet ink (`#111111`), and strictly operational emerald/crimson accents.
+- **Tone**: Laboratory-calibrated optical instrumentation and precision engineering specifications. No cartoonish gamification, no neon sci-fi clichés, no decorative clutter, zero emoji glyphs in UI controls.
 
 ## Product Principles
 
-1. **Mission-Critical Precision**: Every status, voltage rail, baud rate, and timing metric must be authentic, calibrated, and instantly legible at a glance.
-2. **Frictionless Tactical Speed**: An operator under extreme stress must be able to arm, encode, and transmit critical emergency payloads in fewer than two taps.
-3. **Zero Visual Noise**: Pure signal, zero aesthetic fluff. High contrast, dedicated elevation surfaces, and crisp telemetry typography.
-4. **Resilient Multimodal Fallback**: Graceful automatic fallback from physical ESP32 to Web Serial, Camera Torch, Screen Beacon, and Virtual Simulation.
+1. **Mission-Critical Precision**: Every status, voltage rail, diode current, baud rate, and timing metric must be authentic, calibrated, and instantly legible at a glance.
+2. **Frictionless Tactical Speed**: An operator under stress must be able to arm, encode, and transmit critical emergency payloads in fewer than two taps — with thumb-zone primary controls on mobile.
+3. **Quiet Minimal Clarity**: Pure signal, architectural negative space, razor hairlines, and WCAG AA/AAA contrast on every surface.
+4. **Resilient Multimodal Fallback**: Graceful automatic fallback from physical ESP32 (Wi-Fi/Serial) to Camera Torch, Screen Beacon, and Virtual Simulation.

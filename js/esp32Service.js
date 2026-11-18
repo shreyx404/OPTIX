@@ -16,7 +16,19 @@ class Esp32Service {
     this.serialPort = null;
     this.serialWriter = null;
     this.serialReader = null;
+    this._serialReadableClosed = null;
+    this._serialDisconnectHandler = null;
     this.serialSupported = 'serial' in navigator;
+
+    // Built-in client-side virtual ESP32 simulator (works offline / on static hosts)
+    this._simStartTime = Date.now();
+    this._simState = {
+      transmitting: false,
+      currentSequence: '',
+      unitMs: 80,
+      repeat: 1,
+      lastTransmission: null
+    };
 
     // Callbacks
     this.onStatusChange = null;
@@ -29,9 +41,24 @@ class Esp32Service {
 
   init(options = {}) {
     this.targetIp = options.targetIp || localStorage.getItem('optix_esp32_ip') || '192.168.4.1';
-    this.targetPort = options.targetPort || parseInt(localStorage.getItem('optix_esp32_port') || '80', 10);
+    const rawPort = options.targetPort || parseInt(localStorage.getItem('optix_esp32_port') || '80', 10);
+    this.targetPort = Number.isFinite(rawPort) && rawPort >= 1 && rawPort <= 65535 ? rawPort : 80;
     this.mode = options.mode || localStorage.getItem('optix_mode') || 'simulation';
     this.useProxy = options.useProxy !== undefined ? options.useProxy : (localStorage.getItem('optix_proxy') === 'true');
+
+    if (this.mode === 'simulation') {
+      this.isConnected = true;
+    }
+
+    if (this.serialSupported && !this._serialDisconnectHandler) {
+      this._serialDisconnectHandler = (event) => {
+        if (this.serialPort && event.target === this.serialPort) {
+          this.log('USB Serial device unplugged unexpectedly.', 'warn');
+          this.disconnectSerial();
+        }
+      };
+      navigator.serial.addEventListener('disconnect', this._serialDisconnectHandler);
+    }
 
     this.log(`ESP32 Service initialized in [${this.mode.toUpperCase()}] mode.`);
   }
@@ -44,9 +71,16 @@ class Esp32Service {
   }
 
   log(msg, type = 'info') {
+    const now = new Date();
+    const utcTimestamp = [
+      String(now.getUTCHours()).padStart(2, '0'),
+      String(now.getUTCMinutes()).padStart(2, '0'),
+      String(now.getUTCSeconds()).padStart(2, '0')
+    ].join(':') + ' UTC';
+
     const entry = {
-      timestamp: new Date().toLocaleTimeString(),
-      text: msg,
+      timestamp: utcTimestamp,
+      text: String(msg),
       type
     };
     this.logs.unshift(entry);
@@ -99,6 +133,20 @@ class Esp32Service {
    * Ping ESP32 hardware to check connectivity
    */
   async ping() {
+    if (this.mode === 'simulation') {
+      const uptimeSec = Math.floor((Date.now() - this._simStartTime) / 1000);
+      const data = {
+        status: 'ok',
+        device: 'Virtual-ESP32 (Local)',
+        mode: 'simulation',
+        uptime: uptimeSec
+      };
+      this.isConnected = true;
+      this.log(`Virtual ESP32 heartbeat ACK (uptime ${uptimeSec}s).`, 'success');
+      if (this.onStatusChange) this.onStatusChange({ connected: true, mode: this.mode, data });
+      return data;
+    }
+
     if (this.mode === 'serial') {
       const connected = Boolean(this.serialPort && this.serialWriter);
       this.isConnected = connected;
@@ -124,6 +172,14 @@ class Esp32Service {
    * Query full hardware telemetry status
    */
   async getStatus() {
+    if (this.mode === 'simulation') {
+      return {
+        ...this._simState,
+        mode: 'simulation',
+        uptimeSec: Math.floor((Date.now() - this._simStartTime) / 1000)
+      };
+    }
+
     if (this.mode === 'serial') {
       return { transmitting: this.isTransmitting, mode: 'serial' };
     }
@@ -148,10 +204,34 @@ class Esp32Service {
 
     this.log(`Transmitting sequence: "${morseSequence}" (${unitMs}ms unit, ${repeat}x) via ${this.mode.toUpperCase()}`);
 
+    // Mode 0: Client-side Virtual Simulator (works completely offline without a Node server)
+    if (this.mode === 'simulation') {
+      this._simState = {
+        transmitting: true,
+        currentSequence: morseSequence,
+        unitMs,
+        repeat,
+        lastTransmission: { morse: morseSequence, text: text || '', timestamp: new Date().toISOString() }
+      };
+      this.isConnected = true;
+      this.isTransmitting = true;
+      const res = {
+        success: true,
+        mode: 'simulation',
+        device: 'Virtual-ESP32 (Local)',
+        sequence: morseSequence,
+        text: text || '',
+        unit_ms: unitMs,
+        repeat
+      };
+      this.log(`Virtual ESP32 accepted sequence "${text || morseSequence}" (${unitMs}ms/dot, ${repeat}x).`, 'success');
+      return res;
+    }
+
     // Mode 1: Web Serial USB Connection
     if (this.mode === 'serial') {
       if (!this.serialWriter) {
-        throw new Error('Serial port not connected. Please connect USB first.');
+        throw new Error('Serial port not connected. Connect USB first.');
       }
       const command = `TX ${morseSequence} ${unitMs} ${repeat}\n`;
       const encoder = new TextEncoder();
@@ -161,7 +241,7 @@ class Esp32Service {
       return { success: true, mode: 'serial' };
     }
 
-    // Mode 2 & 3: HTTP REST (Real ESP32 or Virtual Simulator)
+    // Mode 2: HTTP REST (Real ESP32)
     const payload = {
       morse: morseSequence,
       text: text || '',
@@ -191,13 +271,21 @@ class Esp32Service {
   async stopTransmission() {
     this.log('Emergency Stop command triggered');
 
+    if (this.mode === 'simulation') {
+      this._simState.transmitting = false;
+      this.isTransmitting = false;
+      this.log('Virtual ESP32 transmission halted.', 'warn');
+      return { success: true, mode: 'simulation' };
+    }
+
     if (this.mode === 'serial') {
       if (this.serialWriter) {
         const encoder = new TextEncoder();
-        await this.serialWriter.write(encoder.encode("STOP\n"));
+        await this.serialWriter.write(encoder.encode('STOP\n'));
       }
       this.isTransmitting = false;
-      return { success: true };
+      this.log('Serial STOP command dispatched.', 'warn');
+      return { success: true, mode: 'serial' };
     }
 
     try {
@@ -243,9 +331,24 @@ class Esp32Service {
   }
 
   async disconnectSerial() {
+    if (this.serialReader) {
+      try {
+        await this.serialReader.cancel();
+      } catch (e) {}
+      this.serialReader = null;
+    }
+    if (this._serialReadableClosed) {
+      try {
+        await this._serialReadableClosed;
+      } catch (e) {}
+      this._serialReadableClosed = null;
+    }
     if (this.serialWriter) {
       try {
         await this.serialWriter.close();
+      } catch (e) {}
+      try {
+        this.serialWriter.releaseLock();
       } catch (e) {}
       this.serialWriter = null;
     }
@@ -256,6 +359,7 @@ class Esp32Service {
       this.serialPort = null;
     }
     this.isConnected = false;
+    this.isTransmitting = false;
     this.log('USB Serial disconnected');
     if (this.onStatusChange) this.onStatusChange({ connected: false, mode: this.mode });
   }
@@ -263,7 +367,8 @@ class Esp32Service {
   async readSerialLoop() {
     while (this.serialPort && this.serialPort.readable) {
       const textDecoder = new TextDecoderStream();
-      const readableStreamClosed = this.serialPort.readable.pipeTo(textDecoder.writable);
+      const readableStreamClosed = this.serialPort.readable.pipeTo(textDecoder.writable).catch(() => {});
+      this._serialReadableClosed = readableStreamClosed;
       const reader = textDecoder.readable.getReader();
       this.serialReader = reader;
 
@@ -278,8 +383,14 @@ class Esp32Service {
       } catch (error) {
         console.warn('Serial read error:', error);
       } finally {
-        reader.releaseLock();
+        try {
+          reader.releaseLock();
+        } catch (e) {}
+        if (this.serialReader === reader) {
+          this.serialReader = null;
+        }
       }
+      break;
     }
   }
 }

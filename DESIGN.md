@@ -1,75 +1,93 @@
 ---
 name: OPTIX Visual System
-description: Warm Optical Instrument — Visible Light Communication & Morse Transmitter
+description: Quiet Minimal / Swiss Purism — Visible Light Communication & Morse Transmitter
 colors:
-  bg-base: "#08090c"
-  bg-surface: "#0f1114"
-  bg-elevated: "#16181d"
-  bg-overlay: "#1e2028"
-  bg-input: "#0b0c10"
-  border-subtle: "rgba(255, 255, 255, 0.06)"
-  border-medium: "rgba(255, 255, 255, 0.12)"
-  border-focus: "rgba(230, 180, 80, 0.5)"
-  text-primary: "#f0ece4"
-  text-secondary: "#a8a29e"
-  text-muted: "#78716c"
-  accent-primary: "#e5a93b"
-  accent-primary-subtle: "rgba(229, 169, 59, 0.10)"
-  accent-primary-hover: "#f0bc52"
-  accent-signal: "#d4c9a8"
-  accent-signal-subtle: "rgba(212, 201, 168, 0.08)"
-  accent-danger: "#d4453a"
-  accent-danger-subtle: "rgba(212, 69, 58, 0.10)"
-  accent-success: "#5cb85c"
-  accent-success-subtle: "rgba(92, 184, 92, 0.08)"
+  bg-base: "#f7f7f7"
+  bg-surface: "#ffffff"
+  bg-subtle: "#fafafa"
+  bg-elevated: "#f1f1f1"
+  bg-input: "#ffffff"
+  border-subtle: "#e5e5e5"
+  border-medium: "#d4d4d4"
+  border-control: "#c7c7c7"
+  border-strong: "#111111"
+  text-primary: "#111111"
+  text-secondary: "#454545"
+  text-muted: "#666666"
+  text-caption: "#737373"
+  text-inverse: "#ffffff"
+  accent-primary: "#111111"
+  accent-primary-hover: "#262626"
+  accent-primary-subtle: "rgba(17, 17, 17, 0.05)"
+  accent-success: "#0d7a55"
+  accent-success-subtle: "rgba(13, 122, 85, 0.08)"
+  accent-warn: "#9a5b13"
+  accent-danger: "#d92d20"
+  accent-danger-fill: "#b91c1c"
+  accent-danger-fill-hover: "#991b1b"
+  accent-danger-subtle: "rgba(217, 45, 32, 0.08)"
+  chamber-bg: "#0b0c0e"
+  amber-strobe: "#d9941e"
 typography:
   brand:
-    fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
-    fontSize: "1.5rem"
+    fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "0.9375rem"
     fontWeight: 800
-    lineHeight: 1.1
-    letterSpacing: "0.15em"
+    lineHeight: 1
+    letterSpacing: "0.22em"
     textTransform: "uppercase"
-  morse-hero:
-    fontFamily: "'JetBrains Mono', monospace"
-    fontSize: "1.75rem"
-    fontWeight: 700
-    lineHeight: 1.8
-    letterSpacing: "0.15em"
+  payload-display:
+    fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "2.85rem"
+    fontWeight: 400
+    lineHeight: 1.18
+    letterSpacing: "0.14em"
   section-title:
-    fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
-    fontSize: "0.8125rem"
-    fontWeight: 600
+    fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "0.9375rem"
+    fontWeight: 700
     lineHeight: 1.3
-    letterSpacing: "0"
+    letterSpacing: "0.1em"
+    textTransform: "uppercase"
   body:
-    fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+    fontFamily: "'Public Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "0"
-  nav-tab:
-    fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
-    fontSize: "0.8125rem"
-    fontWeight: 500
-    lineHeight: 1.3
-  metric-label:
-    fontFamily: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
-    fontSize: "0.625rem"
-    fontWeight: 600
-    lineHeight: 1.2
-    letterSpacing: "0.1em"
-    textTransform: "uppercase"
-  mono:
-    fontFamily: "'JetBrains Mono', monospace"
+  body-sm:
+    fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
     fontSize: "0.8125rem"
     fontWeight: 500
     lineHeight: 1.4
-    letterSpacing: "0"
+  body-md:
+    fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "1rem"
+    fontWeight: 600
+    lineHeight: 1.4
+  buffer-lg:
+    fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "1.25rem"
+    fontWeight: 500
+    lineHeight: 1.3
+  nav-tab:
+    fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "0.75rem"
+    fontWeight: 500
+    lineHeight: 1.2
+    letterSpacing: "0.04em"
+  micro-label:
+    fontFamily: "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "0.75rem"
+    fontWeight: 500
+    lineHeight: 1.2
+    letterSpacing: "0.1em"
+    textTransform: "uppercase"
 rounded:
-  xs: "4px"
-  sm: "6px"
-  md: "8px"
+  none: "0px"
+  xs: "2px"
+  sm: "3px"
+  md: "4px"
   full: "9999px"
 spacing:
   xs: "4px"
@@ -80,126 +98,88 @@ spacing:
 components:
   button-primary:
     backgroundColor: "{colors.accent-primary}"
-    textColor: "{colors.bg-base}"
-    rounded: "{rounded.sm}"
-    padding: "9.6px 20px"
+    textColor: "{colors.text-inverse}"
+    rounded: "{rounded.xs}"
+    padding: "0 22px"
     boxShadow: "none"
   button-primary-hover:
     backgroundColor: "{colors.accent-primary-hover}"
-  button-ghost:
-    backgroundColor: "transparent"
-    borderColor: "{colors.border-subtle}"
-    textColor: "{colors.text-muted}"
-    rounded: "{rounded.sm}"
-    padding: "6px 12px"
+  button-secondary:
+    backgroundColor: "{colors.bg-surface}"
+    borderColor: "{colors.border-medium}"
+    textColor: "{colors.text-primary}"
+    rounded: "{rounded.xs}"
+    padding: "0 22px"
   preset-chip:
-    backgroundColor: "transparent"
+    backgroundColor: "{colors.bg-surface}"
     borderColor: "{colors.border-subtle}"
-    textColor: "{colors.text-secondary}"
-    rounded: "{rounded.full}"
-    padding: "4.8px 10.4px"
+    textColor: "{colors.text-primary}"
+    rounded: "{rounded.xs}"
+    padding: "8px 12px"
 ---
 
 # Design System
 
 ## Overview & Philosophy
 
-**Strip the theater. Amplify the signal.**
+**Quiet Minimal — Swiss Purism & Kenya Hara Inspired Optical Instrumentation.**
 
-OPTIX is a Visible Light Communication (VLC) Morse code transmitter engineered for real low-light field operation. Its aesthetic is grounded in authentic optical instrumentation — warm amber signal lamps, phosphor oscilloscopes, and dark anodized metal enclosures — rather than generic sci-fi dashboards.
+OPTIX translates Visible Light Communication (VLC) Morse transmission into a serene, laboratory-calibrated light-mode optical instrument. Architectural negative space, hairline 1px grid dividers, crisp pure-white optical surfaces on an alabaster gallery ground, and restrained monochromatic typography let the signal, emitter aperture, and hardware routing state command focus without visual noise.
 
 ### Core Principles
 
-1. **Silence is louder than noise** — Remove redundant chrome, icon pods, and decorative labels so the active Morse signal commands full attention.
-2. **Morse is the aesthetic** — High contrast, binary rhythm, and deliberate negative space echo dots, dashes, and inter-symbol gaps.
-3. **Earned complexity** — The primary Transmit screen stays spare and focused; dense technical controls live only where needed in Hardware and Settings.
-4. **Warmth in the dark** — Warm amber and parchment cream reduce ocular fatigue in dark environments and replace cold neon clichés.
+1. **Architectural Negative Space** — Generous alabaster ground (`#f7f7f7`) and single-pixel dividers (`#e5e5e5`) frame every module without heavy card chrome or drop shadows.
+2. **Instrument Precision** — Monospace calibration markings (`JetBrains Mono`, `tabular-nums`), sharp `2px` architectural corners, and exact ITU-R M.1677-1 nomenclature echo Leica/Braun optical instruments.
+3. **Functional Micro-Accents Only** — Color is strictly operational: emerald (`#0d7a55`) exclusively for live online links, optical laser red (`#d92d20`) exclusively for the `EMITTER` endpoint, active 650nm diode emission, playhead cursor, and `ABORT` danger state.
+4. **WCAG AA/AAA Contrast Discipline** — Every text, label, rail marker, and control outline on alabaster (`#f7f7f7`) and white (`#ffffff`) meets strict WCAG AA/AAA readability standards.
 
 ## Colors
 
-### Surfaces (Anodized Dark Neutrals)
+### Surfaces (Alabaster & Pure White)
 
-- **Base Ground (`#08090c`)**: Deep warm-shifted obsidian canvas.
-- **Surface (`#0f1114`)**: Subtle tonal step reserved for genuinely contained surfaces (terminal logs, buffers, reference tables).
-- **Elevated (`#16181d`)**: Active states, tactile keys, and secondary controls.
-- **Overlay (`#1e2028`)**: Popovers, hover highlights, and elevated overlays.
-- **Input Ground (`#0b0c10`)**: Recessed text input and oscilloscope canvas background.
+- **Base Ground (`#f7f7f7`)**: Gallery alabaster canvas across the full shell, header, and calibration footer.
+- **Surface (`#ffffff`)**: Pure white framed surfaces for the optical diode dial, symbol stream box, emergency token buttons, routing path bar, oscilloscope canvas, inputs, and telemetry terminal.
+- **Subtle (`#fafafa`)** & **Elevated (`#f1f1f1`)**: Quiet tonal steps for table headers and hover fills.
+- **Optical Chamber (`#0b0c0e`)**: Reserved strictly for the WebGL 3D Torch testbench viewport and the Fullscreen Optical Strobe overlay where physical luminance contrast is required.
 
-### Typography & Hairline Borders
+### Ink & Hairline Borders
 
-- **Primary Text (`#f0ece4`)**: Warm cream/parchment white for crisp low-glare readability.
-- **Secondary Text (`#a8a29e`)**: Warm stone gray for descriptions, inactive chips, and labels.
-- **Muted Text (`#78716c`)**: Quiet metadata, inline separators, and placeholders.
-- **Subtle Border (`rgba(255, 255, 255, 0.06)`)**: Quiet structural hairlines and dividers.
-- **Medium Border (`rgba(255, 255, 255, 0.12)`)**: Interactive borders and form outlines.
-- **Focus Border (`rgba(230, 180, 80, 0.5)`)**: Warm amber focus indicator.
+- **Primary Ink (`#111111`)**: High-contrast matte jet black for headlines, payload stream, primary buttons, checked checkboxes, and TTL waveform trace (17.6:1 on base, 18.8:1 on white).
+- **Secondary Ink (`#454545`)**: Graphite ink for prose, checkboxes, and secondary readouts (8.9:1 on base).
+- **Muted Ink (`#666666`)**: Calibrated metadata labels and inactive navigation items (5.3:1 on base, 5.7:1 on white).
+- **Subtle Border (`#e5e5e5`)**: 1px horizontal and vertical architectural dividers, header/footer rules, and framed zone borders.
+- **Medium Border (`#d4d4d4`)** & **Strong Border (`#111111`)**: Interactive control outlines and active focus/hover borders.
 
-### Signal & Functional Accents
+### Operational Accents
 
-- **Primary Amber (`#e5a93b`)** / **Hover (`#f0bc52`)**: Signal lamp accent for hero Morse output, active tab underline, primary CTA buttons, and oscilloscope waveform trace.
-- **Phosphor Signal (`#d4c9a8`)**: Secondary warm phosphor tint for oscilloscope voltage rail markers and subtle instrumentation readouts.
-- **Success (`#5cb85c`)**: Muted instrument green for verified online hardware links and positive confirmations.
-- **Danger (`#d4453a`)**: Muted crimson for emergency `ABORT`, hardware faults, and the oscilloscope active playhead cursor.
+- **Primary Action (`#111111` / Hover `#262626`)**: Matte jet-black primary CTAs (`TRANSMIT VIA ESP32 ↵`), active checkboxes, and active segmented pills.
+- **Link Online (`#0d7a55`)**: Technical emerald reserved exclusively for `● LINK ONLINE` and verified online status indicators.
+- **Optical Emitter / Danger (`#d92d20` / Solid Fill `#b91c1c`)**: 650nm laser-diode red reserved for the `EMITTER` routing endpoint, active optical diode firing pulse, oscilloscope playhead, and armed `ABORT` / `SOS` controls.
 
 ## Typography
 
-- **UI Interface**: `Inter` (`400, 500, 600, 700, 800`) — Engineered for high screen legibility across small controls and clean editorial structure.
-- **Data, Morse & Telemetry**: `JetBrains Mono` (`400, 500, 600, 700`) with `font-variant-numeric: tabular-nums` for rock-solid alignment on live UTC clocks, WPM readouts, durations, and pulse buffers.
-
-### Typographic Hierarchy
-
-- **Brand Wordmark (`OPTIX`)**: `1.5rem`, Weight `800`, uppercase, `+0.15em` tracking — monumental standalone mark with no icon pod or version badge.
-- **Morse Output Hero**: `1.75rem`, Weight `700`, `JetBrains Mono`, warm amber `#e5a93b`, `+0.15em` tracking, centered, line-height `1.8`.
-- **Section Titles**: `0.8125rem`, Weight `600`, plain language (`Morse Output`, `Manual Key`, `Beacon & Waveform`, `ESP32 Connection`, `Timing & Audio`).
-- **Body & Inputs**: `0.875rem`, Weight `400`, sentence case.
-- **Metric Labels**: `0.625rem`, Weight `600`, uppercase, `+0.1em` tracking, modeled on instrument dial legends.
+- **Primary Instrument Face**: `JetBrains Mono` (`300, 400, 500, 600, 700, 800`) with `font-variant-numeric: tabular-nums` for brand mark, numbered navigation, payload input, emergency tokens, dial markings, symbol stream, buttons, and calibration footer.
+- **Supporting Prose Face**: `Public Sans` (`400, 500, 600, 700`) for longer technical descriptions, settings tables, and 3D Torch subsystem specifications.
 
 ## Layout & Navigation
 
-- **Single-Column Discipline**: Centered single-column workspace (`max-width: 720px`) across desktop, tablet, and mobile. Generous vertical rhythm replaces multi-column dashboard sprawl.
-  - **Desktop (`1024px+`)**: `720px` centered column with generous vertical breathing room.
-  - **Tablet (`768px–1023px`)**: Same `720px` single-column flow with tightened padding.
-  - **Mobile (`< 768px`)**: Full-width with `0.75rem` horizontal padding and stacked action buttons.
-- **Flattened Header**: Single-line top bar with a bottom hairline border and no enclosing card:
-  - Left: Monumental `OPTIX` wordmark only.
-  - Right: Minimal hardware status dot + concise state (`SIM`, `ONLINE`, `STANDBY`), plain monospaced UTC clock (`HH:MM:SS`), and prominent `ABORT` button.
-- **Underline Navigation**: Five plain text tabs (`Transmit`, `Key`, `Beacon`, `Hardware`, `Settings`) over a `1px` hairline divider with a `2px` `#e5a93b` active bottom underline. No tab icons, no numbered badges, no segmented pill tray.
-- **Borderless Hierarchy**: `.surface-panel` is transparent and borderless — sections separate via whitespace and subtle horizontal rules. `.surface-card` (`#0f1114` + `1px solid rgba(255, 255, 255, 0.06)`) is reserved strictly for genuinely contained artifacts such as the terminal console, buffer readouts, and reference table.
+- **Unified Header Bar (`60px`)**: Single sticky row on desktop with `OPTIX` wordmark + live `SYS.SIMULATED / HH:MM:SS UTC` telemetry on the left, inline numbered tabs (`01. Transmit` through `06. 3D Torch`) with active bottom ink underline in the center, and bordered `● ABORT` button on the right.
+- **2-Column Architectural Split (`01. Transmit`)**: Centered within the viewport between header and calibration footer, divided by a full-height `1px solid #e5e5e5` vertical hairline:
+  - **Left Column**: `PAYLOAD / TEXT STREAM` borderless large-scale input + `CLEAR` + voice dictation, square `Adaptive Compression (Huffman-Morse)` checkbox + `ITU-R M.1677-1`, crisp rectangular `STANDARD EMERGENCY TOKENS` (`SOS Distress`, `MED HELP Medical`, `FIRE EVAC Alert`, `NEED WATER Supply`, `ALL SAFE Ack`, +3 expandable), and `SIGNAL ROUTING PATH` with live `● LINK ONLINE` status.
+  - **Right Column**: Centered `236px` circular **Optical Diode D1** aperture dial (`N 0° 00'`, `100mW`, `λ 650nm`, `F/1.4`, press-and-hold manual pulse + live transmission glow), `SYMBOL STREAM REPRESENTATION` stacked character breakdown (`S / O / S`) with inline telemetry (`27 units  2.16s  15 WPM`), collapsible live 3.3V TTL oscilloscope trace, and the `TRANSMIT VIA ESP32 ↵` + `LOOP BEACON` action bar.
+- **Bottom Calibration Footer (`44px`)**: Displays `OPTIX v4.0.2 / ARCH: QUIET MINIMAL | DIODE CURRENT: 24.2 mA` (live 180.0 mA on high pulse) on the left and `SWISS / PURISM SPEC  KENYA HARA INSP.  <W> × <H> CALIBRATED` on the right.
 
-## Component Specifications
+## Mobile & Touch Adaptation (`<= 1120px`, `<= 960px`, `<= 640px`, `<= 390px`)
 
-### Transmit Workspace
-- **Textarea-First Entry**: Direct message textarea with `"Type your message..."` placeholder, inline toolbar with subtle icon-only voice dictation button, character counter, and inline Adaptive Compression toggle.
-- **Hero Morse Output**: Borderless, centered warm-amber Morse sequence with a quiet copy icon and clickable inline character breakdown directly beneath.
-- **Inline Telemetry Metrics**: Single centered monospaced line (`18 units · 1.44s · 15 WPM`) replacing multi-card metric grids.
-- **Action Triggers**: Flat warm-amber primary button (`Send to ESP32`) and restrained secondary trigger (`Start Beacon`) with zero drop shadows.
-- **Compact Preset Chips**: Neutral hairline pill chips (`SOS`, `HELP`, `MAYDAY`, etc.) showing monospace code and short label, with warm amber hover state and no noisy category color coding.
-
-### Manual Key
-- **Tactile Telegraph Paddle**: Large circular tap key with immediate optical/acoustic press feedback, paired with discrete mechanical buttons (`DOT`, `DASH`, `Letter Gap`, `Word Gap`) and streamlined Morse/decoded plaintext buffer rows.
-
-### Optical Beacon & Waveform Oscilloscope
-- **Optical Emitter Aperture**: Oversized `160px+` circular beacon bulb as the focal centerpiece of the Beacon view, plus Fullscreen Beacon toggle.
-- **Oscilloscope Canvas (`opticalTransmitter.js`)**: Warm amber TTL `3.3V` pulse timeline rendered on `#0b0c10`:
-  - Graticule grid: dashed `rgba(229, 169, 59, 0.06)`
-  - Voltage rails: `HIGH 3.3V` (`rgba(212, 201, 168, 0.5)`) and `LOW 0V` (`rgba(240, 236, 228, 0.25)`)
-  - Reference baseline: `rgba(240, 236, 228, 0.1)`
-  - Standby message: `STANDBY — NO SIGNAL` (`rgba(240, 236, 228, 0.3)`)
-  - Pulse fill gradients: active `rgba(240, 188, 82, 0.45) → rgba(229, 169, 59, 0.08)`; inactive `rgba(229, 169, 59, 0.22) → rgba(229, 169, 59, 0.03)`
-  - Waveform stroke: `#e5a93b`, `2px` width, restrained glow (`rgba(229, 169, 59, 0.35)`, `4px` blur)
-  - Active playhead: crisp `2px` `#d4453a` vertical cursor with `#f0ece4` marker dot on the `HIGH` rail
-- **Hardware Toggles**: Clean inline switch rows for Camera Torch and Acoustic Sidetone without boxed card wrappers.
-
-### Hardware Bridge & Settings
-- **Hardware Pipeline**: Simplified signal flow (`CLIENT → BRIDGE → ESP32 → LED`), mode selector, IP/Port inputs, USB Serial trigger, and monospace terminal activity log.
-- **Settings**: Borderless WPM and sidetone frequency sliders, repeat selector, and the ITU-R M.1677-1 timing ratio reference table.
+- **Safe-Area Awareness**: `env(safe-area-inset-top/bottom/left/right)` applied across the sticky header, workspace, sticky mobile action bar, toast stack, fullscreen beacon HUD, and calibration footer.
+- **Sticky Thumb-Zone CTA Bar (`<= 640px`)**: `TRANSMIT VIA ESP32 ↵` and `LOOP BEACON` pin to the bottom viewport edge over frosted alabaster (`rgba(247, 247, 247, 0.96)`) so emergency transmission remains within one-thumb reach at all scroll positions.
+- **Touch Ergonomics (`@media (pointer: coarse)`)**: Minimum `44px` height on all interactive buttons, tabs, token chips, checkboxes, and icon controls; `22px` range slider thumbs; `touch-action: manipulation` to remove double-tap delay; and `>= 1rem` (`16px`) font-size on all mobile inputs and selects to prevent iOS Safari focus auto-zoom.
+- **Scrollable Header Tabs & Schematics**: Horizontal `scroll-snap` numbered navigation bar with right-edge fade cue (`<= 1120px`), compact `176px` optical diode dial (`<= 640px`), 2-column emergency tokens grid (1-column on `<= 390px`), horizontal-scroll signal routing schematic, and non-overlapping mobile 3D Torch HUD controls.
 
 ## Do's and Don'ts
 
-- **DO** separate sections with whitespace, typography scale, and subtle hairlines instead of wrapping every block in a bordered card.
-- **DO** use `tabular-nums` for clocks, WPM, durations, and numeric telemetry.
-- **DO** keep labels plain, concise, and operational (`Transmit`, `Send to ESP32`, `SIM`, `ONLINE`, `STANDBY`).
-- **DO** maintain WCAG AA/AAA contrast on all cream-on-obsidian text and amber accents.
-- **DON'T** reintroduce neon cyan (`#00f0ff`), neon emerald (`#00e599`), or hot magenta (`#ff0055`) glows or gradients.
-- **DON'T** decorate tabs or panels with numbered step badges, icon pods, or sci-fi subtitles.
-- **DON'T** use emoji characters as UI icons or elastic/bouncy easing functions; stick to clean exponential deceleration (`cubic-bezier(0.16, 1, 0.3, 1)`).
+- **DO** preserve generous alabaster whitespace and `1px solid #e5e5e5` architectural dividers.
+- **DO** keep corners crisp (`2px`) and surfaces flat (zero drop shadows on layout blocks, zero neon glow on traces).
+- **DO** use `tabular-nums` for clocks, diode current, WPM, unit counts, and durations.
+- **DON'T** reintroduce dark backgrounds outside the 3D Torch optical chamber and Fullscreen Optical Strobe overlay.
+- **DON'T** use emoji characters as UI icons or decorative gradients.
