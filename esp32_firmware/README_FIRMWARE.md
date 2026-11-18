@@ -244,3 +244,11 @@ You can also control the ESP32 directly via USB Serial terminal:
 - **Flash Memory Persistence**: Uploading firmware writes the code to the ESP32's onboard SPI flash memory. Disconnecting power **never erases the code**.
 - **Cold Boot Time**: When connected to any standard 5V power source (power bank, USB wall charger, or 5V battery), the ESP32 boots in **< 2 seconds** and immediately begins broadcasting the `OPTIX-Optical-Transmitter` Wi-Fi network.
 - **Autonomous Emergency Node**: In disaster situations, you can power the ESP32 with just a pocket power bank. Responders or survivors can connect with their smartphones directly to `http://192.168.4.1` and transmit optical signals without needing a laptop, internet router, or cellular network.
+
+---
+
+## 🔭 Phase 1 Benchtop Validation → Phase 2 Self-Contained Torch (`OPTIX-MK2`)
+
+This ESP32 + breadboard circuit serves as **Phase 1 Proof-of-Concept Hardware**, validating ITU-R M.1677-1 optical timing, non-blocking FreeRTOS pulse generation, and `IRLZ44N` MOSFET high-power LED switching on an accessible low-cost benchtop rig.
+
+In **Phase 2 (`OPTIX-MK2` Future Scope)** — modeled interactively in the **`06. 3D Torch`** tab (including **Fullscreen Presentation Mode**) — this optical driver stage migrates onto a **Raspberry Pi Compute Module 5 (CM5, 4GB RAM)** custom carrier PCB (`GPIO 18` PWM → `IRLZ44N` constant-current buck driver → `10W` Cree XHP50 collimated LED) inside a custom 3D-printed rugged enclosure powered by a `2S1P 18650` pack with **18W USB-C PD** charging, enabling 100% phone-free offline voice AI (`whisper.cpp` + quantized semantic compression) in the field. See [ARCHITECTURE.md](../ARCHITECTURE.md) and [PROTOCOL.md](../PROTOCOL.md) for the complete Phase 2 BOM and pinout specification.

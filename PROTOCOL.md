@@ -157,3 +157,20 @@ Immediately halts active optical transmission and forces GPIO LOW (timeout: `300
 | `STOP` | Host → ESP32 | `STOP\n` — Immediate optical abort, forces GPIO LOW |
 | `PING` | Host → ESP32 | `PING\n` — Returns device uptime and free heap |
 | `STATUS` | Host → ESP32 | `STATUS\n` — Returns active sequence and pulse telemetry |
+
+---
+
+## 5. Phase 2 (`OPTIX-MK2`) Onboard Embedded Bus & GPIO Pinout Map
+
+In the self-contained Phase 2 **OPTIX-MK2** torch (modeled in `06. 3D Torch`), all peripheral signaling executes directly over the **Raspberry Pi CM5** custom carrier PCB without Wi-Fi or host-phone transport:
+
+| Peripheral / Subsystem | Bus / Signal | CM5 GPIO Pinout | Electrical & Functional Spec |
+| :--- | :--- | :--- | :--- |
+| **MOSFET Optical Keying Driver** | Hardware PWM / Digital TX | `GPIO 18` | `3.3V` TTL pulse train driving `IRLZ44N` gate for microsecond ITU-R M.1677-1 keying (`10W` Cree XHP50 LED) |
+| **INMP441 Digital MEMS Mic** | 24-Bit I2S Digital Audio | `GPIO 19` (LRCLK), `GPIO 20` (DIN), `GPIO 21` (BCLK) | `3.3V` digital audio bus feeding offline `whisper.cpp` STT; immune to high-current LED PWM switching noise |
+| **1.3" SH1106 Telemetry OLED** | I2C (`400 kHz`) | `GPIO 2` (SDA), `GPIO 3` (SCL) | Displays active mode, compressed payload, Morse stream, AI time savings %, WPM, and `7.4V` fuel-gauge battery % |
+| **BTN 1 · PTT (Voice AI)** | GPIO Active-Low Interrupt | `GPIO 5` | Triggers onboard microphone capture → `whisper.cpp` STT → quantized LLM semantic compression |
+| **BTN 2 · TX (Morse / Key)** | GPIO Active-Low Interrupt | `GPIO 6` | Dispatches encoded payload to `GPIO 18` optical emitter or operates as direct manual telegraph paddle |
+| **BTN 3 · SOS (Distress)** | GPIO Active-Low Interrupt | `GPIO 13` | Recessed crimson hardware override — forces immediate high-priority `SOS` (`... --- ...`) distress burst |
+| **BTN 4 · MODE (Beam)** | GPIO Active-Low Interrupt | `GPIO 26` | Cycles operating modes (`VOICE AI`, `PRESET`, `MORSE BEACON`, and `STEADY 10W FLASHLIGHT`) |
+| **USB-C PD BMS & Debug Port** | USB Type-C (`5V–15V` PD) | Dedicated 2S BMS + UART | `18W` fast charging for 2S1P 18650 pack (`7.4V / 25.9Wh`), regulated `5V/3A` CM5 rail, and service UART |

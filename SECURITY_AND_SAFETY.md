@@ -29,6 +29,10 @@ Standard Morse keying at `15 WPM` (`80 ms / dot`) flashes at up to **6.25 Hz**, 
 - **Current-Limiting Resistor Required**: Never wire a standard 5mm LED directly to ESP32 `GPIO 2` / `GPIO 4` without a `150Ω–330Ω` (`220Ω` recommended) series resistor.
 - **High-Power LED / MOSFET Isolation**: High-power emitters (`1W–10W`) must be driven through a logic-level N-Channel MOSFET (`IRLZ44N`) with a shared ground and appropriate thermal heatsinking.
 - **Ocular Precaution**: Avoid direct close-range eye exposure to collimated `1W–10W` LEDs or smartphone camera flash strobes during prolonged `∞ LOOP` tests.
+- **Phase 2 (`OPTIX-MK2`) Battery, Thermal & Mechanical Safeguards**:
+  - **2S1P 18650 Balance & Protection**: The planned `7.4V` (`3500mAh / 25.9Wh`) pack requires a dedicated 2S balance-charging BMS with `18W` USB-C PD input protection, overcharge/over-discharge cutoff, overcurrent protection, and an NTC thermistor probe directly monitoring cell temperature.
+  - **10W Thermal Path**: The Cree XHP50 star MCPCB bonds thermally to a CNC aluminum heatsink slug conducting heat into the finned front bezel; driver thermal sensing throttles steady-beam duty if internal enclosure temperature exceeds safe CF-PETG/PA12 thresholds.
+  - **Physical Master Lockout**: A mechanical tailcap switch physically disconnects the battery bus during transport to prevent accidental 10W optical discharge or parasitic CM5 drain, paired with a recessed crimson guard bezel around `BTN 3 · SOS` to prevent inadvertent distress activation.
 
 ---
 

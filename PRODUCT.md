@@ -12,28 +12,29 @@ Vanilla HTML5, Modern CSS (3-layer design tokens, mobile-first safe areas), ES M
 
 ## Users
 
-Field operators, emergency response personnel, search & rescue teams, and embedded systems engineers operating in RF-denied, infrastructure-compromised, or electronic-warfare environments where cellular, Wi-Fi, and satellite links are jammed or unavailable.
+Field operators, military personnel, backcountry hikers, emergency response & search-and-rescue (SAR) teams, and embedded systems engineers operating in RF-denied, off-grid, infrastructure-compromised, or electronic-warfare environments where cellular, Wi-Fi, and satellite links are jammed or unavailable.
 
 ## Product Purpose
 
-OPTIX provides a reliable, direct Visible Light Communication (VLC) telecommunications interface. It accepts voice dictation, typed plain text, emergency token presets, or manual telegraph keying, computes opt-in semantic contractions to minimize optical beacon exposure, modulates the signal to standard ITU-R M.1677-1 Morse code, and drives optical emitters (ESP32 High-Power LEDs, mobile camera torches, and calibrated screen beacons) alongside an interactive Phase 2 3D hardware digital twin.
+OPTIX provides a reliable, direct Visible Light Communication (VLC) telecommunications interface. In **Phase 1 (Benchtop Proof-of-Concept)**, it accepts voice dictation, typed plain text, emergency token presets, or manual telegraph keying, computes opt-in semantic contractions to minimize optical beacon exposure, modulates the signal to standard ITU-R M.1677-1 Morse code, and drives optical emitters (ESP32 LEDs, mobile camera torches, and calibrated screen beacons). In **Phase 2 (OPTIX-MK2 Self-Contained Tactical Torch — Future Scope & Interactive 3D Digital Twin)**, all speech-to-text (`whisper.cpp`), quantized AI semantic compression (`SmolLM2`/`Qwen2.5-0.5B`), and 10W collimated LED keying execute autonomously onboard a **Raspberry Pi CM5** inside a custom 3D-printed rugged torch with zero phone or network dependency.
 
 ## Positioning
 
-Adaptive Semantic Optical Telecommunications: Unlike conventional bulk optical modems, OPTIX pairs an opt-in adaptive semantic tokenization engine (saving up to 50% optical air time while strictly preserving negations) with a laboratory-calibrated Swiss Purism interface that remains legible on desktops, tablets, and field smartphones.
+Adaptive Semantic Optical Telecommunications: Unlike conventional bulk optical modems, OPTIX pairs an opt-in adaptive semantic tokenization engine (saving up to 50% optical air time while strictly preserving negations) with a laboratory-calibrated Swiss Purism interface that remains legible on desktops, tablets, and field smartphones — and bridges directly from an ESP32 benchtop prototype to a full self-contained tactical torch digital twin.
 
 ## Operating Context
 
-- **Environment**: Emergency field shelters, maritime optical signaling, outdoor daylight or indoor testbenches, and embedded hardware prototyping stations.
-- **Hardware Integration**: ESP32 microcontrollers over Wi-Fi HTTP SoftAP (`192.168.4.1`) or USB Web Serial (`115200` baud), driving LEDs via GPIO 2/4 with non-blocking FreeRTOS hardware timing; plus a client-side virtual simulator for zero-hardware offline validation.
-- **Physical Affordances**: Screen luminescence beacon with WCAG 2.3.1 safety gate, high-speed rear camera torch strobe, 300–1500 Hz harmonic CW acoustic sidetone, and press-and-hold optical diode manual test aperture.
+- **Environment**: Off-grid backcountry/mountain trails, military tactical patrols, disaster shelters, maritime optical signaling, outdoor daylight or indoor testbenches, and embedded hardware prototyping stations.
+- **Phase 1 Hardware Integration**: ESP32 microcontrollers over Wi-Fi HTTP SoftAP (`192.168.4.1`) or USB Web Serial (`115200` baud), driving LEDs via GPIO 2/4 with non-blocking FreeRTOS hardware timing; plus a client-side virtual simulator for zero-hardware offline validation.
+- **Phase 2 Self-Contained Target (`OPTIX-MK2`)**: Custom 3D-printed CF-PETG/PA12 torch housing integrating a Raspberry Pi CM5 (4GB RAM, 32GB eMMC), INMP441 I2S MEMS mic, live 1.3" SH1106 OLED, 4 IP67 hardware buttons (`PTT Voice AI`, `TX Morse`, recessed crimson `SOS`, `MODE / Steady Beam`), IRLZ44N MOSFET driver, 10W Cree XHP50 collimated LED, 2S1P 18650 Li-Ion pack (25.9Wh), and 18W USB-C PD 2S BMS (~$118 / ~₹9,800 estimated BOM).
+- **Physical Affordances**: Screen luminescence beacon with WCAG 2.3.1 safety gate, high-speed rear camera torch strobe, 300–1500 Hz harmonic CW acoustic sidetone, press-and-hold optical diode manual test aperture, and interactive fullscreen 3D Torch Digital Twin.
 
 ## Capabilities and Constraints
 
-- **Input Modalities**: Voice dictation (Web Speech API over HTTPS/localhost), borderless text stream input, standard emergency token bank (`SOS`, `MED HELP`, `FIRE EVAC`, `NEED WATER`, `ALL SAFE`, plus extended tokens), and manual Morse telegraph paddle with automatic dot/dash duration detection (`1.8T` threshold).
+- **Input Modalities**: Voice dictation (Web Speech API over HTTPS/localhost), borderless text stream input, standard emergency token bank (`SOS`, `MED HELP`, `FIRE EVAC`, `NEED WATER`, `ALL SAFE`, plus extended tokens), manual Morse telegraph paddle with automatic dot/dash duration detection (`1.8T` threshold), and clickable 3D Torch hardware button triggers (`PTT`, `TX`, `SOS`, `MODE`).
 - **Modulation & Timing**: ITU-R M.1677-1 Morse standard (`1T` dot, `3T` dash, `1T` intra-element gap, `3T` inter-character gap, `7T` inter-word gap), adjustable speed (`5–40 WPM`), adjustable audio sidetone frequency (`300–1500 Hz`), and burst repeat counts (`1x`, `3x`, `5x`, `∞ LOOP`).
-- **Telemetry & Monitoring**: Live UTC mission clock, interactive 3.3V TTL pulse oscilloscope with mouse/keyboard scrubbing, character/unit/duration counters, live optical diode current readout (`24.2 mA` standby / `180.0 mA` emitting), signal routing path indicator, and continuous UTC hardware telemetry log.
-- **Workspaces**: Six numbered modules (`01. Transmit`, `02. Manual Key`, `03. Beacon`, `04. Hardware`, `05. Parameters`, `06. 3D Torch`).
+- **Telemetry & Monitoring**: Live UTC mission clock, interactive 3.3V TTL pulse oscilloscope with mouse/keyboard scrubbing, character/unit/duration counters, live optical diode current readout (`24.2 mA` standby / `180.0 mA` emitting), signal routing path indicator, live 3D Torch OLED telemetry texture, and continuous UTC hardware telemetry log.
+- **Workspaces**: Six numbered modules (`01. Transmit`, `02. Manual Key`, `03. Beacon`, `04. Hardware`, `05. Parameters`, `06. 3D Torch` with Fullscreen Presentation Mode).
 - **Safety**: Dedicated high-priority `ABORT` button (`Esc` global shortcut), WCAG 2.3.1 photosensitive strobe safety gate with live Hz disclosure, 2-second arming countdown, reduced-motion non-strobe default, and automatic stop-on-exit.
 
 ## Brand Commitments

@@ -40,9 +40,21 @@ HOST [WEB / MOBILE] ────> BRIDGE [HTTP REST / USB UART / SIM] ───�
   - `03. Beacon` — Synchronized local optical emitter stage, calibrated light-mode 3.3V TTL oscilloscope with mouse/keyboard pulse inspection and click-to-seek, speed slider (`5–40 WPM`), burst loop controls (`1x`, `3x`, `5x`, `∞ LOOP`), Mobile Camera Torch strobe, Acoustic CW Sidetone, and WCAG 2.3.1 gated Fullscreen Strobe.
   - `04. Hardware` — ESP32 connection pipeline diagram, mode selector (`Simulated ESP32`, `Wi-Fi HTTP REST`, `Web Serial USB`), SoftAP host/port configuration, CORS proxy switch, live heartbeat ping, and XSS-safe UTC telemetry log.
   - `05. Parameters` — Transmission speed (`5–40 WPM` with live `ms / dot` calculation), sidetone frequency (`300–1500 Hz`), burst repeat selector, and ITU-R M.1677-1 timing ratio specification table.
-  - `06. 3D Torch` — Lazy-loaded offline Three.js interactive digital twin of the Phase 2 **OPTIX-MK2** self-contained torch (Raspberry Pi CM5 + 10W collimated LED + 4 hardware buttons + Assembled/X-Ray/Exploded inspection), live-synced to the optical keying engine.
+  - `06. 3D Torch` — Lazy-loaded offline Three.js interactive digital twin of the Phase 2 **OPTIX-MK2** self-contained tactical torch (**Raspberry Pi CM5** + **10W Cree XHP50 collimated LED** + **IRLZ44N MOSFET driver** + **INMP441 I2S MEMS mic** + **live 1.3" OLED** + **4 clickable hardware buttons** + **2S 18650 pack** + **USB-C PD BMS** + **custom 3D-printed housing**). Supports **Assembled / X-Ray / Exploded (0–100%)** views, 5 camera presets, clickable 9-subsystem BOM inspector, **Fullscreen Presentation Mode** with floating dock, and real-time sync to the OPTIX Morse engine (beam, `GPIO 18` wire glow, and live 3D OLED).
 - **Mobile-First Field Ergonomics**: Sticky thumb-zone action bar on mobile (`<= 640px`), iOS/Android notch safe-area insets (`env(safe-area-inset-*)`), `>= 44px` coarse-pointer touch targets, `>= 16px` mobile input floor to prevent iOS focus zoom, and horizontal snap-scrolling tab bar.
 - **Resilient Multimodal Fallback**: If an external ESP32 endpoint is unreachable, OPTIX logs the fault and automatically cascades transmission to the local Mobile Camera Torch / Screen Beacon so emergency signaling never fails silently.
+
+---
+
+## Phase 1 Proof-of-Concept vs. Phase 2 Future Scope (OPTIX-MK2)
+
+OPTIX follows a two-phase hardware development roadmap designed for **RF-denied, zero-network environments** (military operations, backcountry hikers, search & rescue, and disaster zones):
+
+- **Phase 1 — Benchtop Proof-of-Concept (Live Hardware Demo)**: Validates the complete optical communication pipeline end-to-end using an **ESP32 + breadboard + OPTIX web console** — proving voice/text ingestion, opt-in adaptive semantic compression (up to 50% shorter optical bursts), ITU-R M.1677-1 timing, and non-blocking FreeRTOS LED keying.
+- **Phase 2 — Self-Contained Tactical Torch (`OPTIX-MK2`, Future Scope + Live 3D Digital Twin)**: Consolidates all processing into a single rugged 3D-printed handheld torch with zero phone or network dependency:
+  - **Onboard AI Compute**: **Raspberry Pi Compute Module 5 (CM5, 4GB RAM, 32GB eMMC, `55 × 40 mm`)** — chosen over Pi Zero 2 W (`512 MB RAM` cannot run local AI compression alongside STT) and standard Pi 5 (`85 × 56 mm` too bulky for a `52 mm` barrel) to run offline `whisper.cpp` (Speech-to-Text) + quantized `SmolLM2` / `Qwen2.5-0.5B` semantic compression locally.
+  - **Field Controls & Power**: 4 IP67 hardware buttons (`PTT Voice AI`, `TX Morse`, recessed crimson `SOS`, `MODE / Steady Beam`), live 1.3" OLED, `INMP441` I2S MEMS mic, 10W collimated LED (`1.5–3 km` night LOS), `2S1P 18650` battery pack (`25.9 Wh`), and **18W USB-C PD** fast charging.
+  - **Estimated Prototype BOM**: `~$118` (`~₹9,800`). Full subsystem architecture, pinout map, and BOM breakdown are documented in [ARCHITECTURE.md](ARCHITECTURE.md) and inspectable interactively in **`06. 3D Torch`** (including **Fullscreen Presentation Mode**).
 
 ---
 

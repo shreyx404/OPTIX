@@ -21,6 +21,10 @@ All notable changes to the **OPTIX Adaptive Semantic Optical Morse Communication
 - Enforced `>= 44px` touch targets, `22px` coarse-pointer slider thumbs, `touch-action: manipulation`, and `>= 16px` mobile input/select font size to prevent iOS Safari focus zoom.
 - Added horizontal `scroll-snap` header tabs with right-edge fade cue (`<= 1120px`), compact `176px` mobile diode dial, 2-column emergency tokens grid, non-overlapping mobile 3D Torch HUD, and safe toast positioning above the sticky bar.
 
+### Added — Phase 2 (`OPTIX-MK2`) 3D Torch Fullscreen Presentation Mode & Architecture Docs
+- Added **Fullscreen Presentation Mode** to `06. 3D Torch` (`FULLSCREEN` header button, HUD corner expand/compress toggle, native Fullscreen API + `.is-fullscreen` fallback, `Esc` exit, and automatic WebGL `ResizeObserver` rescaling) with a floating **Fullscreen Presentation Dock** (live clicked-part spec/BOM callout, synced Assembled/X-Ray/Exploded toggles, synced Explode slider, and `PTT Voice` / `TX Morse` / `SOS` / `Steady Beam` / `Exit` controls).
+- Documented the complete Phase 1 Benchtop PoC → Phase 2 **OPTIX-MK2 Self-Contained Tactical Torch** engineering roadmap, Raspberry Pi CM5 (`4GB RAM`, `32GB eMMC`, `55×40mm`) selection rationale, 9-subsystem architecture, GPIO/I2S/I2C/USB-C PD pinout map, battery/thermal safety safeguards, and `~$118` (`~₹9,800`) prototype BOM across [README.md](README.md), [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), [ARCHITECTURE.md](ARCHITECTURE.md), [PROTOCOL.md](PROTOCOL.md), [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md), and [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md).
+
 ### Added — System Documentation
 - Created [ARCHITECTURE.md](ARCHITECTURE.md), [PROTOCOL.md](PROTOCOL.md), [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md), and [CHANGELOG.md](CHANGELOG.md); updated [README.md](README.md), [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md).
 
