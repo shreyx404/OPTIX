@@ -1,0 +1,21 @@
+{
+  "name": "biotcp-optical-morse",
+  "version": "1.0.0",
+  "description": "Adaptive Semantic Morse-Based Optical Communication System - Mobile to ESP32 Web Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "morse-code",
+    "optical-communication",
+    "esp32",
+    "vlc",
+    "visible-light-communication",
+    "iot",
+    "emergency-communication"
+  ],
+  "author": "",
+  "license": "MIT"
+}

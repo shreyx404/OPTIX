@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local TLS certificates & keys
+*.pem
+*.key
+*.crt
+
+# Environment & secrets
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local AI agent tool configs
+.agent/
+.agents/
+.claude/
+.codex/
+.gemini/
