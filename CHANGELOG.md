@@ -4,6 +4,27 @@ All notable changes to the **OPTIX Adaptive Semantic Optical Morse Communication
 
 ---
 
+## [4.0.3] — 2026-11-19
+
+### Aligned — BIOT (Internet of Things) Subject Syllabus Mapping & Deck Refinement
+- **Presentation Renamed & Standardized**: Renamed `Copy of Presentation.pptx` to [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx), establishing clean, uniform academic deliverable naming alongside [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx).
+- **Curriculum Mapping (Slide 4)**: Aligned Slide 4 directly with the formal **BIOT (Internet of Things)** syllabus across all four units:
+  - **Unit I (Introduction to IoT)**: IoT definitions & characteristics (dynamic/self-adapting optical "Thing", unique MAC/IP addressing), 4-tier IoT Architecture (Perception, Network, Middleware, Application), physical & logical design (things, functional blocks, Request-Response model), and IoT vs M2M paradigm (point-to-point M2M serial/SoftAP telemetry vs scalable IP network integration).
+  - **Unit II (Microprocessor & Microcontroller)**: Microcontroller selection criteria for IoT applications (32-bit dual-core Xtensa ESP32 selected over legacy MCS-51 8051 for deterministic microsecond FreeRTOS keying, on-chip Wi-Fi & low power), 240 MHz Harvard SoC architecture, GPIO 2/4 digital port configuration & 220Ω protection, logic-level IRLZ44N MOSFET power switching, Harvard IRAM/DRAM execution, and external 4MB SPI Flash memory interfacing.
+  - **Unit III (IP-Based Protocols for IoT)**: RESTful IoT protocol (stateless HTTP/1.1 REST endpoints `/api/ping`, `/status`, `/transmit`, `/stop` with JSON schemas), protocol comparison (REST vs CoAP, MQTT, and AMQP for constrained links), IPv4 SoftAP (`192.168.4.1/24`) and IPv6-ready stack, WPA2-PSK SoftAP authentication, and CORS origin access control.
+  - **Unit IV (IoT Security and Privacy)**: Security challenges & threat surface (mitigating RF jamming/eavesdropping via optical PHY; input boundary validation), zero-cloud offline data privacy, local TLS encryption, and fail-safe GPIO emergency stop logic.
+- **Beyond Syllabus (Slide 5)**: Structured Slide 5 to showcase 6 advanced engineering accomplishments exceeding standard bachelor's coursework:
+  1. Visible Light Communication (VLC) physical layer & ITU-R M.1677-1 Morse standards (PARIS timing).
+  2. FreeRTOS preemptive dual-core multitasking on ESP32 Core 1 with microsecond-accurate timers (`vTaskDelayUntil`).
+  3. Adaptive Semantic Compression (NLP engine) with Huffman-Morse tokenization and strict negation preservation.
+  4. Advanced browser hardware APIs: driverless Web Serial (`navigator.serial` 115200 baud) and Web Speech/Audio APIs.
+  5. Monotonic drift-compensated timing engine (`performance.now()`) with real-time 60 FPS HTML5 Canvas oscilloscope.
+  6. Phase 2 OPTIX-MK2 tactical torch hardware architecture and Three.js WebGL interactive 3D CAD digital twin.
+- **Institutional Alignment**: Updated Slide 1 with `Course / Subject: BIOT (Internet of Things)`, refined Slide 2 Abstract & Slide 6 Final Outputs with edge IoT node classifications, and updated [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) cover page with the formal course title.
+- **System Documentation**: Synchronized all markdown documentation indexes across `README.md`, `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, `PROTOCOL.md`, `SECURITY_AND_SAFETY.md`, `HARDWARE_SETUP.md`, and `esp32_firmware/README_FIRMWARE.md`.
+
+---
+
 ## [4.0.2] — 2026-11-18
 
 ### Redesigned — Quiet Minimal / Swiss Purism Visual System
@@ -32,9 +53,11 @@ All notable changes to the **OPTIX Adaptive Semantic Optical Morse Communication
 - **Accessibility & Ergonomics**: Added `.skip-link`, consolidated into a single `<main>` landmark with WAI-ARIA `tablist`/`tab`/`tabpanel` + arrow-key navigation, restored `:focus-visible` rings on range sliders/inputs/selects, added `Space`/`Enter` keying on `#tapperKey`, `Ctrl/Cmd+Enter` IME-safe transmit, global `Esc` abort, keyboard oscilloscope pulse scrubbing, stacked accessible `#toastRegion` (`role="alert"`/`role="status"`), Manual Key `Backspace` + clickable `A–Z · 0–9` Morse reference chart, `localStorage` persistence of calibrated operator settings (`optix_wpm`, `optix_pitch`, `optix_repeat`, `optix_sound`), and `navigator.onLine` voice status.
 - **Performance**: Replaced static `torchDigitalTwin.js` import with lazy dynamic `import()` (`-711 KB` initial startup savings), cached oscilloscope dimensions via `ResizeObserver` + hoisted pulse gradients (eliminating 60fps `getBoundingClientRect()` layout thrashing), and switched pulse scheduling to `performance.now()` drift-compensated monotonic timing.
 
-### Added — System Documentation & Project Presentation
+### Added — System Documentation, Hardware Manual & Institutional Project Deliverables
+- Created [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx): Complete 20-page institutional project report structured with cover page, Table of Contents (Pages 1–16+), abstract, 7 concrete objectives, tools, 5-stage architecture pipeline, Table 1 system addressing/parameter specifications (18 rows), embedded FreeRTOS technologies, 9 implementation phases, Table 2 empirical test results (9 tests, 100% Pass), 11 high-resolution figures/captions, challenges & troubleshooting, and Phase 2 OPTIX-MK2 roadmap.
+- Created [HARDWARE_SETUP.md](HARDWARE_SETUP.md): Comprehensive operational manual covering ESP32 & breadboard wiring (standard 5mm LED and IRLZ44N MOSFET high-power stage), power-on self-test (POST), Arduino IDE flashing, Windows Firewall rules, all 6 connection methods (Laptop SoftAP/USB, Mobile Full Console/Standalone 192.168.4.1, Shared Router STA, Virtual Sim), REST/Serial API references, and pre-demo verification checklist.
+- Completed the 8-slide institutional project presentation deck ([OPTIX_Presentation.pptx](OPTIX_Presentation.pptx)) with OPTIX Abstract & KPIs, an editable native-vector Flow of Program pipeline diagram, Syllabus vs. Out-of-Syllabus technical breakdowns, live captured console outputs (`01. Transmit`, `03. Beacon`, `06. 3D Torch` X-Ray Digital Twin), and Phase 1 → Phase 2 (`OPTIX-MK2`) Conclusion roadmap, leaving student roster and guide fields blank for manual entry.
 - Created [ARCHITECTURE.md](ARCHITECTURE.md), [PROTOCOL.md](PROTOCOL.md), [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md), and [CHANGELOG.md](CHANGELOG.md); updated [README.md](README.md), [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md).
-- Completed the 8-slide institutional project presentation deck ([Copy of Presentation.pptx](Copy%20of%20Presentation.pptx)) with OPTIX Abstract & KPIs, an editable native-vector Flow of Program pipeline diagram, Syllabus vs. Out-of-Syllabus technical breakdowns, live captured console outputs (`01. Transmit`, `03. Beacon`, `06. 3D Torch` X-Ray Digital Twin), and Phase 1 → Phase 2 (`OPTIX-MK2`) Conclusion roadmap, leaving student roster and guide fields blank for manual entry.
 
 ---
 

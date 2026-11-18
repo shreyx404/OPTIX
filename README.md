@@ -17,8 +17,10 @@
 | [PROTOCOL.md](PROTOCOL.md) | ITU-R M.1677-1 timing math, semantic compression invariants, REST API, and UART protocol |
 | [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md) | WCAG 2.3.1 strobe safety gate, optical safety, HTTPS mic policy, and XSS/CORS boundaries |
 | [CHANGELOG.md](CHANGELOG.md) | Release history from v1.0 POC through v4.0.2 Quiet Minimal redesign |
+| [HARDWARE_SETUP.md](HARDWARE_SETUP.md) | Complete ESP32 & breadboard wiring, flashing, firewall, and laptop/mobile/USB/STA setup guide |
 | [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) | ESP32 wiring schematics, MOSFET driver circuit, flashing, and standalone SoftAP operation |
-| [Copy of Presentation.pptx](Copy%20of%20Presentation.pptx) | 8-slide project presentation deck (abstract, program flow, syllabus/beyond-syllabus topics, live UI outputs, and Phase 2 roadmap; student info blank) |
+| [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) | Complete 20-page institutional project report (cover page, abstract, objectives, network architecture, addressing, FreeRTOS firmware, 9 empirical tests, 11 figures, challenges, and Phase 2 roadmap; student details blank) |
+| [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) | 8-slide project presentation deck (abstract, program flow, BIOT syllabus Units I–IV mapping, beyond-syllabus topics, live UI outputs, and Phase 2 roadmap; student info blank) |
 
 ---
 
@@ -88,7 +90,9 @@ OPTIX/
 ├── PROTOCOL.md                       # Optical timing, compression & hardware wire protocol spec
 ├── SECURITY_AND_SAFETY.md            # Photosensitive strobe safety, optical & transport security
 ├── CHANGELOG.md                      # Version history
-└── Copy of Presentation.pptx         # 8-slide OPTIX project presentation deck (student details blank)
+├── HARDWARE_SETUP.md                 # Complete ESP32 & breadboard wiring, flashing, firewall & access guide
+├── Project_OPTIX_Report.docx         # Complete 20-page institutional project report (student details blank)
+└── OPTIX_Presentation.pptx          # 8-slide OPTIX project presentation deck (mapped to BIOT Units I–IV)
 ```
 
 ---

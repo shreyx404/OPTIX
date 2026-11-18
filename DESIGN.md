@@ -120,6 +120,8 @@ components:
 
 # Design System
 
+> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [HARDWARE_SETUP.md](HARDWARE_SETUP.md) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [ARCHITECTURE.md](ARCHITECTURE.md) · [PROTOCOL.md](PROTOCOL.md) · [PRODUCT.md](PRODUCT.md) · [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md)
+
 ## Overview & Philosophy
 
 **Quiet Minimal — Swiss Purism & Kenya Hara Inspired Optical Instrumentation.**
