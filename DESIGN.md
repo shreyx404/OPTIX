@@ -177,6 +177,13 @@ OPTIX translates Visible Light Communication (VLC) Morse transmission into a ser
 - **Touch Ergonomics (`@media (pointer: coarse)`)**: Minimum `44px` height on all interactive buttons, tabs, token chips, checkboxes, and icon controls; `22px` range slider thumbs; `touch-action: manipulation` to remove double-tap delay; and `>= 1rem` (`16px`) font-size on all mobile inputs and selects to prevent iOS Safari focus auto-zoom.
 - **Scrollable Header Tabs & Schematics**: Horizontal `scroll-snap` numbered navigation bar with right-edge fade cue (`<= 1120px`), compact `176px` optical diode dial (`<= 640px`), 2-column emergency tokens grid (1-column on `<= 390px`), horizontal-scroll signal routing schematic, and non-overlapping mobile 3D Torch HUD controls.
 
+## Accessibility, Keyboard & Motion Discipline
+
+- **Landmarks & Roving Navigation**: Single `<main id="mainWorkspace">` landmark, keyboard `.skip-link`, WAI-ARIA `tablist`/`tab`/`tabpanel` with `ArrowLeft`/`ArrowRight`/`Home`/`End` roving focus, and visible `:focus-visible` rings on all buttons, links, inputs, selects, and range sliders.
+- **Operator Keyboard Shortcuts**: `Ctrl/Cmd+Enter` transmits from `#textInput` (IME-safe); `Esc` aborts active transmission globally or closes & stops Fullscreen Beacon; `Space`/`Enter` keys `#tapperKey` and Optical Diode D1; `ArrowLeft`/`ArrowRight`/`Home`/`End`/`Enter` scrubs and seeks the TTL oscilloscope canvases.
+- **Reduced Motion & Strobe Safety**: `@media (prefers-reduced-motion: reduce)` removes decorative transforms/animations while preserving crisp state-change cues, and JS enforces the WCAG 2.3.1 fullscreen strobe safety gate (defaulting to **No Strobe** when reduced motion is active above `3 Hz`).
+- **Accessible Notifications**: Stacked `#toastRegion` uses `role="alert"` (dismissible errors) and `role="status"` (confirmations) with selectable text.
+
 ## Do's and Don'ts
 
 - **DO** preserve generous alabaster whitespace and `1px solid #e5e5e5` architectural dividers.

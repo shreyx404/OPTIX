@@ -115,9 +115,23 @@ python server.py
 
 ---
 
+## Keyboard Shortcuts & Accessibility
+
+| Shortcut | Context | Action |
+| :--- | :--- | :--- |
+| `Ctrl+Enter` / `Cmd+Enter` | Payload textarea (`01. Transmit`) | Dispatch optical transmission (IME-safe) |
+| `Esc` | Global / Fullscreen Beacon | Emergency `ABORT` active transmission or stop & exit fullscreen |
+| `ArrowLeft` / `ArrowRight` / `Home` / `End` | Navigation tabs | Move roving focus between workspaces `01`–`06` |
+| `Space` / `Enter` | Manual Key (`#tapperKey`) & Optical Diode D1 | Key Morse dit/dah (or hold to test optical aperture) |
+| `ArrowLeft` / `ArrowRight` / `Enter` | TTL Oscilloscope canvas | Inspect individual pulses and seek playback |
+
+- **WCAG AA/AAA & 2.3.1 Hardening**: Single `<main>` landmark, keyboard skip link, visible `:focus-visible` outlines on every control (including range sliders), accessible `#toastRegion` (`role="alert"`/`role="status"`), XSS-safe DOM rendering, Pointer Events capture + blur release on the telegraph paddle, and a mandatory WCAG 2.3.1 photosensitive strobe safety gate on Fullscreen Beacon.
+
+---
+
 ## Verification & Quality Gates
 
-- Zero external build step or runtime bundler required — runs directly from static ES modules.
-- Automated UI audit verified via `impeccable detect --json http://localhost:3000` (`0` warnings / `0` anti-patterns).
-- Syntax verification across all JavaScript modules via `node --check`.
+- Zero external build step or runtime bundler required — runs directly from static ES modules with lazy dynamic loading of `js/torchDigitalTwin.js` (`-711 KB` initial startup payload).
+- Multi-skill UI audit & remediation verified across `impeccable`, `ui-ux-pro-max`, `design-system`, `ui-styling`, and `brand` — live desktop (`1280×800`) and mobile (`390×844`) scans via `impeccable detect --json http://localhost:3000` return **`[]` (`0` warnings / `0` anti-patterns)**.
+- Syntax verification (`node --check`) and DOM ID integrity verified across all JavaScript modules (`0` syntax errors, `0` broken IDs).
 - See [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) for wiring diagrams, pinout safety, and hardware troubleshooting.

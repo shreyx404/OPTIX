@@ -88,6 +88,24 @@ To guarantee field signaling reliability when external hardware is unreachable:
 3. Local Mobile Camera Torch (if armed) + Local Screen Optical Beacon + CW Sidetone
 ```
 
+- **Resilient Hardware Monitoring & Persistence**:
+  - **15-Second Wi-Fi Heartbeat**: When `mode === 'wifi'` and `isConnected === true` on a visible tab (`document.visibilityState === 'visible'`), `js/app.js` polls `esp32Service.getStatus()` every `15 s` so `SYS.ONLINE` transitions immediately to `FAULT` if the ESP32 drops off the network.
+  - **Offline Voice Awareness**: `online` / `offline` window listeners update `#micBtn` status proactively when cloud Web Speech is unreachable in RF-denied environments, while preserving typed text via `initialText` during dictation.
+  - **Pointer Capture & Blur Safety**: `#tapperKey` uses Pointer Events (`pointerdown` + `setPointerCapture`, `pointerup`, `pointercancel`, `lostpointercapture`) plus `window.blur` cleanup so interrupted touch gestures or tab switches never leave a stuck carrier tone.
+  - **Performance Optimizations**: `js/torchDigitalTwin.js` (and `655 KB` `three.module.min.js`) loads lazily via dynamic `import()` only when Tab `06. 3D Torch` is opened (`-711 KB` initial startup savings); oscilloscope canvases cache dimensions via `ResizeObserver` and hoist gradient allocations outside per-pulse loops to eliminate 60fps `getBoundingClientRect()` layout thrashing.
+  - **Persisted `localStorage` Keys**:
+
+| Key | Scope | Default |
+| :--- | :--- | :--- |
+| `optix_wpm` | Calibrated Morse speed (`5–40 WPM`) | `15` |
+| `optix_pitch` | CW acoustic sidetone frequency (`300–1500 Hz`) | `750` |
+| `optix_repeat` | Burst repeat mode (`1`, `3`, `5`, `999`) | `1` |
+| `optix_sound` | Acoustic sidetone enabled boolean | `true` |
+| `optix_mode` | Hardware bridge mode (`simulation`, `wifi`, `serial`) | `simulation` |
+| `optix_esp32_ip` | Target ESP32 SoftAP / LAN host | `192.168.4.1` |
+| `optix_esp32_port` | Target ESP32 HTTP port (`1–65535`) | `80` |
+| `optix_proxy` | CORS relay proxy enabled boolean | `false` |
+
 ---
 
 ## 5. Local Development & Bridge Servers

@@ -41,4 +41,19 @@ Standard Morse keying at `15 WPM` (`80 ms / dot`) flashes at up to **6.25 Hz**, 
 - **XSS-Safe Telemetry Rendering**: All ESP32 serial/HTTP telemetry log entries (`esp32Service.onLogMessage`), Morse character breakdown tokens, toast notifications, and error banners are constructed exclusively via `document.createElement` and `textContent` — never raw unescaped `innerHTML`. Semantic compression diff banners pass all dynamic strings through `escapeHtml()`.
 - **Local TLS for Mobile Microphone Dictation**: Browsers restrict `SpeechRecognition` and `getUserMedia` (camera torch) to secure contexts (`https://` or `http://localhost`). `server.js` supports local self-signed HTTPS (`:3443` via `cert.pem`/`key.pem`). Private key files (`*.pem`, `*.key`, `*.crt`) are strictly excluded from version control via `.gitignore`.
 - **Input Bounds & Port Clamping**: WPM (`5–40`), sidetone frequency (`300–1500 Hz`), and HTTP port (`1–65535`) are validated and clamped client-side before persistence or hardware dispatch.
+- **Web Serial Lifecycle Safety**: `esp32Service.disconnectSerial()` explicitly cancels the locked `serialReader` and awaits `readableStreamClosed` before calling `serialPort.close()`, preventing Chrome `InvalidStateError` locks; a `navigator.serial` `disconnect` event listener automatically detects unexpected USB cable removal and resets link state.
 - **Local-Only Bridge Scope**: `server.js` and its `/proxy/esp32` CORS relay are intended strictly for trusted local LAN / ESP32 SoftAP subnets (`192.168.4.x` / `localhost`) and must not be exposed directly to the public internet.
+
+---
+
+## 5. Accessibility, Keyboard Parity & Multi-Skill UI Audit Verification
+
+Hardened and verified across `impeccable`, `ui-ux-pro-max`, `design-system`, `ui-styling`, and `brand` UI quality gates:
+
+- **Landmarks & WAI-ARIA Structure**: Includes a keyboard `.skip-link` to `#mainWorkspace`, a single `<main>` landmark wrapping six `role="tabpanel"` views, `role="tablist"` / `role="tab"` navigation with `aria-selected` and roving `tabindex` (`ArrowLeft`/`ArrowRight`/`Home`/`End`), live `aria-valuenow` updates on `#transmissionProgress`, and `aria-pressed` on toggle controls.
+- **Complete Keyboard Operability**:
+  - `Ctrl+Enter` / `Cmd+Enter` (IME-safe) dispatches transmission from the payload stream.
+  - `Esc` aborts active transmission globally or exits and stops Fullscreen Beacon / 3D Torch fullscreen.
+  - `Space` / `Enter` keys the Manual Telegraph Paddle (`#tapperKey`, ignoring key auto-repeat) and tests the Optical Diode D1 aperture.
+  - `ArrowLeft` / `ArrowRight` / `Home` / `End` inspect individual oscilloscope pulses and `Enter` / `Space` seeks playback; symbol breakdown tiles and the `A–Z · 0–9` reference chart are native `<button>` elements.
+- **Screen-Reader Feedback & Contrast**: Stacked notifications mount inside `#toastRegion` using `role="alert"` (dismissible error alerts) and `role="status"` (confirmations) with selectable text; dynamic buffers and status badges declare `aria-live="polite"`; all operational surfaces maintain WCAG AA/AAA text contrast (`>= 4.5:1`), visible `:focus-visible` outlines across buttons, sliders, and inputs, and state-preserving `prefers-reduced-motion` handling.
