@@ -26,9 +26,9 @@ All notable changes to the **OPTIX Adaptive Semantic Optical Morse Communication
 
 ## [4.0.3] — 2026-11-19
 
-### Aligned — BIOT (Internet of Things) Subject Syllabus Mapping & Deck Refinement
+### Aligned — BIOT (Basics of IoT) Subject Syllabus Mapping & Deck Refinement
 - **Presentation Renamed & Standardized**: Renamed `Copy of Presentation.pptx` to [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx), establishing clean, uniform academic deliverable naming alongside [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx).
-- **Curriculum Mapping (Slide 4)**: Aligned Slide 4 directly with the formal **BIOT (Internet of Things)** syllabus across all four units:
+- **Curriculum Mapping (Slide 4)**: Aligned Slide 4 directly with the formal **BIOT (Basics of IoT)** syllabus across all four units:
   - **Unit I (Introduction to IoT)**: IoT definitions & characteristics (dynamic/self-adapting optical "Thing", unique MAC/IP addressing), 4-tier IoT Architecture (Perception, Network, Middleware, Application), physical & logical design (things, functional blocks, Request-Response model), and IoT vs M2M paradigm (point-to-point M2M serial/SoftAP telemetry vs scalable IP network integration).
   - **Unit II (Microprocessor & Microcontroller)**: Microcontroller selection criteria for IoT applications (32-bit dual-core Xtensa ESP32 selected over legacy MCS-51 8051 for deterministic microsecond FreeRTOS keying, on-chip Wi-Fi & low power), 240 MHz Harvard SoC architecture, GPIO 2/4 digital port configuration & 220Ω protection, logic-level IRLZ44N MOSFET power switching, Harvard IRAM/DRAM execution, and external 4MB SPI Flash memory interfacing.
   - **Unit III (IP-Based Protocols for IoT)**: RESTful IoT protocol (stateless HTTP/1.1 REST endpoints `/api/ping`, `/status`, `/transmit`, `/stop` with JSON schemas), protocol comparison (REST vs CoAP, MQTT, and AMQP for constrained links), IPv4 SoftAP (`192.168.4.1/24`) and IPv6-ready stack, WPA2-PSK SoftAP authentication, and CORS origin access control.
@@ -40,7 +40,7 @@ All notable changes to the **OPTIX Adaptive Semantic Optical Morse Communication
   4. Advanced browser hardware APIs: driverless Web Serial (`navigator.serial` 115200 baud) and Web Speech/Audio APIs.
   5. Monotonic drift-compensated timing engine (`performance.now()`) with real-time 60 FPS HTML5 Canvas oscilloscope.
   6. Phase 2 OPTIX-MK2 tactical torch hardware architecture and Three.js WebGL interactive 3D CAD digital twin.
-- **Institutional Alignment**: Updated Slide 1 with `Course / Subject: BIOT (Internet of Things)`, refined Slide 2 Abstract & Slide 6 Final Outputs with edge IoT node classifications, and updated [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) cover page with the formal course title.
+- **Institutional Alignment**: Updated Slide 1 with `Course / Subject: BIOT (Basics of IoT)`, refined Slide 2 Abstract & Slide 6 Final Outputs with edge IoT node classifications, and updated [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) cover page with the formal course title.
 - **System Documentation**: Synchronized all markdown documentation indexes across `README.md`, `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, `PROTOCOL.md`, `SECURITY_AND_SAFETY.md`, `HARDWARE_SETUP.md`, and `esp32_firmware/README_FIRMWARE.md`.
 
 ---
