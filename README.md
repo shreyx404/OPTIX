@@ -20,7 +20,7 @@
 | [HARDWARE_SETUP.md](HARDWARE_SETUP.md) | Complete ESP32 & breadboard wiring, flashing, firewall, and laptop/mobile/USB/STA setup guide |
 | [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) | ESP32 wiring schematics, MOSFET driver circuit, flashing, and standalone SoftAP operation |
 | [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) | Complete 20-page institutional project report (cover page, abstract, objectives, network architecture, addressing, FreeRTOS firmware, 9 empirical tests, 11 figures, challenges, and Phase 2 roadmap; student details blank) |
-| [Project_OPTIX_BIOT_Report.docx](Project_OPTIX_BIOT_Report.docx) | Comprehensive 32-page formal Building Internet of Things (BIOT) course project report formatted to official university guidelines (Cover page, Certificate, Synopsis, Acknowledgement, Abstract, Table of Contents, Chapters 1–8, References, and all 11 empirical figures; student info blank) |
+| [Project_OPTIX_BIOT_Report.docx](Project_OPTIX_BIOT_Report.docx) | Comprehensive 32-page formal Basics of IoT (BIOT) course project report formatted to official university guidelines (Cover page, Certificate, Synopsis, Acknowledgement, Abstract, Table of Contents, Chapters 1–8, References, and all 11 empirical figures; student info blank) |
 | [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) | 8-slide project presentation deck (abstract, program flow, BIOT syllabus Units I–IV mapping, beyond-syllabus topics, live UI outputs, and Phase 2 roadmap; student info blank) |
 
 ---
