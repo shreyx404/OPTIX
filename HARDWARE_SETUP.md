@@ -2,7 +2,7 @@
 
 This document is the complete, end-to-end operational manual for assembling, flashing, configuring, and controlling the **OPTIX Phase 1 ESP32 Optical Transmitter** across **Laptop (Wi-Fi & USB)**, **Mobile Phone (Full Console & Standalone Offline Portal)**, and **Home/Lab Router Networks**.
 
-> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [Project_OPTIX_DCN_Report.docx](Project_OPTIX_DCN_Report.docx) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [ARCHITECTURE.md](ARCHITECTURE.md) · [PROTOCOL.md](PROTOCOL.md) · [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md) · [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) · [esp32_firmware/esp32_firmware.ino](esp32_firmware/esp32_firmware.ino)
+> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [Project_OPTIX_BIOT_Report.docx](Project_OPTIX_BIOT_Report.docx) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [ARCHITECTURE.md](ARCHITECTURE.md) · [PROTOCOL.md](PROTOCOL.md) · [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md) · [esp32_firmware/README_FIRMWARE.md](esp32_firmware/README_FIRMWARE.md) · [esp32_firmware/esp32_firmware.ino](esp32_firmware/esp32_firmware.ino)
 
 ---
 

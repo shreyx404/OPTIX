@@ -2,7 +2,7 @@
 
 This document details the runtime architecture, client ES module graph, optical timing state machine, hardware transport layers, and Phase 1 → Phase 2 hardware evolution of **OPTIX**.
 
-> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [Project_OPTIX_DCN_Report.docx](Project_OPTIX_DCN_Report.docx) · [HARDWARE_SETUP.md](HARDWARE_SETUP.md) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [PROTOCOL.md](PROTOCOL.md) · [PRODUCT.md](PRODUCT.md) · [DESIGN.md](DESIGN.md) · [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md)
+> **Related Documentation:** [README.md](README.md) · [Project_OPTIX_Report.docx](Project_OPTIX_Report.docx) · [Project_OPTIX_BIOT_Report.docx](Project_OPTIX_BIOT_Report.docx) · [HARDWARE_SETUP.md](HARDWARE_SETUP.md) · [OPTIX_Presentation.pptx](OPTIX_Presentation.pptx) · [PROTOCOL.md](PROTOCOL.md) · [PRODUCT.md](PRODUCT.md) · [DESIGN.md](DESIGN.md) · [SECURITY_AND_SAFETY.md](SECURITY_AND_SAFETY.md)
 
 ---
 

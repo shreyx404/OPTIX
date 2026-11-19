@@ -2,7 +2,7 @@
 
 This document describes how to flash, wire, and operate the **ESP32 Optical Transmitter** node for the **OPTIX Optical Communication System**.
 
-> **Related Documentation:** [README.md](../README.md) · [HARDWARE_SETUP.md](../HARDWARE_SETUP.md) · [Project_OPTIX_Report.docx](../Project_OPTIX_Report.docx) · [Project_OPTIX_DCN_Report.docx](../Project_OPTIX_DCN_Report.docx) · [OPTIX_Presentation.pptx](../OPTIX_Presentation.pptx) · [ARCHITECTURE.md](../ARCHITECTURE.md) · [PROTOCOL.md](../PROTOCOL.md) · [SECURITY_AND_SAFETY.md](../SECURITY_AND_SAFETY.md)
+> **Related Documentation:** [README.md](../README.md) · [HARDWARE_SETUP.md](../HARDWARE_SETUP.md) · [Project_OPTIX_Report.docx](../Project_OPTIX_Report.docx) · [Project_OPTIX_BIOT_Report.docx](../Project_OPTIX_BIOT_Report.docx) · [OPTIX_Presentation.pptx](../OPTIX_Presentation.pptx) · [ARCHITECTURE.md](../ARCHITECTURE.md) · [PROTOCOL.md](../PROTOCOL.md) · [SECURITY_AND_SAFETY.md](../SECURITY_AND_SAFETY.md)
 
 ---
 
